@@ -2,8 +2,8 @@
 
 ## Specs
 
-Frontend: React with TypeScript
-Backend: NodeJS with Express
+-   Frontend: React with TypeScript
+-   Backend: NodeJS with Express
 
 ## Installation
 
