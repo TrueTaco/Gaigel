@@ -1,4 +1,9 @@
-# Template for React TypeScript Frontend with Express NodeJS Backend
+# Gaigel
+
+## Specs
+
+Frontend: React with TypeScript
+Backend: NodeJS with Express
 
 ## Installation
 
