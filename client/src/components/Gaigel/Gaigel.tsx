@@ -22,33 +22,23 @@ interface CardProps {
 
 const Gaigel: React.FC<Props> = () => {
     const classes = useStyles();
+    const [playerCount, setPlayerCount] = useState<number>(4);
+    const [fieldCards, setFieldCards] = useState<CardProps[]>([
+        { type: "Herz", value: "Unter" },
+        { type: "Eichel", value: "Sieben" },
+    ]);
     const [userCards, setUserCards] = useState<CardProps[]>([
-        {
-            type: "Herz",
-            value: "Ass",
-        },
-        {
-            type: "Bollen",
-            value: "Sieben",
-        },
-        {
-            type: "Eichel",
-            value: "König",
-        },
-        {
-            type: "Herz",
-            value: "Ober",
-        },
-        {
-            type: "Blatt",
-            value: "Zehn",
-        },
+        { type: "Herz", value: "Ass" },
+        { type: "Bollen", value: "Sieben" },
+        { type: "Eichel", value: "König" },
+        { type: "Herz", value: "Ober" },
+        { type: "Blatt", value: "Zehn" },
     ]);
 
     return (
         <Grid className={classes.root} justifyContent="center" container>
             <Talon />
-            <PlayingField fieldCards={userCards} />
+            <PlayingField fieldCards={fieldCards} playerCount={playerCount} />
             <UserCards userCards={userCards} />
         </Grid>
     );

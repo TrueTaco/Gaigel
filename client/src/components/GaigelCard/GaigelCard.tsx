@@ -31,6 +31,7 @@ const GaigelCard: React.FC<Props> = ({ type, value, clickable }) => {
     return (
         <Paper
             className={classes.root}
+            style={{ border: type === "" ? "1px dashed lightgrey" : "" }}
             onClick={() => {
                 if (clickable) console.log(type + " " + value + " legen");
             }}
