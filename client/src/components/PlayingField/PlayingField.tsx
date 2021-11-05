@@ -1,16 +1,16 @@
-import { useState } from "react";
-
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 
 import GaigelCard from "../../components/GaigelCard/GaigelCard";
 
 const useStyles = makeStyles({
-    root: {},
+    root: {
+        margin: 30,
+    },
 });
 
 interface Props {
-    userCards: CardProps[];
+    fieldCards: CardProps[];
 }
 
 interface CardProps {
@@ -18,18 +18,17 @@ interface CardProps {
     value: string;
 }
 
-const UserCards: React.FC<Props> = ({ userCards }) => {
+const PlayingField: React.FC<Props> = ({ fieldCards }) => {
     const classes = useStyles();
-    const [cards, setCards] = useState<CardProps[]>(userCards);
     let i: number = 0;
 
     return (
         <Grid className={classes.root} container spacing={2} justifyContent="center">
-            {cards.map((card) => {
+            {fieldCards.map((card) => {
                 i++;
                 return (
                     <Grid item key={i}>
-                        <GaigelCard type={card.type} value={card.value} clickable={true} />
+                        <GaigelCard type={card.type} value={card.value} clickable={false} />
                     </Grid>
                 );
             })}
@@ -37,4 +36,4 @@ const UserCards: React.FC<Props> = ({ userCards }) => {
     );
 };
 
-export default UserCards;
+export default PlayingField;

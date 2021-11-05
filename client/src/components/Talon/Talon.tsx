@@ -26,7 +26,12 @@ const Talon: React.FC<Props> = () => {
     const classes = useStyles();
 
     return (
-        <Grid item>
+        <Grid
+            item
+            onClick={() => {
+                console.log("Karte ziehen");
+            }}
+        >
             <CardActionArea className={classes.cardActionArea}>
                 <Paper className={classes.paper}>
                     <Typography align="center">Talon Rückseite</Typography>

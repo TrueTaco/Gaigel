@@ -22,14 +22,23 @@ const useStyles = makeStyles({
 interface Props {
     type: string;
     value: string;
+    clickable: boolean;
 }
 
-const GaigelCard: React.FC<Props> = ({ type, value }) => {
+const GaigelCard: React.FC<Props> = ({ type, value, clickable }) => {
     const classes = useStyles();
 
     return (
-        <Paper className={classes.root} onClick={() => console.log(type + value)}>
-            <CardActionArea className={classes.cardActionArea}>
+        <Paper
+            className={classes.root}
+            onClick={() => {
+                if (clickable) console.log(type + " " + value + " legen");
+            }}
+        >
+            <CardActionArea
+                className={classes.cardActionArea}
+                style={{ pointerEvents: clickable ? "auto" : "none" }}
+            >
                 <Box>
                     <Typography>{type}</Typography>
                     <Typography>{value}</Typography>
