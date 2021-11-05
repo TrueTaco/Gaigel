@@ -2,6 +2,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
+import CardActionArea from "@material-ui/core/CardActionArea";
 
 const useStyles = makeStyles({
     root: {
@@ -10,6 +11,11 @@ const useStyles = makeStyles({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+    },
+    cardActionArea: {
+        height: "100%",
+        width: "100%",
+        display: "flex",
     },
 });
 
@@ -23,10 +29,12 @@ const GaigelCard: React.FC<Props> = ({ type, value }) => {
 
     return (
         <Paper className={classes.root} onClick={() => console.log(type + value)}>
-            <Box>
-                <Typography>{type}</Typography>
-                <Typography>{value}</Typography>
-            </Box>
+            <CardActionArea className={classes.cardActionArea}>
+                <Box>
+                    <Typography>{type}</Typography>
+                    <Typography>{value}</Typography>
+                </Box>
+            </CardActionArea>
         </Paper>
     );
 };

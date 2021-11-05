@@ -8,6 +8,7 @@ import GaigelCard from "../../components/GaigelCard/GaigelCard";
 const useStyles = makeStyles({
     root: {
         margin: 10,
+        marginTop: 150,
     },
 });
 
