@@ -1,13 +1,11 @@
 import Box from "@material-ui/core/Box";
 
-import ExampleComponent from "./components/ExampleComponent/ExampleComponent";
+import Gaigel from "./components/Gaigel/Gaigel";
 
 const App: React.FC = () => {
     return (
         <Box>
-            <ExampleComponent />
-            <ExampleComponent text="Hello" />
-            <ExampleComponent text="Beep" />
+            <Gaigel />
         </Box>
     );
 };
