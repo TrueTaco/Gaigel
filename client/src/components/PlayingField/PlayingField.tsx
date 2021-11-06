@@ -35,9 +35,6 @@ const PlayingField: React.FC<Props> = ({ fieldCards, playerCount }) => {
             tempCards.push({ type: "", value: "" });
         }
         setCards(tempCards);
-        console.log(tempCards);
-        console.log(fieldCards);
-        console.log("K");
     }, [fieldCards, playerCount]);
 
     return (

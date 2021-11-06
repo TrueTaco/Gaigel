@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 
@@ -11,6 +9,7 @@ const useStyles = makeStyles({
 
 interface Props {
     userCards: CardProps[];
+    playCard: (type: string, value: string) => void;
 }
 
 interface CardProps {
@@ -18,18 +17,22 @@ interface CardProps {
     value: string;
 }
 
-const UserCards: React.FC<Props> = ({ userCards }) => {
+const UserCards: React.FC<Props> = ({ userCards, playCard }) => {
     const classes = useStyles();
-    const [cards, setCards] = useState<CardProps[]>(userCards);
     let i: number = 0;
 
     return (
         <Grid className={classes.root} container spacing={2} justifyContent="center">
-            {cards.map((card) => {
+            {userCards.map((card) => {
                 i++;
                 return (
                     <Grid item key={i}>
-                        <GaigelCard type={card.type} value={card.value} clickable={true} />
+                        <GaigelCard
+                            type={card.type}
+                            value={card.value}
+                            clickable={true}
+                            playCard={playCard}
+                        />
                     </Grid>
                 );
             })}

@@ -23,9 +23,10 @@ interface Props {
     type: string;
     value: string;
     clickable: boolean;
+    playCard?: (type: string, value: string) => void;
 }
 
-const GaigelCard: React.FC<Props> = ({ type, value, clickable }) => {
+const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard }) => {
     const classes = useStyles();
 
     return (
@@ -33,7 +34,7 @@ const GaigelCard: React.FC<Props> = ({ type, value, clickable }) => {
             className={classes.root}
             style={{ border: type === "" ? "1px dashed lightgrey" : "" }}
             onClick={() => {
-                if (clickable) console.log(type + " " + value + " legen");
+                if (clickable && typeof playCard !== "undefined") playCard(type, value);
             }}
         >
             <CardActionArea

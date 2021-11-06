@@ -35,11 +35,17 @@ const Gaigel: React.FC<Props> = () => {
         { type: "Blatt", value: "Zehn" },
     ]);
 
+    const playCard = (type: string, value: string) => {
+        console.log(type + " " + value + " wurde gelegt");
+        setUserCards(userCards.filter((card) => !(card.type === type && card.value === value)));
+        console.log(userCards);
+    };
+
     return (
         <Grid className={classes.root} justifyContent="center" container>
             <Talon />
             <PlayingField fieldCards={fieldCards} playerCount={playerCount} />
-            <UserCards userCards={userCards} />
+            <UserCards userCards={userCards} playCard={playCard} />
         </Grid>
     );
 };
