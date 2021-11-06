@@ -20,21 +20,23 @@ const useStyles = makeStyles({
     },
 });
 
-interface Props {}
+interface Props {
+    drawCard: () => void;
+}
 
-const Talon: React.FC<Props> = () => {
+const Talon: React.FC<Props> = ({ drawCard }) => {
     const classes = useStyles();
 
     return (
         <Grid
             item
             onClick={() => {
-                console.log("Karte ziehen");
+                drawCard();
             }}
         >
             <CardActionArea className={classes.cardActionArea}>
                 <Paper className={classes.paper}>
-                    <Typography align="center">Talon Rückseite</Typography>
+                    <Typography align="center">Talon</Typography>
                 </Paper>
             </CardActionArea>
         </Grid>

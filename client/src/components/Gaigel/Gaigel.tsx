@@ -22,11 +22,20 @@ interface CardProps {
 
 const Gaigel: React.FC<Props> = () => {
     const classes = useStyles();
+
+    // Amount of players that are currently playing
     const [playerCount, setPlayerCount] = useState<number>(4);
-    const [fieldCards, setFieldCards] = useState<CardProps[]>([
+
+    // The cards that can still be drawn from the talon
+    const [talonCards, setTalonCards] = useState<CardProps[]>();
+
+    // The cards that are currently being played
+    const [playedCards, setPlayedCards] = useState<CardProps[]>([
         { type: "Herz", value: "Unter" },
         { type: "Eichel", value: "Sieben" },
     ]);
+
+    // The cards that the user currently has
     const [userCards, setUserCards] = useState<CardProps[]>([
         { type: "Herz", value: "Ass" },
         { type: "Bollen", value: "Sieben" },
@@ -36,15 +45,29 @@ const Gaigel: React.FC<Props> = () => {
     ]);
 
     const playCard = (type: string, value: string) => {
-        console.log(type + " " + value + " wurde gelegt");
-        setUserCards(userCards.filter((card) => !(card.type === type && card.value === value)));
-        console.log(userCards);
+        // The array of played cars is filled up with empty entries in order to make empty GaigelCards
+        // For some reason those also append to playedCards
+        // Therefore they need to be filtered out
+        let actualPlayedCards: CardProps[] = playedCards.filter(
+            (card) => card.type !== "" && card.value !== ""
+        );
+        if (actualPlayedCards.length < playerCount) {
+            setUserCards(userCards.filter((card) => !(card.type === type && card.value === value)));
+            setPlayedCards(() => [...actualPlayedCards, { type: type, value: value }]);
+        }
+    };
+
+    const drawCard = () => {
+        console.log(playedCards);
+        if (userCards.length < 5) {
+            setUserCards((userCards) => [...userCards, { type: "Blatt", value: "Ass" }]);
+        }
     };
 
     return (
         <Grid className={classes.root} justifyContent="center" container>
-            <Talon />
-            <PlayingField fieldCards={fieldCards} playerCount={playerCount} />
+            <Talon drawCard={drawCard} />
+            <PlayingField playedCards={playedCards} playerCount={playerCount} />
             <UserCards userCards={userCards} playCard={playCard} />
         </Grid>
     );

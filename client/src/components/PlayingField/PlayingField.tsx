@@ -12,7 +12,7 @@ const useStyles = makeStyles({
 });
 
 interface Props {
-    fieldCards: CardProps[];
+    playedCards: CardProps[];
     playerCount: number;
 }
 
@@ -21,7 +21,7 @@ interface CardProps {
     value: string;
 }
 
-const PlayingField: React.FC<Props> = ({ fieldCards, playerCount }) => {
+const PlayingField: React.FC<Props> = ({ playedCards, playerCount }) => {
     const classes = useStyles();
     let i: number = 0;
 
@@ -30,12 +30,12 @@ const PlayingField: React.FC<Props> = ({ fieldCards, playerCount }) => {
     );
 
     useEffect(() => {
-        let tempCards: CardProps[] = fieldCards;
-        for (let i = fieldCards.length; i < playerCount; i++) {
+        let tempCards: CardProps[] = playedCards;
+        for (let i = playedCards.length; i < playerCount; i++) {
             tempCards.push({ type: "", value: "" });
         }
         setCards(tempCards);
-    }, [fieldCards, playerCount]);
+    }, [playedCards, playerCount]);
 
     return (
         <Grid className={classes.root} container spacing={2} justifyContent="center">
