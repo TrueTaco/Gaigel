@@ -36,7 +36,9 @@ const Talon: React.FC<Props> = ({ drawCard }) => {
         >
             <CardActionArea className={classes.cardActionArea}>
                 <Paper className={classes.paper}>
-                    <Typography align="center">Talon</Typography>
+                    <Typography variant="h1" align="center">
+                        🃏
+                    </Typography>
                 </Paper>
             </CardActionArea>
         </Grid>

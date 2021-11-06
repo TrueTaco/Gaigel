@@ -24,24 +24,24 @@ const Gaigel: React.FC<Props> = () => {
     const classes = useStyles();
 
     // Amount of players that are currently playing
-    const [playerCount, setPlayerCount] = useState<number>(4);
+    const [playerCount, setPlayerCount] = useState<number>(3);
 
     // The cards that can still be drawn from the talon
     const [talonCards, setTalonCards] = useState<CardProps[]>();
 
     // The cards that are currently being played
     const [playedCards, setPlayedCards] = useState<CardProps[]>([
-        { type: "Herz", value: "Unter" },
-        { type: "Eichel", value: "Sieben" },
+        { type: "Herz", value: "U" },
+        { type: "Eichel", value: "7" },
     ]);
 
     // The cards that the user currently has
     const [userCards, setUserCards] = useState<CardProps[]>([
-        { type: "Herz", value: "Ass" },
-        { type: "Bollen", value: "Sieben" },
-        { type: "Eichel", value: "König" },
-        { type: "Herz", value: "Ober" },
-        { type: "Blatt", value: "Zehn" },
+        { type: "Herz", value: "A" },
+        { type: "Schellen", value: "7" },
+        { type: "Eichel", value: "K" },
+        { type: "Herz", value: "O" },
+        { type: "Blatt", value: "10" },
     ]);
 
     const playCard = (type: string, value: string) => {
@@ -60,7 +60,7 @@ const Gaigel: React.FC<Props> = () => {
     const drawCard = () => {
         console.log(playedCards);
         if (userCards.length < 5) {
-            setUserCards((userCards) => [...userCards, { type: "Blatt", value: "Ass" }]);
+            setUserCards((userCards) => [...userCards, { type: "Blatt", value: "A" }]);
         }
     };
 

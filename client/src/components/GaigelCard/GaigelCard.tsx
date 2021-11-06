@@ -26,8 +26,21 @@ interface Props {
     playCard?: (type: string, value: string) => void;
 }
 
+interface Hash {
+    [details: string]: string;
+}
+
 const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard }) => {
     const classes = useStyles();
+    const symbolMap: Hash = {};
+    symbolMap["Eichel"] = "♣️";
+    symbolMap["Eichel2"] = "♧";
+    symbolMap["Blatt"] = "♠️";
+    symbolMap["Blatt2"] = "♤";
+    symbolMap["Herz"] = "♥️";
+    symbolMap["Herz2"] = "♡";
+    symbolMap["Schellen"] = "♦️";
+    symbolMap["Schellen2"] = "♢";
 
     return (
         <Paper
@@ -42,8 +55,15 @@ const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard }) => {
                 style={{ pointerEvents: clickable ? "auto" : "none" }}
             >
                 <Box>
-                    <Typography>{type}</Typography>
-                    <Typography>{value}</Typography>
+                    <Typography align="center">
+                        {symbolMap[type + "2"]}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        {symbolMap[type]}
+                    </Typography>
+                    <Typography align="center">{value}</Typography>
+                    <Typography align="center">
+                        {symbolMap[type]}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        {symbolMap[type + "2"]}
+                    </Typography>
                 </Box>
             </CardActionArea>
         </Paper>
