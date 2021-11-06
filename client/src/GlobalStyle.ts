@@ -26,7 +26,7 @@ const GlobalStyle = createGlobalStyle`
 
    /* This is here to make my eyes hurt less at night */
    body{
-      background-color: #292929;
+      /* background-color: #292929; */
    }
 
    /* html {
