@@ -26,7 +26,7 @@ const Gaigel: React.FC<Props> = () => {
     const classes = useStyles();
 
     // Amount of players that are currently playing
-    const [playerCount, setPlayerCount] = useState<number>(3);
+    const [playerCount, setPlayerCount] = useState<number>(4);
 
     // The cards that can still be drawn from the talon
     const [talonCards, setTalonCards] = useState<CardProps[]>([
@@ -58,7 +58,11 @@ const Gaigel: React.FC<Props> = () => {
             (card) => card.type !== "" && card.value !== ""
         );
         if (actualPlayedCards.length < playerCount) {
-            setUserCards(userCards.filter((card) => !(card.type === type && card.value === value)));
+            let playedCardIndex: number = userCards.findIndex((card) => {
+                return card.type === type && card.value === value;
+            });
+            setUserCards(userCards.filter((card, index) => index !== playedCardIndex));
+
             setPlayedCards(() => [...actualPlayedCards, { type: type, value: value }]);
         }
     };
@@ -70,7 +74,7 @@ const Gaigel: React.FC<Props> = () => {
     };
 
     useEffect(() => {
-        console.log("HE");
+        console.log("UseEffect was called");
     }, []);
 
     return (
