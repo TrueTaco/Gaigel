@@ -6,7 +6,7 @@ import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 
 import Talon from "../../components/Talon/Talon";
-import GaigelCard from "../../components/GaigelCard/GaigelCard";
+import TrumpCard from "../../components/TrumpCard/TrumpCard";
 import PlayingField from "../../components/PlayingField/PlayingField";
 import UserCards from "../../components/UserCards/UserCards";
 import { forEachTrailingCommentRange } from "typescript";
@@ -91,9 +91,8 @@ const Gaigel: React.FC<Props> = () => {
     };
 
     const createTalon = () => {
-        // let types: string[] = ["Eichel", "Blatt", "Herz", "Schellen"];
-        let types: string[] = ["Eichel"];
-        // let values: string[] = ["7", "U", "O", "K", "10", "A"];
+        let types: string[] = ["Eichel", "Blatt", "Herz", "Schellen"];
+        // let types: string[] = ["Eichel"];
         let values: string[] = ["7", "U", "O", "K", "10", "A"];
         let newTalon: CardProps[] = [];
 
@@ -150,20 +149,9 @@ const Gaigel: React.FC<Props> = () => {
             alignContent="space-around"
             container
         >
-            <Grid container>
-                <Button
-                    variant="contained"
-                    onClick={() => {
-                        drawCard(3);
-                    }}
-                >
-                    Ziehen
-                </Button>
-            </Grid>
-
             <Grid justifyContent="center" alignItems="center" container>
                 <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
-                <GaigelCard type={trumpCard.type} value={trumpCard.value} clickable={false} />
+                <TrumpCard trumpCard={trumpCard} />
             </Grid>
 
             <PlayingField playedCards={playedCards} playerCount={playerCount} />
