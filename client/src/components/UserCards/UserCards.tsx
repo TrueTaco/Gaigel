@@ -1,10 +1,16 @@
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
 
 import GaigelCard from "../../components/GaigelCard/GaigelCard";
 
 const useStyles = makeStyles({
-    root: {},
+    root: {
+        marginTop: 100,
+    },
+    header: {
+        marginBottom: 10,
+    },
 });
 
 interface Props {
@@ -22,20 +28,24 @@ const UserCards: React.FC<Props> = ({ userCards, playCard }) => {
     let i: number = 0;
 
     return (
-        <Grid className={classes.root} container spacing={2} justifyContent="center">
-            {userCards.map((card) => {
-                i++;
-                return (
-                    <Grid item key={i}>
-                        <GaigelCard
-                            type={card.type}
-                            value={card.value}
-                            clickable={true}
-                            playCard={playCard}
-                        />
-                    </Grid>
-                );
-            })}
+        <Grid container className={classes.root} justifyContent="center">
+            <Typography className={classes.header}>Your cards:</Typography>
+
+            <Grid container spacing={2} justifyContent="center">
+                {userCards.map((card) => {
+                    i++;
+                    return (
+                        <Grid item key={i}>
+                            <GaigelCard
+                                type={card.type}
+                                value={card.value}
+                                clickable={true}
+                                playCard={playCard}
+                            />
+                        </Grid>
+                    );
+                })}
+            </Grid>
         </Grid>
     );
 };
