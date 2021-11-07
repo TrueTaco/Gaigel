@@ -29,10 +29,9 @@ const Gaigel: React.FC<Props> = () => {
     const [playerCount, setPlayerCount] = useState<number>(4);
 
     // The cards that can still be drawn from the talon
-    const [talonCards, setTalonCards] = useState<CardProps[]>([
-        { type: "Herz", value: "U" },
-        { type: "Eichel", value: "7" },
-    ]);
+    const [talonCards, setTalonCards] = useState<CardProps[]>(
+        new Array(48).fill({ type: "", value: "" })
+    );
 
     // The cards that are currently being played
     const [playedCards, setPlayedCards] = useState<CardProps[]>([
@@ -71,10 +70,38 @@ const Gaigel: React.FC<Props> = () => {
         if (userCards.length < 5) {
             setUserCards((userCards) => [...userCards, { type: "Blatt", value: "A" }]);
         }
+        console.log(talonCards);
+    };
+
+    const createTalon = () => {
+        let types: string[] = ["Eichel", "Blatt", "Herz", "Schellen"];
+        let values: string[] = ["7", "U", "O", "K", "10", "A"];
+        let newTalon: CardProps[] = [];
+
+        types.forEach((type) =>
+            values.forEach((value) => {
+                newTalon.push({ type: type, value: value });
+            })
+        );
+
+        newTalon.push(...newTalon);
+        fisherYatesShuffle(newTalon);
+
+        setTalonCards(newTalon);
+    };
+
+    // Reliable shuffling algorithm
+    // Source: https://www.delftstack.com/de/howto/javascript/shuffle-array-javascript/
+    const fisherYatesShuffle = (arr: CardProps[]) => {
+        for (let i = arr.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
     };
 
     useEffect(() => {
         console.log("UseEffect was called");
+        createTalon();
     }, []);
 
     return (
