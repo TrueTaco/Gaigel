@@ -6,6 +6,7 @@ import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 
 import Talon from "../../components/Talon/Talon";
+import GaigelCard from "../../components/GaigelCard/GaigelCard";
 import PlayingField from "../../components/PlayingField/PlayingField";
 import UserCards from "../../components/UserCards/UserCards";
 import { forEachTrailingCommentRange } from "typescript";
@@ -34,6 +35,9 @@ const Gaigel: React.FC<Props> = () => {
     const [talonCards, setTalonCards] = useState<CardProps[]>(
         new Array(0).fill({ type: "", value: "" })
     );
+
+    // The trump card
+    const [trumpCard, setTrumpCard] = useState<CardProps>({ type: "", value: "" });
 
     // The cards that are currently being played
     const [playedCards, setPlayedCards] = useState<CardProps[]>([
@@ -65,7 +69,6 @@ const Gaigel: React.FC<Props> = () => {
 
     const drawCard = (amount: number) => {
         if (userCards.length < 5 && talonCards.length > 0) {
-            console.log("DRAW");
             // Gets last cards of the talon array and removes them
             let drawnCards: CardProps[] = talonCards.slice(talonCards.length - amount);
             setTalonCards(talonCards.slice(0, talonCards.length - amount));
@@ -78,6 +81,13 @@ const Gaigel: React.FC<Props> = () => {
             // Gives drawn cards to player
             setUserCards(newUserCards);
         }
+    };
+
+    const chooseTrumpCard = () => {
+        let newTrumpCard: CardProps = talonCards[talonCards.length - 1];
+        setTalonCards(talonCards.slice(0, talonCards.length - 1));
+
+        setTrumpCard(newTrumpCard);
     };
 
     const createTalon = () => {
@@ -108,10 +118,30 @@ const Gaigel: React.FC<Props> = () => {
         }
     };
 
+    const handOutCards = () => {
+        if (userCards.length === 0) {
+            drawCard(3);
+            return;
+        }
+        if (trumpCard.value === "") {
+            chooseTrumpCard();
+            return;
+        }
+        if (userCards.length === 3) {
+            drawCard(2);
+            return;
+        }
+    };
+
     useEffect(() => {
-        console.log("UseEffect was called");
+        console.log("UseEffect 1 was called");
         createTalon();
     }, []);
+
+    useEffect(() => {
+        console.log("UseEffect 2 was called");
+        handOutCards();
+    }, [talonCards]);
 
     return (
         <Grid
@@ -120,7 +150,7 @@ const Gaigel: React.FC<Props> = () => {
             alignContent="space-around"
             container
         >
-            <Grid item>
+            <Grid container>
                 <Button
                     variant="contained"
                     onClick={() => {
@@ -131,7 +161,11 @@ const Gaigel: React.FC<Props> = () => {
                 </Button>
             </Grid>
 
-            <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
+            <Grid justifyContent="center" alignItems="center" container>
+                <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
+                <GaigelCard type={trumpCard.type} value={trumpCard.value} clickable={false} />
+            </Grid>
+
             <PlayingField playedCards={playedCards} playerCount={playerCount} />
             <UserCards userCards={userCards} playCard={playCard} />
         </Grid>
