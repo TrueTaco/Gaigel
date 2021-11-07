@@ -4,6 +4,8 @@ import Paper from "@material-ui/core/Paper";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import Typography from "@material-ui/core/Typography";
 
+import GaigelCard from "../../components/GaigelCard/GaigelCard";
+
 const useStyles = makeStyles({
     root: {
         display: "flex",
@@ -25,11 +27,14 @@ const useStyles = makeStyles({
     counter: {
         marginTop: 10,
     },
+    header: {
+        marginBottom: 10,
+    },
 });
 
 interface Props {
     cardsLeft: number;
-    drawCard: () => void;
+    drawCard: (amount: number) => void;
 }
 
 const Talon: React.FC<Props> = ({ cardsLeft, drawCard }) => {
@@ -37,11 +42,12 @@ const Talon: React.FC<Props> = ({ cardsLeft, drawCard }) => {
 
     return (
         <Grid item className={classes.root}>
+            <Typography className={classes.header}>Talon</Typography>
             <Paper className={classes.paper}>
                 <CardActionArea
                     className={classes.cardActionArea}
                     onClick={() => {
-                        drawCard();
+                        drawCard(1);
                     }}
                 >
                     <Typography variant="h4" align="center">

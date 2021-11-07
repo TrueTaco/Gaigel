@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
 
 import Talon from "../../components/Talon/Talon";
 import PlayingField from "../../components/PlayingField/PlayingField";
 import UserCards from "../../components/UserCards/UserCards";
+import { forEachTrailingCommentRange } from "typescript";
 
 const useStyles = makeStyles({
     root: {
@@ -30,7 +32,7 @@ const Gaigel: React.FC<Props> = () => {
 
     // The cards that can still be drawn from the talon
     const [talonCards, setTalonCards] = useState<CardProps[]>(
-        new Array(48).fill({ type: "", value: "" })
+        new Array(0).fill({ type: "", value: "" })
     );
 
     // The cards that are currently being played
@@ -40,14 +42,9 @@ const Gaigel: React.FC<Props> = () => {
     ]);
 
     // The cards that the user currently has
-    const [userCards, setUserCards] = useState<CardProps[]>([
-        { type: "Herz", value: "A" },
-        { type: "Schellen", value: "7" },
-        { type: "Eichel", value: "K" },
-        // { type: "Herz", value: "O" },
-        { type: "Blatt", value: "10" },
-        { type: "Blatt", value: "10" },
-    ]);
+    const [userCards, setUserCards] = useState<CardProps[]>(
+        new Array(0).fill({ type: "", value: "" })
+    );
 
     const playCard = (type: string, value: string) => {
         // The array of played cards is filled up with empty entries in PlayingField.tsx in order to make empty GaigelCards
@@ -66,15 +63,27 @@ const Gaigel: React.FC<Props> = () => {
         }
     };
 
-    const drawCard = () => {
-        if (userCards.length < 5) {
-            setUserCards((userCards) => [...userCards, { type: "Blatt", value: "A" }]);
+    const drawCard = (amount: number) => {
+        if (userCards.length < 5 && talonCards.length > 0) {
+            console.log("DRAW");
+            // Gets last cards of the talon array and removes them
+            let drawnCards: CardProps[] = talonCards.slice(talonCards.length - amount);
+            setTalonCards(talonCards.slice(0, talonCards.length - amount));
+
+            let newUserCards: CardProps[] = userCards;
+            drawnCards.forEach((card) => {
+                newUserCards.push(card);
+            });
+
+            // Gives drawn cards to player
+            setUserCards(newUserCards);
         }
-        console.log(talonCards);
     };
 
     const createTalon = () => {
-        let types: string[] = ["Eichel", "Blatt", "Herz", "Schellen"];
+        // let types: string[] = ["Eichel", "Blatt", "Herz", "Schellen"];
+        let types: string[] = ["Eichel"];
+        // let values: string[] = ["7", "U", "O", "K", "10", "A"];
         let values: string[] = ["7", "U", "O", "K", "10", "A"];
         let newTalon: CardProps[] = [];
 
@@ -111,6 +120,17 @@ const Gaigel: React.FC<Props> = () => {
             alignContent="space-around"
             container
         >
+            <Grid item>
+                <Button
+                    variant="contained"
+                    onClick={() => {
+                        drawCard(3);
+                    }}
+                >
+                    Ziehen
+                </Button>
+            </Grid>
+
             <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
             <PlayingField playedCards={playedCards} playerCount={playerCount} />
             <UserCards userCards={userCards} playCard={playCard} />
