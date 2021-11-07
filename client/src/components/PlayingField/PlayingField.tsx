@@ -2,12 +2,16 @@ import { useEffect, useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
 
 import GaigelCard from "../../components/GaigelCard/GaigelCard";
 
 const useStyles = makeStyles({
     root: {
-        margin: 30,
+        marginTop: 100,
+    },
+    header: {
+        marginBottom: 10,
     },
 });
 
@@ -38,15 +42,19 @@ const PlayingField: React.FC<Props> = ({ playedCards, playerCount }) => {
     }, [playedCards, playerCount]);
 
     return (
-        <Grid className={classes.root} container spacing={2} justifyContent="center">
-            {cards.map((card) => {
-                i++;
-                return (
-                    <Grid item key={i}>
-                        <GaigelCard type={card.type} value={card.value} clickable={false} />
-                    </Grid>
-                );
-            })}
+        <Grid container justifyContent="center" className={classes.root}>
+            <Typography className={classes.header}>Played cards:</Typography>
+
+            <Grid container spacing={2} justifyContent="center">
+                {cards.map((card) => {
+                    i++;
+                    return (
+                        <Grid item key={i}>
+                            <GaigelCard type={card.type} value={card.value} clickable={false} />
+                        </Grid>
+                    );
+                })}
+            </Grid>
         </Grid>
     );
 };

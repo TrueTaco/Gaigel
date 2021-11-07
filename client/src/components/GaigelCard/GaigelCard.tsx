@@ -6,8 +6,8 @@ import CardActionArea from "@material-ui/core/CardActionArea";
 
 const useStyles = makeStyles({
     root: {
-        width: 75,
-        height: 100,
+        width: 50,
+        height: 75,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -56,12 +56,12 @@ const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard }) => {
             >
                 <Box>
                     <Typography align="center">
-                        {symbolMap[type + "2"]}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        {symbolMap[type + "2"]}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         {symbolMap[type]}
                     </Typography>
                     <Typography align="center">{value}</Typography>
                     <Typography align="center">
-                        {symbolMap[type]}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        {symbolMap[type]}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         {symbolMap[type + "2"]}
                     </Typography>
                 </Box>

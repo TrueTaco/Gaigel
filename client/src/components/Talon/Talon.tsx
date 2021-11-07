@@ -5,42 +5,51 @@ import CardActionArea from "@material-ui/core/CardActionArea";
 import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles({
-    root: {},
+    root: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+    },
     cardActionArea: {
         height: "100%",
         width: "100%",
         display: "flex",
     },
     paper: {
-        width: 75,
-        height: 100,
+        width: 50,
+        height: 75,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
     },
+    counter: {
+        marginTop: 10,
+    },
 });
 
 interface Props {
+    cardsLeft: number;
     drawCard: () => void;
 }
 
-const Talon: React.FC<Props> = ({ drawCard }) => {
+const Talon: React.FC<Props> = ({ cardsLeft, drawCard }) => {
     const classes = useStyles();
 
     return (
-        <Grid
-            item
-            onClick={() => {
-                drawCard();
-            }}
-        >
-            <CardActionArea className={classes.cardActionArea}>
-                <Paper className={classes.paper}>
-                    <Typography variant="h1" align="center">
+        <Grid item className={classes.root}>
+            <Paper className={classes.paper}>
+                <CardActionArea
+                    className={classes.cardActionArea}
+                    onClick={() => {
+                        drawCard();
+                    }}
+                >
+                    <Typography variant="h4" align="center">
                         🃏
                     </Typography>
-                </Paper>
-            </CardActionArea>
+                </CardActionArea>
+            </Paper>
+            <Typography className={classes.counter}>Cards left: {cardsLeft}</Typography>
         </Grid>
     );
 };

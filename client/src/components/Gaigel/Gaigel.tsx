@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
 
 import Talon from "../../components/Talon/Talon";
 import PlayingField from "../../components/PlayingField/PlayingField";
@@ -10,6 +11,7 @@ import UserCards from "../../components/UserCards/UserCards";
 const useStyles = makeStyles({
     root: {
         margin: 10,
+        marginTop: 50,
     },
 });
 
@@ -27,7 +29,10 @@ const Gaigel: React.FC<Props> = () => {
     const [playerCount, setPlayerCount] = useState<number>(3);
 
     // The cards that can still be drawn from the talon
-    const [talonCards, setTalonCards] = useState<CardProps[]>();
+    const [talonCards, setTalonCards] = useState<CardProps[]>([
+        { type: "Herz", value: "U" },
+        { type: "Eichel", value: "7" },
+    ]);
 
     // The cards that are currently being played
     const [playedCards, setPlayedCards] = useState<CardProps[]>([
@@ -40,12 +45,13 @@ const Gaigel: React.FC<Props> = () => {
         { type: "Herz", value: "A" },
         { type: "Schellen", value: "7" },
         { type: "Eichel", value: "K" },
-        { type: "Herz", value: "O" },
+        // { type: "Herz", value: "O" },
+        { type: "Blatt", value: "10" },
         { type: "Blatt", value: "10" },
     ]);
 
     const playCard = (type: string, value: string) => {
-        // The array of played cars is filled up with empty entries in order to make empty GaigelCards
+        // The array of played cards is filled up with empty entries in PlayingField.tsx in order to make empty GaigelCards
         // For some reason those also append to playedCards
         // Therefore they need to be filtered out
         let actualPlayedCards: CardProps[] = playedCards.filter(
@@ -58,15 +64,23 @@ const Gaigel: React.FC<Props> = () => {
     };
 
     const drawCard = () => {
-        console.log(playedCards);
         if (userCards.length < 5) {
             setUserCards((userCards) => [...userCards, { type: "Blatt", value: "A" }]);
         }
     };
 
+    useEffect(() => {
+        console.log("HE");
+    }, []);
+
     return (
-        <Grid className={classes.root} justifyContent="center" container>
-            <Talon drawCard={drawCard} />
+        <Grid
+            className={classes.root}
+            justifyContent="center"
+            alignContent="space-around"
+            container
+        >
+            <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
             <PlayingField playedCards={playedCards} playerCount={playerCount} />
             <UserCards userCards={userCards} playCard={playCard} />
         </Grid>
