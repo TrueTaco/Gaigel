@@ -78,6 +78,46 @@ const Gaigel: React.FC<Props> = () => {
                 newUserCards.push(card);
             });
 
+
+
+            newUserCards.sort((a,b): number => {
+                const points = new Map();
+                points.set("7", 0);
+                points.set("U", 2);
+                points.set("O", 3);
+                points.set("K", 4);
+                points.set("10", 10);
+                points.set("A", 11);
+                if (points.get(a.value) < points.get(b.value)){
+                    return -1;
+                }if (points.get(a.value) > points.get(b.value)) {
+                    return 1;
+                } else{
+                    return  0;
+                }
+            });
+
+            newUserCards.sort((a,b): number => {
+                //"Eichel", "Blatt", "Herz", "Schellen"
+                const trump = new Map();
+                trump.set("Eichel", 0);
+                trump.set("Blatt", 1);
+                trump.set("Herz", 2);
+                trump.set("Schellen", 3);
+
+                if(trumpCard.type === a.type || trumpCard.type === b.type){
+                    trump.set(trumpCard.type, 5);
+                }
+
+                if (trump.get(a.value) < trump.get(b.value)){
+                    return -1;
+                }if (trump.get(a.value) > trump.get(b.value)) {
+                    return 1;
+                } else{
+                    return  0;
+                }
+            });
+
             // Gives drawn cards to player
             setUserCards(newUserCards);
         }
