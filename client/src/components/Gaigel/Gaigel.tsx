@@ -9,6 +9,7 @@ import Talon from "../../components/Talon/Talon";
 import TrumpCard from "../../components/TrumpCard/TrumpCard";
 import PlayingField from "../../components/PlayingField/PlayingField";
 import UserCards from "../../components/UserCards/UserCards";
+import PlayerList from "../../components/PlayerList/PlayerList";
 import { forEachTrailingCommentRange } from "typescript";
 
 const useStyles = makeStyles({
@@ -78,9 +79,7 @@ const Gaigel: React.FC<Props> = () => {
                 newUserCards.push(card);
             });
 
-
-
-            newUserCards.sort((a,b): number => {
+            newUserCards.sort((a, b): number => {
                 const points = new Map();
                 points.set("7", 0);
                 points.set("U", 2);
@@ -88,16 +87,17 @@ const Gaigel: React.FC<Props> = () => {
                 points.set("K", 4);
                 points.set("10", 10);
                 points.set("A", 11);
-                if (points.get(a.value) < points.get(b.value)){
+                if (points.get(a.value) < points.get(b.value)) {
                     return -1;
-                }if (points.get(a.value) > points.get(b.value)) {
+                }
+                if (points.get(a.value) > points.get(b.value)) {
                     return 1;
-                } else{
-                    return  0;
+                } else {
+                    return 0;
                 }
             });
 
-            newUserCards.sort((a,b): number => {
+            newUserCards.sort((a, b): number => {
                 //"Eichel", "Blatt", "Herz", "Schellen"
                 const trump = new Map();
                 trump.set("Eichel", 0);
@@ -105,16 +105,17 @@ const Gaigel: React.FC<Props> = () => {
                 trump.set("Herz", 2);
                 trump.set("Schellen", 3);
 
-                if(trumpCard.type === a.type || trumpCard.type === b.type){
+                if (trumpCard.type === a.type || trumpCard.type === b.type) {
                     trump.set(trumpCard.type, 5);
                 }
 
-                if (trump.get(a.value) < trump.get(b.value)){
+                if (trump.get(a.value) < trump.get(b.value)) {
                     return -1;
-                }if (trump.get(a.value) > trump.get(b.value)) {
+                }
+                if (trump.get(a.value) > trump.get(b.value)) {
                     return 1;
-                } else{
-                    return  0;
+                } else {
+                    return 0;
                 }
             });
 
@@ -190,6 +191,7 @@ const Gaigel: React.FC<Props> = () => {
             container
         >
             <Grid justifyContent="center" alignItems="center" container>
+                <PlayerList name={"Jerry"} />
                 <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
                 <TrumpCard trumpCard={trumpCard} />
             </Grid>
