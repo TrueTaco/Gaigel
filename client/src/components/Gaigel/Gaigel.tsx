@@ -10,7 +10,6 @@ import TrumpCard from "../../components/TrumpCard/TrumpCard";
 import PlayingField from "../../components/PlayingField/PlayingField";
 import UserCards from "../../components/UserCards/UserCards";
 import PlayerList from "../../components/PlayerList/PlayerList";
-import { forEachTrailingCommentRange } from "typescript";
 
 const useStyles = makeStyles({
     root: {
@@ -186,18 +185,22 @@ const Gaigel: React.FC<Props> = () => {
     return (
         <Grid
             className={classes.root}
-            justifyContent="center"
+            justifyContent="space-evenly" // Change this to make player list and the rest behave in some way idk look at the flex guide xd
             alignContent="space-around"
             container
         >
-            <Grid justifyContent="center" alignItems="center" container>
+            <Grid item>
                 <PlayerList name={"Jerry"} />
-                <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
-                <TrumpCard trumpCard={trumpCard} />
             </Grid>
+            <Grid>
+                <Grid justifyContent="center" alignItems="center" container>
+                    <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
+                    <TrumpCard trumpCard={trumpCard} />
+                </Grid>
 
-            <PlayingField playedCards={playedCards} playerCount={playerCount} />
-            <UserCards userCards={userCards} playCard={playCard} />
+                <PlayingField playedCards={playedCards} playerCount={playerCount} />
+                <UserCards userCards={userCards} playCard={playCard} />
+            </Grid>
         </Grid>
     );
 };
