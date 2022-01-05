@@ -23,7 +23,8 @@
     "dependencies": {
         "@material-ui/core": "^4.12.3",
         "concurrently": "^6.2.0",
-        "express": "^4.17.1"
+        "express": "^4.17.1",
+        "socket.io": "^4.4.0"
     },
     "devDependencies": {
         "nodemon": "^2.0.12",

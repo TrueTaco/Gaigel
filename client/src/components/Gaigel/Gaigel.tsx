@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import socketIOClient from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -9,7 +10,6 @@ import Talon from "../../components/Talon/Talon";
 import TrumpCard from "../../components/TrumpCard/TrumpCard";
 import PlayingField from "../../components/PlayingField/PlayingField";
 import UserCards from "../../components/UserCards/UserCards";
-import PlayerList from "../../components/PlayerList/PlayerList";
 
 const useStyles = makeStyles({
     root: {
@@ -27,6 +27,9 @@ interface CardProps {
 
 const Gaigel: React.FC<Props> = () => {
     const classes = useStyles();
+
+    // Latest response from server
+    const [response, setResponse] = useState("");
 
     // Amount of players that are currently playing
     const [playerCount, setPlayerCount] = useState<number>(4);
@@ -175,6 +178,12 @@ const Gaigel: React.FC<Props> = () => {
     useEffect(() => {
         console.log("UseEffect 1 was called");
         createTalon();
+
+        const socket = socketIOClient("http://127.0.0.1:5000");
+        socket.on("onConnectionMessage", (data) => {
+            setResponse(data);
+            console.log("Response: " + data);
+        });
     }, []);
 
     useEffect(() => {
@@ -185,22 +194,17 @@ const Gaigel: React.FC<Props> = () => {
     return (
         <Grid
             className={classes.root}
-            justifyContent="space-evenly" // Change this to make player list and the rest behave in some way idk look at the flex guide xd
+            justifyContent="center"
             alignContent="space-around"
             container
         >
-            <Grid item>
-                <PlayerList name={"Jerry"} />
+            <Typography>|{response}|</Typography>
+            <Grid justifyContent="center" alignItems="center" container>
+                <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
+                <TrumpCard trumpCard={trumpCard} />
             </Grid>
-            <Grid>
-                <Grid justifyContent="center" alignItems="center" container>
-                    <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
-                    <TrumpCard trumpCard={trumpCard} />
-                </Grid>
-
-                <PlayingField playedCards={playedCards} playerCount={playerCount} />
-                <UserCards userCards={userCards} playCard={playCard} />
-            </Grid>
+            <PlayingField playedCards={playedCards} playerCount={playerCount} />
+            <UserCards userCards={userCards} playCard={playCard} />
         </Grid>
     );
 };
