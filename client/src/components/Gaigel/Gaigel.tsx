@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import socketIOClient from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -9,7 +10,6 @@ import Talon from "../../components/Talon/Talon";
 import TrumpCard from "../../components/TrumpCard/TrumpCard";
 import PlayingField from "../../components/PlayingField/PlayingField";
 import UserCards from "../../components/UserCards/UserCards";
-import { forEachTrailingCommentRange } from "typescript";
 
 const useStyles = makeStyles({
     root: {
@@ -27,6 +27,9 @@ interface CardProps {
 
 const Gaigel: React.FC<Props> = () => {
     const classes = useStyles();
+
+    // Latest response from server
+    const [response, setResponse] = useState("");
 
     // Amount of players that are currently playing
     const [playerCount, setPlayerCount] = useState<number>(4);
@@ -78,9 +81,7 @@ const Gaigel: React.FC<Props> = () => {
                 newUserCards.push(card);
             });
 
-
-
-            newUserCards.sort((a,b): number => {
+            newUserCards.sort((a, b): number => {
                 const points = new Map();
                 points.set("7", 0);
                 points.set("U", 2);
@@ -88,16 +89,17 @@ const Gaigel: React.FC<Props> = () => {
                 points.set("K", 4);
                 points.set("10", 10);
                 points.set("A", 11);
-                if (points.get(a.value) < points.get(b.value)){
+                if (points.get(a.value) < points.get(b.value)) {
                     return -1;
-                }if (points.get(a.value) > points.get(b.value)) {
+                }
+                if (points.get(a.value) > points.get(b.value)) {
                     return 1;
-                } else{
-                    return  0;
+                } else {
+                    return 0;
                 }
             });
 
-            newUserCards.sort((a,b): number => {
+            newUserCards.sort((a, b): number => {
                 //"Eichel", "Blatt", "Herz", "Schellen"
                 const trump = new Map();
                 trump.set("Eichel", 0);
@@ -105,16 +107,17 @@ const Gaigel: React.FC<Props> = () => {
                 trump.set("Herz", 2);
                 trump.set("Schellen", 3);
 
-                if(trumpCard.type === a.type || trumpCard.type === b.type){
+                if (trumpCard.type === a.type || trumpCard.type === b.type) {
                     trump.set(trumpCard.type, 5);
                 }
 
-                if (trump.get(a.value) < trump.get(b.value)){
+                if (trump.get(a.value) < trump.get(b.value)) {
                     return -1;
-                }if (trump.get(a.value) > trump.get(b.value)) {
+                }
+                if (trump.get(a.value) > trump.get(b.value)) {
                     return 1;
-                } else{
-                    return  0;
+                } else {
+                    return 0;
                 }
             });
 
@@ -175,6 +178,12 @@ const Gaigel: React.FC<Props> = () => {
     useEffect(() => {
         console.log("UseEffect 1 was called");
         createTalon();
+
+        const socket = socketIOClient("http://127.0.0.1:5000");
+        socket.on("onConnectionMessage", (data) => {
+            setResponse(data);
+            console.log("Response: " + data);
+        });
     }, []);
 
     useEffect(() => {
@@ -189,11 +198,11 @@ const Gaigel: React.FC<Props> = () => {
             alignContent="space-around"
             container
         >
+            <Typography>|{response}|</Typography>
             <Grid justifyContent="center" alignItems="center" container>
                 <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
                 <TrumpCard trumpCard={trumpCard} />
             </Grid>
-
             <PlayingField playedCards={playedCards} playerCount={playerCount} />
             <UserCards userCards={userCards} playCard={playCard} />
         </Grid>
