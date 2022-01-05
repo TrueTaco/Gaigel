@@ -1,29 +1,11 @@
 const express = require("express");
 const path = require("path");
+const http = require("http");
+const socketIO = require("socket.io")
 
 const app = express();
-
-app.get("/api/customers", (req, res) => {
-    const customers = [
-        {
-            id: 1,
-            firstName: "Leon",
-            lastName: "Obermann",
-        },
-        {
-            id: 2,
-            firstName: "Till",
-            lastName: "Neumann",
-        },
-        {
-            id: 3,
-            firstName: "Edwin",
-            lastName: "Sept",
-        },
-    ];
-
-    res.json(customers);
-});
+const server = http.createServer(app);
+const io = socketIO(server)
 
 app.use(express.static(path.join(__dirname, "client", "build")));
 
@@ -32,6 +14,23 @@ app.use("/", (req, res) => {
 });
 
 const port = process.env.PORT || 5000;
+
+
+let interval;
+
+io.on("connection", (socket) => {
+    console.log("New client connected");
+    if(interval) clearInterval(interval)
+
+    interval = setInterval(() => {
+        socket.emit("onConnectionMessage", "Hello Client");
+    }, 1000)
+
+    socket.on("disconnect", () => {
+        console.log("Client disconnected");
+        clearInterval(interval)
+    })
+})
 
 app.listen(port, () => {
     console.log(`Server started on port ${port}`);
