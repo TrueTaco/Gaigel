@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import socketIOClient from "socket.io-client";
+import socketIOClient, { Socket } from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -28,7 +28,9 @@ interface CardProps {
 const Gaigel: React.FC<Props> = () => {
     const classes = useStyles();
 
-    // Latest response from server
+    let socket = socketIOClient("http://127.0.0.1:5000");
+
+    // Latest response from server (For debugging purposes)
     const [response, setResponse] = useState("");
 
     // Amount of players that are currently playing
@@ -175,15 +177,33 @@ const Gaigel: React.FC<Props> = () => {
         }
     };
 
+    const checkSocket = (repeat: number) => {
+        console.log(socket);
+        if (repeat > 0) setTimeout(() => checkSocket(repeat - 1), 1000);
+    };
+
     useEffect(() => {
         console.log("UseEffect 1 was called");
         createTalon();
 
-        const socket = socketIOClient("http://127.0.0.1:5000");
-        socket.on("onConnectionMessage", (data) => {
+        socket = socketIOClient("http://127.0.0.1:5000");
+
+        socket.on("onConnect", (data: string) => {
             setResponse(data);
-            console.log("Response: " + data);
+            // console.log("Message: " + data);
         });
+
+        socket.on("heartbeat", (data: string) => {
+            setResponse(data);
+            // console.log("Message: " + data);
+        });
+
+        socket.on("template", (data: string) => {
+            // DO NOT use states (in most cases)
+            // DO use "data"
+        });
+
+        checkSocket(1);
     }, []);
 
     useEffect(() => {
