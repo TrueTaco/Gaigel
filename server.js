@@ -3,7 +3,7 @@ const path = require("path");
 const http = require("http");
 const socketIO = require("socket.io")
 
-// Server
+// MARK: Server Initialization
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server, {cors: {origin: "*"}})
@@ -20,7 +20,7 @@ server.listen(port, () => {
     console.log(`Server started on port ${port}`);
 });
 
-// Sockets
+// MARK: Sockets
 let sockets = []
 let i = 0;
 
