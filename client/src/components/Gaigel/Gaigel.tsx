@@ -1,3 +1,4 @@
+// MARK: Imports
 import { useEffect, useState } from "react";
 import socketIOClient, { Socket } from "socket.io-client";
 
@@ -11,6 +12,7 @@ import TrumpCard from "../../components/TrumpCard/TrumpCard";
 import PlayingField from "../../components/PlayingField/PlayingField";
 import UserCards from "../../components/UserCards/UserCards";
 
+// MARK: Styles
 const useStyles = makeStyles({
     root: {
         margin: 10,
@@ -26,6 +28,7 @@ interface CardProps {
 }
 
 const Gaigel: React.FC<Props> = () => {
+    // MARK: States
     const classes = useStyles();
 
     let socket = socketIOClient("http://127.0.0.1:5000");
@@ -55,6 +58,7 @@ const Gaigel: React.FC<Props> = () => {
         new Array(0).fill({ type: "", value: "" })
     );
 
+    // MARK: playCard
     const playCard = (type: string, value: string) => {
         // The array of played cards is filled up with empty entries in PlayingField.tsx in order to make empty GaigelCards
         // For some reason those also append to playedCards
@@ -72,6 +76,7 @@ const Gaigel: React.FC<Props> = () => {
         }
     };
 
+    // MARK: drawCard
     const drawCard = (amount: number) => {
         if (userCards.length < 5 && talonCards.length > 0) {
             // Gets last cards of the talon array and removes them
@@ -182,6 +187,7 @@ const Gaigel: React.FC<Props> = () => {
         if (repeat > 0) setTimeout(() => checkSocket(repeat - 1), 1000);
     };
 
+    // MARK: useEffect
     useEffect(() => {
         console.log("UseEffect 1 was called");
         createTalon();
@@ -211,6 +217,7 @@ const Gaigel: React.FC<Props> = () => {
         handOutCards();
     }, [talonCards]);
 
+    // MARK: Return
     return (
         <Grid
             className={classes.root}
