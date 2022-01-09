@@ -11,6 +11,8 @@ import Talon from "../../components/Talon/Talon";
 import TrumpCard from "../../components/TrumpCard/TrumpCard";
 import PlayingField from "../../components/PlayingField/PlayingField";
 import UserCards from "../../components/UserCards/UserCards";
+import Control from "../Control/Control";
+import { Container } from "@material-ui/core";
 
 // MARK: Styles
 const useStyles = makeStyles({
@@ -160,12 +162,20 @@ const Gaigel: React.FC<Props> = () => {
         if (repeat > 0) setTimeout(() => checkSocket(repeat - 1), 1000);
     };
 
-    const getTalon = (socket: Socket) => {
-        socket.emit("getTalon", "");
-    };
+    const beginGame = () => {
+        console.log("Game begins");
+        console.log(socket);
+        socket.emit("gameBegin", "");
 
-    const setTalon = (talon: any) => {
-        setTalonCards(talon);
+        socket.on("setTalon", (data: any) => {
+            console.log("Talon set");
+            setTalonCards(data);
+        });
+
+        socket.on("setTrumpCard", (data: any) => {
+            console.log("Trumpcard set");
+            setTrumpCard(data);
+        });
     };
 
     // MARK: useEffect
@@ -174,7 +184,6 @@ const Gaigel: React.FC<Props> = () => {
         //createTalon();
 
         socket = socketIOClient("http://127.0.0.1:5000");
-        getTalon(socket);
 
         socket.on("onConnect", (data: string) => {
             setResponse(data);
@@ -187,9 +196,13 @@ const Gaigel: React.FC<Props> = () => {
         });
 
         socket.on("setTalon", (data: any) => {
-            console.log(data);
-            setTalon(data);
-            // DO use "data"
+            console.log("Talon set");
+            setTalonCards(data);
+        });
+
+        socket.on("setTrumpCard", (data: any) => {
+            console.log("Trumpcard set");
+            setTrumpCard(data);
         });
 
         socket.on("template", (data: string) => {
@@ -234,6 +247,7 @@ const Gaigel: React.FC<Props> = () => {
     };
 
     // MARK: Return
+    // <Typography>|{response}|</Typography>
     return (
         <Grid
             className={classes.root}
@@ -241,7 +255,8 @@ const Gaigel: React.FC<Props> = () => {
             alignContent="space-around"
             container
         >
-            <Typography>|{response}|</Typography>
+            <Control beginGame={beginGame}></Control>
+
             <Grid justifyContent="center" alignItems="center" container>
                 <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
                 <TrumpCard trumpCard={trumpCard} />

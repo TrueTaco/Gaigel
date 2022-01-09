@@ -23,6 +23,8 @@ server.listen(port, () => {
 // MARK: Sockets
 let sockets = []
 let players =[];
+let talon = [];
+let trumpCard;
 let i = 0;
 
 io.on("connection", (socket) => {
@@ -35,8 +37,16 @@ io.on("connection", (socket) => {
     let message = `Hello Client ${socket.id}`;
     socket.emit("onConnect", message);
 
-    socket.on("getTalon", () => {
-        socket.emit("setTalon", createTalon());
+    socket.on("gameBegin", () => {
+        console.log("Game begins");
+        createTalon();
+        chooseTrumpCard()
+        //console.log(talon,trumpCard);
+        socket.broadcast.emit("setTalon", talon);
+        //console.log("setting Talon cards")
+        socket.broadcast.emit("setTrumpCard", trumpCard);
+        //console.log("setting Trumpcard");
+
     })
 
     socket.on("template", () => {
@@ -68,8 +78,9 @@ function createTalon() {
         })
     );
     newTalon.push(...newTalon);
-    let talon = fisherYatesShuffle(newTalon)
-    return talon;
+    newTalon = fisherYatesShuffle(newTalon)
+    talon = newTalon;
+    return newTalon;
 }
 
 // Reliable shuffling algorithm
@@ -81,6 +92,14 @@ function fisherYatesShuffle(arr){
     }
     return arr;
 }
+
+function chooseTrumpCard() {
+    let newTrumpCard = talon[talon.length - 1];
+    talon.slice(0, talon.length - 1);
+
+    trumpCard = newTrumpCard;
+    return trumpCard;
+};
 
 class Card{
     constructor(type, value) {
