@@ -140,6 +140,72 @@ const Gaigel: React.FC<Props> = () => {
         setTrumpCard(newTrumpCard);
     };
 
+    const handOutCards = () => {
+        if (userCards.length === 0) {
+            drawCard(3);
+            return;
+        }
+        if (trumpCard.value === "") {
+            chooseTrumpCard();
+            return;
+        }
+        if (userCards.length === 3) {
+            drawCard(2);
+            return;
+        }
+    };
+
+    const checkSocket = (repeat: number) => {
+        console.log(socket);
+        if (repeat > 0) setTimeout(() => checkSocket(repeat - 1), 1000);
+    };
+
+    const getTalon = (socket: Socket) => {
+        socket.emit("getTalon", "");
+    };
+
+    const setTalon = (talon: any) => {
+        setTalonCards(talon);
+    };
+
+    // MARK: useEffect
+    useEffect(() => {
+        console.log("UseEffect 1 was called");
+        //createTalon();
+
+        socket = socketIOClient("http://127.0.0.1:5000");
+        getTalon(socket);
+
+        socket.on("onConnect", (data: string) => {
+            setResponse(data);
+            // console.log("Message: " + data);
+        });
+
+        socket.on("heartbeat", (data: string) => {
+            setResponse(data);
+            // console.log("Message: " + data);
+        });
+
+        socket.on("setTalon", (data: any) => {
+            console.log(data);
+            setTalon(data);
+            // DO use "data"
+        });
+
+        socket.on("template", (data: string) => {
+            // DO NOT use states (in most cases)
+            // DO use "data"
+        });
+
+        checkSocket(1);
+    }, []);
+
+    useEffect(() => {
+        console.log("UseEffect 2 was called");
+        handOutCards();
+    }, [talonCards]);
+
+    // MARK: Legacy functions
     const createTalon = () => {
         let types: string[] = ["Eichel", "Blatt", "Herz", "Schellen"];
         // let types: string[] = ["Eichel"];
@@ -166,56 +232,6 @@ const Gaigel: React.FC<Props> = () => {
             [arr[i], arr[j]] = [arr[j], arr[i]];
         }
     };
-
-    const handOutCards = () => {
-        if (userCards.length === 0) {
-            drawCard(3);
-            return;
-        }
-        if (trumpCard.value === "") {
-            chooseTrumpCard();
-            return;
-        }
-        if (userCards.length === 3) {
-            drawCard(2);
-            return;
-        }
-    };
-
-    const checkSocket = (repeat: number) => {
-        console.log(socket);
-        if (repeat > 0) setTimeout(() => checkSocket(repeat - 1), 1000);
-    };
-
-    // MARK: useEffect
-    useEffect(() => {
-        console.log("UseEffect 1 was called");
-        createTalon();
-
-        socket = socketIOClient("http://127.0.0.1:5000");
-
-        socket.on("onConnect", (data: string) => {
-            setResponse(data);
-            // console.log("Message: " + data);
-        });
-
-        socket.on("heartbeat", (data: string) => {
-            setResponse(data);
-            // console.log("Message: " + data);
-        });
-
-        socket.on("template", (data: string) => {
-            // DO NOT use states (in most cases)
-            // DO use "data"
-        });
-
-        checkSocket(1);
-    }, []);
-
-    useEffect(() => {
-        console.log("UseEffect 2 was called");
-        handOutCards();
-    }, [talonCards]);
 
     // MARK: Return
     return (
