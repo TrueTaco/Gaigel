@@ -3,19 +3,12 @@ const path = require("path");
 const http = require("http");
 const socketIO = require("socket.io")
 
+// MARK: Server Initialization
 const app = express();
 const server = http.createServer(app);
-const io = socketIO(server)
+const io = socketIO(server, {cors: {origin: "*"}})
 
 app.use(express.static(path.join(__dirname, "client", "build")));
-
-// Header settings
-app.use(function(req, res, next) {
-    // res.header("Access-Control-Allow-Origin", "http://localhost:5000"); // In Production
-    res.header("Access-Control-Allow-Origin", "*"); // In Development
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-  });
 
 app.use("/", (req, res) => {
     res.sendFile(path.join(__dirname, "client", "build", "index.html"));
@@ -23,23 +16,36 @@ app.use("/", (req, res) => {
 
 const port = process.env.PORT || 5000;
 
-let interval;
+server.listen(port, () => {
+    console.log(`Server started on port ${port}`);
+});
+
+// MARK: Sockets
+let sockets = []
+let i = 0;
 
 io.on("connection", (socket) => {
-    console.log("New client connected");
-    if(interval) clearInterval(interval)
+    console.log("New client connected (" + socket.id + ")");
+    sockets.push(socket);
 
-    interval = setInterval(() => {
-        socket.emit("onConnectionMessage", "Hello Client");
-        console.log("Sending a message");
-    }, 1000)
+    let message = `Hello Client ${socket.id}`;
+    socket.emit("onConnect", message);
+
+    socket.on("template", () => {
+        // Do something
+    })
 
     socket.on("disconnect", () => {
-        console.log("Client disconnected");
-        clearInterval(interval)
+        console.log("Client disconnected (" + socket.id + ")");
     })
 })
 
-app.listen(port, () => {
-    console.log(`Server started on port ${port}`);
-});
+function heartbeat () {
+    let message = `Heartbeat ${i}`;
+    io.emit("heartbeat", message);
+    i++;
+
+    setTimeout(heartbeat, 4000);
+}
+
+heartbeat();

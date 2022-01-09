@@ -1,5 +1,6 @@
+// MARK: Imports
 import { useEffect, useState } from "react";
-import socketIOClient from "socket.io-client";
+import socketIOClient, { Socket } from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -11,6 +12,7 @@ import TrumpCard from "../../components/TrumpCard/TrumpCard";
 import PlayingField from "../../components/PlayingField/PlayingField";
 import UserCards from "../../components/UserCards/UserCards";
 
+// MARK: Styles
 const useStyles = makeStyles({
     root: {
         margin: 10,
@@ -26,9 +28,12 @@ interface CardProps {
 }
 
 const Gaigel: React.FC<Props> = () => {
+    // MARK: States
     const classes = useStyles();
 
-    // Latest response from server
+    let socket = socketIOClient("http://127.0.0.1:5000");
+
+    // Latest response from server (For debugging purposes)
     const [response, setResponse] = useState("");
 
     // Amount of players that are currently playing
@@ -53,6 +58,7 @@ const Gaigel: React.FC<Props> = () => {
         new Array(0).fill({ type: "", value: "" })
     );
 
+    // MARK: playCard
     const playCard = (type: string, value: string) => {
         // The array of played cards is filled up with empty entries in PlayingField.tsx in order to make empty GaigelCards
         // For some reason those also append to playedCards
@@ -70,6 +76,7 @@ const Gaigel: React.FC<Props> = () => {
         }
     };
 
+    // MARK: drawCard
     const drawCard = (amount: number) => {
         if (userCards.length < 5 && talonCards.length > 0) {
             // Gets last cards of the talon array and removes them
@@ -175,15 +182,34 @@ const Gaigel: React.FC<Props> = () => {
         }
     };
 
+    const checkSocket = (repeat: number) => {
+        console.log(socket);
+        if (repeat > 0) setTimeout(() => checkSocket(repeat - 1), 1000);
+    };
+
+    // MARK: useEffect
     useEffect(() => {
         console.log("UseEffect 1 was called");
         createTalon();
 
-        const socket = socketIOClient("http://127.0.0.1:5000");
-        socket.on("onConnectionMessage", (data) => {
+        socket = socketIOClient("http://127.0.0.1:5000");
+
+        socket.on("onConnect", (data: string) => {
             setResponse(data);
-            console.log("Response: " + data);
+            // console.log("Message: " + data);
         });
+
+        socket.on("heartbeat", (data: string) => {
+            setResponse(data);
+            // console.log("Message: " + data);
+        });
+
+        socket.on("template", (data: string) => {
+            // DO NOT use states (in most cases)
+            // DO use "data"
+        });
+
+        checkSocket(1);
     }, []);
 
     useEffect(() => {
@@ -191,6 +217,7 @@ const Gaigel: React.FC<Props> = () => {
         handOutCards();
     }, [talonCards]);
 
+    // MARK: Return
     return (
         <Grid
             className={classes.root}
