@@ -28,26 +28,26 @@ let trumpCard;
 let i = 0;
 
 io.on("connection", (socket) => {
-    //console.log("New client connected (" + socket.id + ")");
+    console.log("New client connected (" + socket.id + ")");
     sockets.push(socket);
     players.push(new Player(socket));
-
-    console.log(sockets.length);
     console.log(players.length);
 
     let message = `Hello Client ${socket.id}`;
     socket.emit("onConnect", message);
-
+    console.log(players.length);
     socket.on("gameBegin", () => {
         console.log("Game begins");
         createTalon();
         chooseTrumpCard();
         io.emit("setTalon", talon);
         io.emit("setTrumpCard", trumpCard);
+        console.log(players.length);
         players.forEach((player) => {
             drawCard(5, player);
-            player.socket.emit("setCards", player.cards);
-            //io.to(player.socketID).emit("setCards", player.cards);
+            io.to(player.socket.id).emit("setCards", player.cards);
+            //player.socket.emit("setCards", player.cards);
+            console.log("Player: " + player);
         });
         io.emit("setTalon", talon);
     });

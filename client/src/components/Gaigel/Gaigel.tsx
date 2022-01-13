@@ -74,7 +74,80 @@ const Gaigel: React.FC<Props> = () => {
         }
     };
 
-    // MARK: drawCard
+    const beginGame = () => {
+        console.log("Game begins");
+        // @ts-ignore
+        socket.emit("gameBegin", "");
+    };
+
+    // MARK: useEffect
+    useEffect(() => {
+        console.log("UseEffect 1 was called");
+        // @ts-ignore
+        setSocket(socket);
+    }, []);
+
+    // @ts-ignore
+    useEffect(() => {
+        const newSocket = socketIOClient("http://127.0.0.1:5000");
+        // @ts-ignore
+        setSocket(newSocket);
+
+        newSocket.on("onConnect", (data: string) => {
+            setResponse(data);
+        });
+
+        newSocket.on("setTalon", (data: any) => {
+            console.log("Talon set");
+            setTalonCards(data);
+        });
+
+        newSocket.on("setTrumpCard", (data: any) => {
+            console.log("Trumpcard set");
+            setTrumpCard(data);
+        });
+
+        newSocket.on("setCards", (data: any) => {
+            console.log("Playercards set");
+            setUserCards(data);
+        });
+
+        newSocket.on("template", (data: string) => {
+            // DO NOT use states (in most cases)
+            // DO use "data"
+        });
+
+        return () => newSocket.close();
+    }, [setSocket]);
+
+    // MARK: Legacy functions
+    const createTalon = () => {
+        let types: string[] = ["Eichel", "Blatt", "Herz", "Schellen"];
+        // let types: string[] = ["Eichel"];
+        let values: string[] = ["7", "U", "O", "K", "10", "A"];
+        let newTalon: CardProps[] = [];
+
+        types.forEach((type) =>
+            values.forEach((value) => {
+                newTalon.push({ type: type, value: value });
+            })
+        );
+
+        newTalon.push(...newTalon);
+        fisherYatesShuffle(newTalon);
+
+        setTalonCards(newTalon);
+    };
+
+    // Reliable shuffling algorithm
+    // Source: https://www.delftstack.com/de/howto/javascript/shuffle-array-javascript/
+    const fisherYatesShuffle = (arr: CardProps[]) => {
+        for (let i = arr.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+    };
+
     const drawCard = (amount: number) => {
         if (userCards.length < 5 && talonCards.length > 0) {
             // Gets last cards of the talon array and removes them
@@ -128,125 +201,6 @@ const Gaigel: React.FC<Props> = () => {
 
             // Gives drawn cards to player
             setUserCards(newUserCards);
-        }
-    };
-
-    /*const handOutCards = () => {
-        if (userCards.length === 0) {
-            drawCard(3);
-            return;
-        }
-        if (trumpCard.value === "") {
-            //chooseTrumpCard();
-            return;
-        }
-        if (userCards.length === 3) {
-            drawCard(2);
-            return;
-        }
-    };*/
-
-    const checkSocket = (repeat: number) => {
-        //console.log(currentSocket);
-        if (repeat > 0) setTimeout(() => checkSocket(repeat - 1), 1000);
-    };
-
-    const beginGame = () => {
-        console.log("Game begins");
-        console.log(socket);
-        console.log("Test");
-        // @ts-ignore
-        socket.emit("gameBegin", "");
-        // @ts-ignore
-        socket.on("setTalon", (data: any) => {
-            console.log("Talon set");
-            setTalonCards(data);
-        });
-        // @ts-ignore
-        socket.on("setTrumpCard", (data: any) => {
-            console.log("Trumpcard set");
-            setTrumpCard(data);
-        });
-        // @ts-ignore
-        socket.on("setCards", (data: any) => {
-            console.log("Playercards set");
-            setUserCards(data);
-        });
-    };
-
-    // MARK: useEffect
-    useEffect(() => {
-        console.log("UseEffect 1 was called");
-        //createTalon();
-
-        //const socket = socketIOClient("http://127.0.0.1:5000");
-        // @ts-ignore
-        setSocket(socket);
-        // @ts-ignore
-        //socketRef.current = socket;
-
-        checkSocket(1);
-    }, []);
-
-    // @ts-ignore
-    useEffect(() => {
-        const newSocket = socketIOClient("http://127.0.0.1:5000");
-        // @ts-ignore
-        setSocket(newSocket);
-
-        newSocket.on("onConnect", (data: string) => {
-            setResponse(data);
-            // console.log("Message: " + data);
-        });
-
-        newSocket.on("setTalon", (data: any) => {
-            console.log("Talon set");
-            setTalonCards(data);
-        });
-
-        newSocket.on("setTrumpCard", (data: any) => {
-            console.log("Trumpcard set");
-            setTrumpCard(data);
-        });
-
-        newSocket.on("template", (data: string) => {
-            // DO NOT use states (in most cases)
-            // DO use "data"
-        });
-
-        return () => newSocket.close();
-    }, [setSocket]);
-
-    //useEffect(() => {
-    ///console.log("UseEffect 2 was called");
-    //handOutCards();
-    //}, [talonCards]);
-
-    // MARK: Legacy functions
-    const createTalon = () => {
-        let types: string[] = ["Eichel", "Blatt", "Herz", "Schellen"];
-        // let types: string[] = ["Eichel"];
-        let values: string[] = ["7", "U", "O", "K", "10", "A"];
-        let newTalon: CardProps[] = [];
-
-        types.forEach((type) =>
-            values.forEach((value) => {
-                newTalon.push({ type: type, value: value });
-            })
-        );
-
-        newTalon.push(...newTalon);
-        fisherYatesShuffle(newTalon);
-
-        setTalonCards(newTalon);
-    };
-
-    // Reliable shuffling algorithm
-    // Source: https://www.delftstack.com/de/howto/javascript/shuffle-array-javascript/
-    const fisherYatesShuffle = (arr: CardProps[]) => {
-        for (let i = arr.length - 1; i > 0; i--) {
-            let j = Math.floor(Math.random() * (i + 1));
-            [arr[i], arr[j]] = [arr[j], arr[i]];
         }
     };
 
