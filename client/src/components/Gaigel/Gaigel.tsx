@@ -1,5 +1,5 @@
 // MARK: Imports
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import socketIOClient, { Socket } from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -33,10 +33,9 @@ const Gaigel: React.FC<Props> = () => {
     // MARK: States
     const classes = useStyles();
 
-    let socket = socketIOClient("http://127.0.0.1:5000");
-
     // Latest response from server (For debugging purposes)
     const [response, setResponse] = useState("");
+    const [socket, setSocket] = useState(null);
 
     // Amount of players that are currently playing
     const [playerCount, setPlayerCount] = useState<number>(4);
@@ -50,10 +49,7 @@ const Gaigel: React.FC<Props> = () => {
     const [trumpCard, setTrumpCard] = useState<CardProps>({ type: "", value: "" });
 
     // The cards that are currently being played
-    const [playedCards, setPlayedCards] = useState<CardProps[]>([
-        { type: "Herz", value: "U" },
-        { type: "Eichel", value: "7" },
-    ]);
+    const [playedCards, setPlayedCards] = useState<CardProps[]>([]);
 
     // The cards that the user currently has
     const [userCards, setUserCards] = useState<CardProps[]>(
@@ -135,46 +131,46 @@ const Gaigel: React.FC<Props> = () => {
         }
     };
 
-    const chooseTrumpCard = () => {
-        let newTrumpCard: CardProps = talonCards[talonCards.length - 1];
-        setTalonCards(talonCards.slice(0, talonCards.length - 1));
-
-        setTrumpCard(newTrumpCard);
-    };
-
-    const handOutCards = () => {
+    /*const handOutCards = () => {
         if (userCards.length === 0) {
             drawCard(3);
             return;
         }
         if (trumpCard.value === "") {
-            chooseTrumpCard();
+            //chooseTrumpCard();
             return;
         }
         if (userCards.length === 3) {
             drawCard(2);
             return;
         }
-    };
+    };*/
 
     const checkSocket = (repeat: number) => {
-        console.log(socket);
+        //console.log(currentSocket);
         if (repeat > 0) setTimeout(() => checkSocket(repeat - 1), 1000);
     };
 
     const beginGame = () => {
         console.log("Game begins");
         console.log(socket);
+        console.log("Test");
+        // @ts-ignore
         socket.emit("gameBegin", "");
-
+        // @ts-ignore
         socket.on("setTalon", (data: any) => {
             console.log("Talon set");
             setTalonCards(data);
         });
-
+        // @ts-ignore
         socket.on("setTrumpCard", (data: any) => {
             console.log("Trumpcard set");
             setTrumpCard(data);
+        });
+        // @ts-ignore
+        socket.on("setCards", (data: any) => {
+            console.log("Playercards set");
+            setUserCards(data);
         });
     };
 
@@ -183,40 +179,48 @@ const Gaigel: React.FC<Props> = () => {
         console.log("UseEffect 1 was called");
         //createTalon();
 
-        socket = socketIOClient("http://127.0.0.1:5000");
-
-        socket.on("onConnect", (data: string) => {
-            setResponse(data);
-            // console.log("Message: " + data);
-        });
-
-        socket.on("heartbeat", (data: string) => {
-            setResponse(data);
-            // console.log("Message: " + data);
-        });
-
-        socket.on("setTalon", (data: any) => {
-            console.log("Talon set");
-            setTalonCards(data);
-        });
-
-        socket.on("setTrumpCard", (data: any) => {
-            console.log("Trumpcard set");
-            setTrumpCard(data);
-        });
-
-        socket.on("template", (data: string) => {
-            // DO NOT use states (in most cases)
-            // DO use "data"
-        });
+        //const socket = socketIOClient("http://127.0.0.1:5000");
+        // @ts-ignore
+        setSocket(socket);
+        // @ts-ignore
+        //socketRef.current = socket;
 
         checkSocket(1);
     }, []);
 
+    // @ts-ignore
     useEffect(() => {
-        console.log("UseEffect 2 was called");
-        handOutCards();
-    }, [talonCards]);
+        const newSocket = socketIOClient("http://127.0.0.1:5000");
+        // @ts-ignore
+        setSocket(newSocket);
+
+        newSocket.on("onConnect", (data: string) => {
+            setResponse(data);
+            // console.log("Message: " + data);
+        });
+
+        newSocket.on("setTalon", (data: any) => {
+            console.log("Talon set");
+            setTalonCards(data);
+        });
+
+        newSocket.on("setTrumpCard", (data: any) => {
+            console.log("Trumpcard set");
+            setTrumpCard(data);
+        });
+
+        newSocket.on("template", (data: string) => {
+            // DO NOT use states (in most cases)
+            // DO use "data"
+        });
+
+        return () => newSocket.close();
+    }, [setSocket]);
+
+    //useEffect(() => {
+    ///console.log("UseEffect 2 was called");
+    //handOutCards();
+    //}, [talonCards]);
 
     // MARK: Legacy functions
     const createTalon = () => {
@@ -244,6 +248,13 @@ const Gaigel: React.FC<Props> = () => {
             let j = Math.floor(Math.random() * (i + 1));
             [arr[i], arr[j]] = [arr[j], arr[i]];
         }
+    };
+
+    const chooseTrumpCard = () => {
+        let newTrumpCard: CardProps = talonCards[talonCards.length - 1];
+        setTalonCards(talonCards.slice(0, talonCards.length - 1));
+
+        setTrumpCard(newTrumpCard);
     };
 
     // MARK: Return
