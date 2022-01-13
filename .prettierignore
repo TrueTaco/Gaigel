@@ -1,5 +1,2 @@
 # Ignore artifacts:
 build
-
-# Ignore all JS files:
-*.js
