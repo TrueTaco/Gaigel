@@ -52,7 +52,7 @@ const Talon: React.FC<Props> = ({ cardsLeft, drawCard }) => {
                     }}
                 >
                     <Typography variant="h4" align="center">
-                        <img src={"/cardBacksite.png"} width={"60"} height={"90"} />
+                        <img src={"/cardBacksite_02.png"} width={"60"} height={"90"} />
                     </Typography>
                 </CardActionArea>
             </Paper>
