@@ -2,7 +2,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 
-import GaigelCard from "../../components/GaigelCard/GaigelCard";
+import GaigelCard from "./GaigelCard";
 
 const useStyles = makeStyles({
     root: {

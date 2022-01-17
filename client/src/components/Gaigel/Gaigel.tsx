@@ -7,11 +7,11 @@ import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 
-import Talon from "../../components/Talon/Talon";
-import TrumpCard from "../../components/TrumpCard/TrumpCard";
-import PlayingField from "../../components/PlayingField/PlayingField";
-import UserCards from "../../components/UserCards/UserCards";
-import Control from "../Control/Control";
+import Talon from "./Talon";
+import TrumpCard from "./TrumpCard";
+import PlayingField from "./PlayingField";
+import UserCards from "./UserCards";
+import Control from "./Control";
 import { Container } from "@material-ui/core";
 
 // MARK: Styles
