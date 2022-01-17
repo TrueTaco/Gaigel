@@ -12,5 +12,14 @@ class Player {
     }
 }
 
+class Game {
+    constructor(players, lobbycode) {
+        this.players = players;
+        this.lobbycode = lobbycode;
+        this.playedCards = [];
+    }
+}
+
 exports.Card = Card;
 exports.Player = Player;
+exports.Game = Game;
