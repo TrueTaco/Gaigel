@@ -58,15 +58,17 @@ const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard }) => {
                 className={classes.cardActionArea}
                 style={{ pointerEvents: clickable ? "auto" : "none" }}
             >
-                <Box>
-                    <img src={symbolMap[type]} width={iconSize} height={iconSize} />
-                    <img src={"/Blank.jpg"} width={"15"} height={iconSize} />
-                    <img src={symbolMap[type]} width={iconSize} height={iconSize} />
-                    <Typography align="center">{value}</Typography>
-                    <img src={symbolMap[type]} width={iconSize} height={iconSize} />
-                    <img src={"/Blank.jpg"} width={"15"} height={iconSize} />
-                    <img src={symbolMap[type]} width={iconSize} height={iconSize} />
-                </Box>
+                {value !== "" && (
+                    <Box>
+                        <img src={symbolMap[type]} width={iconSize} height={iconSize} />
+                        <img src={"/Blank.jpg"} width={"15"} height={iconSize} />
+                        <img src={symbolMap[type]} width={iconSize} height={iconSize} />
+                        <Typography align="center">{value}</Typography>
+                        <img src={symbolMap[type]} width={iconSize} height={iconSize} />
+                        <img src={"/Blank.jpg"} width={"15"} height={iconSize} />
+                        <img src={symbolMap[type]} width={iconSize} height={iconSize} />
+                    </Box>
+                )}
             </CardActionArea>
         </Paper>
     );
