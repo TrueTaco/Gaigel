@@ -69,6 +69,10 @@ const Gaigel: React.FC<Props> = () => {
             setYourCards(yourCards.filter((card, index) => index !== playedCardIndex));
 
             setPlayedCards(() => [...actualPlayedCards, { type: type, value: value }]);
+
+            let playedCard: CardProps = { type: type, value: value };
+            // @ts-ignore
+            socket.emit("playCard", playedCard);
         }
     };
 
@@ -125,9 +129,14 @@ const Gaigel: React.FC<Props> = () => {
             setTrumpCard(data);
         });
 
-        newSocket.on("setCards", (data: any) => {
-            console.log("Playercards set");
+        newSocket.on("setYourCards", (data: any) => {
+            console.log("Your cards set");
             setYourCards(data);
+        });
+
+        newSocket.on("setPlayedCards", (data: any) => {
+            console.log("Played cards set");
+            setPlayedCards(data);
         });
 
         newSocket.on("closeOpening", (data: any) => {
