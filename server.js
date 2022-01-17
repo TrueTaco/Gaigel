@@ -3,6 +3,8 @@ const path = require("path");
 const http = require("http");
 const socketIO = require("socket.io");
 
+const classes = require("./classes.js");
+
 // MARK: Server Initialization
 const app = express();
 const server = http.createServer(app);
@@ -21,35 +23,43 @@ server.listen(port, () => {
 });
 
 // MARK: Sockets
-let sockets = [];
 let players = [];
 let talon = [];
+let currentGame;
 let trumpCard;
 let i = 0;
 
 io.on("connection", (socket) => {
-    console.log("New client connected (" + socket.id + ")");
-    sockets.push(socket);
-    players.push(new Player(socket));
-    console.log(players.length);
+    players.push(new classes.Player(socket));
+    console.log(`${players.length} | New client connected (${socket.id})`);
 
     let message = `Hello Client ${socket.id}`;
     socket.emit("onConnect", message);
-    console.log(players.length);
+
+    // GAME BEGIN
     socket.on("gameBegin", () => {
-        console.log("Game begins");
+        console.log("Game has been started");
+
+        currentGame = new classes.Game(players, "123456");
+
         createTalon();
         chooseTrumpCard();
+
         io.emit("setTalon", talon);
         io.emit("setTrumpCard", trumpCard);
-        console.log(players.length);
+
         players.forEach((player) => {
             drawCard(5, player);
-            io.to(player.socket.id).emit("setCards", player.cards);
-            //player.socket.emit("setCards", player.cards);
-            console.log("Player: " + player);
+            io.to(player.socket.id).emit("setYourCards", player.cards);
         });
+
         io.emit("setTalon", talon);
+    });
+
+    socket.on("playCard", (data) => {
+        // console.log(`Somebody played this card: ${data.type} ${data.value}`);
+        currentGame.playedCards.push(data);
+        io.emit("setPlayedCards", currentGame.playedCards);
     });
 
     socket.on("template", () => {
@@ -57,20 +67,10 @@ io.on("connection", (socket) => {
     });
 
     socket.on("disconnect", () => {
-        players = players.filter((player) => player.socketID == socket.id);
-        sockets = sockets.filter((sock) => sock == socket);
-        console.log(players);
-        console.log("Client disconnected (" + socket.id + ")");
+        players = players.filter((player) => player.socket.id != socket.id);
+        console.log(`${players.length} | Client disconnected (${socket.id})`);
     });
 });
-
-function heartbeat() {
-    let message = `Heartbeat ${i}`;
-    io.emit("heartbeat", message);
-    i++;
-
-    setTimeout(heartbeat, 4000);
-}
 
 function createTalon() {
     let types = ["Eichel", "Blatt", "Herz", "Schellen"];
@@ -80,7 +80,7 @@ function createTalon() {
 
     types.forEach((type) =>
         values.forEach((value) => {
-            newTalon.push(new Card(type, value));
+            newTalon.push(new classes.Card(type, value));
         })
     );
     newTalon.push(...newTalon);
@@ -160,19 +160,4 @@ function drawCard(amount, player) {
     }
 }
 
-class Card {
-    constructor(type, value) {
-        this.type = type;
-        this.value = value;
-    }
-}
-
-class Player {
-    constructor(socket) {
-        this.socket = socket;
-        this.cards = [];
-    }
-}
-
 createTalon();
-//heartbeat();
