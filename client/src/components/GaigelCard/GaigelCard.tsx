@@ -42,13 +42,9 @@ const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard }) => {
     const symbolMap: Hash = {};
     const iconSize = 13;
     symbolMap["Eichel"] = "/Eichel.png";
-    symbolMap["Eichel2"] = "/Eichel.png";
     symbolMap["Blatt"] = "/Blatt.png";
-    symbolMap["Blatt2"] = "/Blatt.png";
     symbolMap["Herz"] = "/Herz.png";
-    symbolMap["Herz2"] = "/Herz.png";
     symbolMap["Schellen"] = "/Bollen.png";
-    symbolMap["Schellen2"] = "/Bollen.png";
 
     return (
         <Paper
@@ -63,17 +59,13 @@ const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard }) => {
                 style={{ pointerEvents: clickable ? "auto" : "none" }}
             >
                 <Box>
-                    <Typography align="center">
-                        <img src={symbolMap[type + "2"]} width={iconSize} height={iconSize} />
-                        <img src={"/Blank.jpg"} width={"15"} height={iconSize} />
-                        <img src={symbolMap[type]} width={iconSize} height={iconSize} />
-                    </Typography>
+                    <img src={symbolMap[type]} width={iconSize} height={iconSize} />
+                    <img src={"/Blank.jpg"} width={"15"} height={iconSize} />
+                    <img src={symbolMap[type]} width={iconSize} height={iconSize} />
                     <Typography align="center">{value}</Typography>
-                    <Typography align="center">
-                        <img src={symbolMap[type + "2"]} width={iconSize} height={iconSize} />
-                        <img src={"/Blank.jpg"} width={"15"} height={iconSize} />
-                        <img src={symbolMap[type]} width={iconSize} height={iconSize} />
-                    </Typography>
+                    <img src={symbolMap[type]} width={iconSize} height={iconSize} />
+                    <img src={"/Blank.jpg"} width={"15"} height={iconSize} />
+                    <img src={symbolMap[type]} width={iconSize} height={iconSize} />
                 </Box>
             </CardActionArea>
         </Paper>
