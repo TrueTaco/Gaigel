@@ -3,6 +3,13 @@ const path = require("path");
 const http = require("http");
 const socketIO = require("socket.io");
 
+const classes = require("./classes.js");
+// const Card = classes.Card;
+// const Player = classes.Player;
+
+// const Card = require("Card");
+// const Player = require("Player");
+
 // MARK: Server Initialization
 const app = express();
 const server = http.createServer(app);
@@ -30,7 +37,7 @@ let i = 0;
 io.on("connection", (socket) => {
     console.log("New client connected (" + socket.id + ")");
     sockets.push(socket);
-    players.push(new Player(socket));
+    players.push(new classes.Player(socket));
     console.log(players.length);
 
     let message = `Hello Client ${socket.id}`;
@@ -80,7 +87,7 @@ function createTalon() {
 
     types.forEach((type) =>
         values.forEach((value) => {
-            newTalon.push(new Card(type, value));
+            newTalon.push(new classes.Card(type, value));
         })
     );
     newTalon.push(...newTalon);
@@ -157,20 +164,6 @@ function drawCard(amount, player) {
                 return 0;
             }
         });
-    }
-}
-
-class Card {
-    constructor(type, value) {
-        this.type = type;
-        this.value = value;
-    }
-}
-
-class Player {
-    constructor(socket) {
-        this.socket = socket;
-        this.cards = [];
     }
 }
 
