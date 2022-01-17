@@ -23,13 +23,13 @@ interface CardProps {
     value: string;
 }
 
-const UserCards: React.FC<Props> = ({ userCards, playCard }) => {
+const YourCards: React.FC<Props> = ({ userCards, playCard }) => {
     const classes = useStyles();
     let i: number = 0;
 
     return (
         <Grid container className={classes.root} justifyContent="center">
-            <Typography className={classes.header}>Your cards:</Typography>
+            <Typography className={classes.header}>Your cards</Typography>
 
             <Grid container spacing={2} justifyContent="center">
                 {userCards.map((card) => {
@@ -50,4 +50,4 @@ const UserCards: React.FC<Props> = ({ userCards, playCard }) => {
     );
 };
 
-export default UserCards;
+export default YourCards;

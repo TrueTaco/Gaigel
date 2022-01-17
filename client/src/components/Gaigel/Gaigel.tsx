@@ -9,8 +9,8 @@ import Button from "@material-ui/core/Button";
 
 import Talon from "./Talon";
 import TrumpCard from "./TrumpCard";
-import PlayingField from "./PlayingField";
-import UserCards from "./UserCards";
+import PlayedCards from "./PlayedCards";
+import YourCards from "./YourCards";
 import Control from "./Control";
 import { Container } from "@material-ui/core";
 
@@ -226,8 +226,8 @@ const Gaigel: React.FC<Props> = () => {
                 <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
                 <TrumpCard trumpCard={trumpCard} />
             </Grid>
-            <PlayingField playedCards={playedCards} playerCount={playerCount} />
-            <UserCards userCards={userCards} playCard={playCard} />
+            <PlayedCards playedCards={playedCards} playerCount={playerCount} />
+            <YourCards userCards={userCards} playCard={playCard} />
         </Grid>
     );
 };
