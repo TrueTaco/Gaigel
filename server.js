@@ -24,6 +24,7 @@ server.listen(port, () => {
 let sockets = [];
 let players = [];
 let talon = [];
+let currentGameState = "Waiting";
 let trumpCard;
 let i = 0;
 
@@ -37,7 +38,6 @@ io.on("connection", (socket) => {
     socket.emit("onConnect", message);
     console.log(players.length);
     socket.on("gameBegin", () => {
-        console.log("Game begins");
         createTalon();
         chooseTrumpCard();
         io.emit("setTalon", talon);
@@ -50,6 +50,36 @@ io.on("connection", (socket) => {
             console.log("Player: " + player);
         });
         io.emit("setTalon", talon);
+    });
+
+    socket.on("AndereAlteHat", () => {
+        console.log("AndereAlteHat");
+        io.to(socket.id).emit("closeOpening", "");
+        // Set GameOpening
+    });
+
+    socket.on("AndereAlteHat", () => {
+        console.log("AndereAlteHat");
+        io.to(socket.id).emit("closeOpening", "");
+        // Set GameOpening
+    });
+
+    socket.on("GeElfen", () => {
+        console.log("GeElfen");
+        io.to(socket.id).emit("closeOpening", "");
+        // Set GameOpening
+    });
+
+    socket.on("HöherHat", () => {
+        console.log("HöherHat");
+        io.to(socket.id).emit("closeOpening", "");
+        // Set GameOpening
+    });
+
+    socket.on("AufDissle", () => {
+        console.log("AufDissle");
+        io.to(socket.id).emit("closeOpening", "");
+        // Set GameOpening
     });
 
     socket.on("template", () => {

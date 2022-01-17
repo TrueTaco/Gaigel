@@ -4,15 +4,13 @@ import socketIOClient, { Socket } from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
 
 import Talon from "./Talon";
 import TrumpCard from "./TrumpCard";
 import PlayedCards from "./PlayedCards";
 import YourCards from "./YourCards";
 import Control from "./Control";
-import { Container } from "@material-ui/core";
+import Opening from "./Opening";
 
 // MARK: Styles
 const useStyles = makeStyles({
@@ -32,10 +30,10 @@ interface CardProps {
 const Gaigel: React.FC<Props> = () => {
     // MARK: States
     const classes = useStyles();
-
+    const [opening, setOpening] = useState(true);
     // Latest response from server (For debugging purposes)
     const [response, setResponse] = useState("");
-    const [socket, setSocket] = useState(null);
+    const [socket, setSocket] = useState();
 
     // Amount of players that are currently playing
     const [playerCount, setPlayerCount] = useState<number>(4);
@@ -74,6 +72,26 @@ const Gaigel: React.FC<Props> = () => {
         }
     };
 
+    const AndereAlteHat = () => {
+        // @ts-ignore
+        socket.emit("AndereAlteHat", "");
+    };
+
+    const GeElfen = () => {
+        // @ts-ignore
+        socket.emit("GeElfen", "");
+    };
+
+    const HöherHat = () => {
+        // @ts-ignore
+        socket.emit("HöherHat", "");
+    };
+
+    const AufDissle = () => {
+        // @ts-ignore
+        socket.emit("AufDissle", "");
+    };
+
     const beginGame = () => {
         console.log("Game begins");
         // @ts-ignore
@@ -110,6 +128,11 @@ const Gaigel: React.FC<Props> = () => {
         newSocket.on("setCards", (data: any) => {
             console.log("Playercards set");
             setYourCards(data);
+        });
+
+        newSocket.on("closeOpening", (data: any) => {
+            console.log("Closed Opening");
+            setOpening(false);
         });
 
         newSocket.on("template", (data: string) => {
@@ -227,6 +250,14 @@ const Gaigel: React.FC<Props> = () => {
                 <TrumpCard trumpCard={trumpCard} />
             </Grid>
             <PlayedCards playedCards={playedCards} playerCount={playerCount} />
+            {opening && (
+                <Opening
+                    AndereAlteHat={AndereAlteHat}
+                    GeElfen={GeElfen}
+                    HöherHat={HöherHat}
+                    AufDissle={AufDissle}
+                ></Opening>
+            )}
             <YourCards userCards={yourCards} playCard={playCard} />
         </Grid>
     );
