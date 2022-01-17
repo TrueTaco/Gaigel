@@ -3,6 +3,7 @@ import Paper from "@material-ui/core/Paper";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import CardActionArea from "@material-ui/core/CardActionArea";
+import { Avatar } from "@material-ui/core";
 
 const useStyles = makeStyles({
     root: {
@@ -16,6 +17,12 @@ const useStyles = makeStyles({
         height: "100%",
         width: "100%",
         display: "flex",
+    },
+    cardIcons: {
+        flex: 1,
+        width: 50,
+        height: 50,
+        resizeMode: "contain",
     },
 });
 
@@ -33,14 +40,15 @@ interface Hash {
 const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard }) => {
     const classes = useStyles();
     const symbolMap: Hash = {};
-    symbolMap["Eichel"] = "♣️";
-    symbolMap["Eichel2"] = "♧";
-    symbolMap["Blatt"] = "♠️";
-    symbolMap["Blatt2"] = "♤";
-    symbolMap["Herz"] = "♥️";
-    symbolMap["Herz2"] = "♡";
-    symbolMap["Schellen"] = "♦️";
-    symbolMap["Schellen2"] = "♢";
+    const iconSize = 13;
+    symbolMap["Eichel"] = "/Eichel.png";
+    symbolMap["Eichel2"] = "/Eichel.png";
+    symbolMap["Blatt"] = "/Blatt.png";
+    symbolMap["Blatt2"] = "/Blatt.png";
+    symbolMap["Herz"] = "/Herz.png";
+    symbolMap["Herz2"] = "/Herz.png";
+    symbolMap["Schellen"] = "/Bollen.png";
+    symbolMap["Schellen2"] = "/Bollen.png";
 
     return (
         <Paper
@@ -56,13 +64,15 @@ const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard }) => {
             >
                 <Box>
                     <Typography align="center">
-                        {symbolMap[type + "2"]}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        {symbolMap[type]}
+                        <img src={symbolMap[type + "2"]} width={iconSize} height={iconSize} />
+                        <img src={"/Blank.jpg"} width={"15"} height={iconSize} />
+                        <img src={symbolMap[type]} width={iconSize} height={iconSize} />
                     </Typography>
                     <Typography align="center">{value}</Typography>
                     <Typography align="center">
-                        {symbolMap[type]}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        {symbolMap[type + "2"]}
+                        <img src={symbolMap[type + "2"]} width={iconSize} height={iconSize} />
+                        <img src={"/Blank.jpg"} width={"15"} height={iconSize} />
+                        <img src={symbolMap[type]} width={iconSize} height={iconSize} />
                     </Typography>
                 </Box>
             </CardActionArea>
