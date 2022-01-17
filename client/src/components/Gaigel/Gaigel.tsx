@@ -7,11 +7,11 @@ import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 
-import Talon from "../../components/Talon/Talon";
-import TrumpCard from "../../components/TrumpCard/TrumpCard";
-import PlayingField from "../../components/PlayingField/PlayingField";
-import UserCards from "../../components/UserCards/UserCards";
-import Control from "../Control/Control";
+import Talon from "./Talon";
+import TrumpCard from "./TrumpCard";
+import PlayedCards from "./PlayedCards";
+import YourCards from "./YourCards";
+import Control from "./Control";
 import { Container } from "@material-ui/core";
 
 // MARK: Styles
@@ -52,7 +52,7 @@ const Gaigel: React.FC<Props> = () => {
     const [playedCards, setPlayedCards] = useState<CardProps[]>([]);
 
     // The cards that the user currently has
-    const [userCards, setUserCards] = useState<CardProps[]>(
+    const [yourCards, setYourCards] = useState<CardProps[]>(
         new Array(0).fill({ type: "", value: "" })
     );
 
@@ -65,10 +65,10 @@ const Gaigel: React.FC<Props> = () => {
             (card) => card.type !== "" && card.value !== ""
         );
         if (actualPlayedCards.length < playerCount) {
-            let playedCardIndex: number = userCards.findIndex((card) => {
+            let playedCardIndex: number = yourCards.findIndex((card) => {
                 return card.type === type && card.value === value;
             });
-            setUserCards(userCards.filter((card, index) => index !== playedCardIndex));
+            setYourCards(yourCards.filter((card, index) => index !== playedCardIndex));
 
             setPlayedCards(() => [...actualPlayedCards, { type: type, value: value }]);
         }
@@ -109,7 +109,7 @@ const Gaigel: React.FC<Props> = () => {
 
         newSocket.on("setCards", (data: any) => {
             console.log("Playercards set");
-            setUserCards(data);
+            setYourCards(data);
         });
 
         newSocket.on("template", (data: string) => {
@@ -149,12 +149,12 @@ const Gaigel: React.FC<Props> = () => {
     };
 
     const drawCard = (amount: number) => {
-        if (userCards.length < 5 && talonCards.length > 0) {
+        if (yourCards.length < 5 && talonCards.length > 0) {
             // Gets last cards of the talon array and removes them
             let drawnCards: CardProps[] = talonCards.slice(talonCards.length - amount);
             setTalonCards(talonCards.slice(0, talonCards.length - amount));
 
-            let newUserCards: CardProps[] = userCards;
+            let newUserCards: CardProps[] = yourCards;
             drawnCards.forEach((card) => {
                 newUserCards.push(card);
             });
@@ -200,7 +200,7 @@ const Gaigel: React.FC<Props> = () => {
             });
 
             // Gives drawn cards to player
-            setUserCards(newUserCards);
+            setYourCards(newUserCards);
         }
     };
 
@@ -226,8 +226,8 @@ const Gaigel: React.FC<Props> = () => {
                 <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
                 <TrumpCard trumpCard={trumpCard} />
             </Grid>
-            <PlayingField playedCards={playedCards} playerCount={playerCount} />
-            <UserCards userCards={userCards} playCard={playCard} />
+            <PlayedCards playedCards={playedCards} playerCount={playerCount} />
+            <YourCards userCards={yourCards} playCard={playCard} />
         </Grid>
     );
 };

@@ -4,7 +4,7 @@ import Paper from "@material-ui/core/Paper";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import Typography from "@material-ui/core/Typography";
 
-import GaigelCard from "../../components/GaigelCard/GaigelCard";
+import GaigelCard from "./GaigelCard";
 
 const useStyles = makeStyles({
     root: {

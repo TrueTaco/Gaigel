@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 
-import GaigelCard from "../../components/GaigelCard/GaigelCard";
+import GaigelCard from "./GaigelCard";
 
 const useStyles = makeStyles({
     root: {
@@ -25,7 +25,7 @@ interface CardProps {
     value: string;
 }
 
-const PlayingField: React.FC<Props> = ({ playedCards, playerCount }) => {
+const PlayedCards: React.FC<Props> = ({ playedCards, playerCount }) => {
     const classes = useStyles();
     let i: number = 0;
 
@@ -43,7 +43,7 @@ const PlayingField: React.FC<Props> = ({ playedCards, playerCount }) => {
 
     return (
         <Grid container justifyContent="center" className={classes.root}>
-            <Typography className={classes.header}>Played cards:</Typography>
+            <Typography className={classes.header}>Played cards</Typography>
 
             <Grid container spacing={2} justifyContent="center">
                 {cards.map((card) => {
@@ -59,4 +59,4 @@ const PlayingField: React.FC<Props> = ({ playedCards, playerCount }) => {
     );
 };
 
-export default PlayingField;
+export default PlayedCards;
