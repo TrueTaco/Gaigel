@@ -4,11 +4,6 @@ const http = require("http");
 const socketIO = require("socket.io");
 
 const classes = require("./classes.js");
-// const Card = classes.Card;
-// const Player = classes.Player;
-
-// const Card = require("Card");
-// const Player = require("Player");
 
 // MARK: Server Initialization
 const app = express();
@@ -56,15 +51,9 @@ io.on("connection", (socket) => {
         players.forEach((player) => {
             drawCard(5, player);
             io.to(player.socket.id).emit("setYourCards", player.cards);
-            //player.socket.emit("setYourCards", player.cards);
-            // console.log("Player: " + player);
         });
 
         io.emit("setTalon", talon);
-    });
-
-    socket.on("template", () => {
-        // Do something
     });
 
     socket.on("playCard", (data) => {
@@ -73,19 +62,15 @@ io.on("connection", (socket) => {
         io.emit("setPlayedCards", currentGame.playedCards);
     });
 
+    socket.on("template", () => {
+        // Do something
+    });
+
     socket.on("disconnect", () => {
         players = players.filter((player) => player.socket.id != socket.id);
         console.log(`${players.length} | Client disconnected (${socket.id})`);
     });
 });
-
-function heartbeat() {
-    let message = `Heartbeat ${i}`;
-    io.emit("heartbeat", message);
-    i++;
-
-    setTimeout(heartbeat, 4000);
-}
 
 function createTalon() {
     let types = ["Eichel", "Blatt", "Herz", "Schellen"];
@@ -176,4 +161,3 @@ function drawCard(amount, player) {
 }
 
 createTalon();
-//heartbeat();
