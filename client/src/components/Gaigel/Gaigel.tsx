@@ -1,18 +1,15 @@
 // MARK: Imports
-import { useEffect, useRef, useState } from "react";
-import socketIOClient, { Socket } from "socket.io-client";
+import { useEffect, useState } from "react";
+import socketIOClient from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
 
 import Talon from "./Talon";
 import TrumpCard from "./TrumpCard";
 import PlayedCards from "./PlayedCards";
 import YourCards from "./YourCards";
 import Control from "./Control";
-import { Container } from "@material-ui/core";
 
 // MARK: Styles
 const useStyles = makeStyles({
@@ -84,6 +81,10 @@ const Gaigel: React.FC<Props> = () => {
         socket.emit("gameBegin", "");
     };
 
+    const drawCard = () => {
+        console.log("Want to draw card");
+    };
+
     // MARK: useEffect
     useEffect(() => {
         console.log("UseEffect 1 was called");
@@ -128,97 +129,6 @@ const Gaigel: React.FC<Props> = () => {
 
         return () => newSocket.close();
     }, [setSocket]);
-
-    // MARK: Legacy functions
-    const createTalon = () => {
-        let types: string[] = ["Eichel", "Blatt", "Herz", "Schellen"];
-        // let types: string[] = ["Eichel"];
-        let values: string[] = ["7", "U", "O", "K", "10", "A"];
-        let newTalon: CardProps[] = [];
-
-        types.forEach((type) =>
-            values.forEach((value) => {
-                newTalon.push({ type: type, value: value });
-            })
-        );
-
-        newTalon.push(...newTalon);
-        fisherYatesShuffle(newTalon);
-
-        setTalonCards(newTalon);
-    };
-
-    // Reliable shuffling algorithm
-    // Source: https://www.delftstack.com/de/howto/javascript/shuffle-array-javascript/
-    const fisherYatesShuffle = (arr: CardProps[]) => {
-        for (let i = arr.length - 1; i > 0; i--) {
-            let j = Math.floor(Math.random() * (i + 1));
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-    };
-
-    const drawCard = (amount: number) => {
-        if (yourCards.length < 5 && talonCards.length > 0) {
-            // Gets last cards of the talon array and removes them
-            let drawnCards: CardProps[] = talonCards.slice(talonCards.length - amount);
-            setTalonCards(talonCards.slice(0, talonCards.length - amount));
-
-            let newUserCards: CardProps[] = yourCards;
-            drawnCards.forEach((card) => {
-                newUserCards.push(card);
-            });
-
-            newUserCards.sort((a, b): number => {
-                const points = new Map();
-                points.set("7", 0);
-                points.set("U", 2);
-                points.set("O", 3);
-                points.set("K", 4);
-                points.set("10", 10);
-                points.set("A", 11);
-                if (points.get(a.value) < points.get(b.value)) {
-                    return -1;
-                }
-                if (points.get(a.value) > points.get(b.value)) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            });
-
-            newUserCards.sort((a, b): number => {
-                //"Eichel", "Blatt", "Herz", "Schellen"
-                const trump = new Map();
-                trump.set("Eichel", 0);
-                trump.set("Blatt", 1);
-                trump.set("Herz", 2);
-                trump.set("Schellen", 3);
-
-                if (trumpCard.type === a.type || trumpCard.type === b.type) {
-                    trump.set(trumpCard.type, 5);
-                }
-
-                if (trump.get(a.value) < trump.get(b.value)) {
-                    return -1;
-                }
-                if (trump.get(a.value) > trump.get(b.value)) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            });
-
-            // Gives drawn cards to player
-            setYourCards(newUserCards);
-        }
-    };
-
-    const chooseTrumpCard = () => {
-        let newTrumpCard: CardProps = talonCards[talonCards.length - 1];
-        setTalonCards(talonCards.slice(0, talonCards.length - 1));
-
-        setTrumpCard(newTrumpCard);
-    };
 
     // MARK: Return
     // <Typography>|{response}|</Typography>
