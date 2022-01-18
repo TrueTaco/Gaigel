@@ -5,6 +5,7 @@ import socketIOClient from "socket.io-client";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 
+import LandingPage from "./LandingPage";
 import Talon from "./Talon";
 import TrumpCard from "./TrumpCard";
 import PlayedCards from "./PlayedCards";
@@ -29,6 +30,9 @@ interface CardProps {
 const Gaigel: React.FC<Props> = () => {
     // MARK: States
     const classes = useStyles();
+
+    // Boolean for deciding on whether to show the landing page or the game
+    const [loggedIn, setLoggedIn] = useState<boolean>(false);
 
     // Latest response from server (For debugging purposes)
     const [response, setResponse] = useState("");
@@ -139,14 +143,20 @@ const Gaigel: React.FC<Props> = () => {
             alignContent="space-around"
             container
         >
-            <Control beginGame={beginGame}></Control>
+            {!loggedIn ? (
+                <LandingPage />
+            ) : (
+                <>
+                    <Control beginGame={beginGame}></Control>
 
-            <Grid justifyContent="center" alignItems="center" container>
-                <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
-                <TrumpCard trumpCard={trumpCard} />
-            </Grid>
-            <PlayedCards playedCards={playedCards} playerCount={playerCount} />
-            <YourCards userCards={yourCards} playCard={playCard} />
+                    <Grid justifyContent="center" alignItems="center" container>
+                        <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
+                        <TrumpCard trumpCard={trumpCard} />
+                    </Grid>
+                    <PlayedCards playedCards={playedCards} playerCount={playerCount} />
+                    <YourCards userCards={yourCards} playCard={playCard} />
+                </>
+            )}
         </Grid>
     );
 };
