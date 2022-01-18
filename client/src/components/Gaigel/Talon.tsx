@@ -4,8 +4,6 @@ import Paper from "@material-ui/core/Paper";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import Typography from "@material-ui/core/Typography";
 
-import GaigelCard from "./GaigelCard";
-
 const useStyles = makeStyles({
     root: {
         width: 100,
@@ -52,7 +50,7 @@ const Talon: React.FC<Props> = ({ cardsLeft, drawCard }) => {
                     }}
                 >
                     <Typography variant="h4" align="center">
-                        <img src={"/cardBacksite_02.png"} width={"60"} height={"90"} />
+                        <img src={"/cardBacksite_02.png"} width={"60"} height={"90"} alt="" />
                     </Typography>
                 </CardActionArea>
             </Paper>

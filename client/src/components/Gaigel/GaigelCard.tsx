@@ -3,7 +3,6 @@ import Paper from "@material-ui/core/Paper";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import CardActionArea from "@material-ui/core/CardActionArea";
-import { Avatar } from "@material-ui/core";
 
 const useStyles = makeStyles({
     root: {
@@ -60,13 +59,13 @@ const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard }) => {
             >
                 {value !== "" && (
                     <Box>
-                        <img src={symbolMap[type]} width={iconSize} height={iconSize} />
-                        <img src={"/Blank.jpg"} width={"15"} height={iconSize} />
-                        <img src={symbolMap[type]} width={iconSize} height={iconSize} />
+                        <img src={symbolMap[type]} width={iconSize} height={iconSize} alt="" />
+                        <img src={"/Blank.jpg"} width={"15"} height={iconSize} alt="" />
+                        <img src={symbolMap[type]} width={iconSize} height={iconSize} alt="" />
                         <Typography align="center">{value}</Typography>
-                        <img src={symbolMap[type]} width={iconSize} height={iconSize} />
-                        <img src={"/Blank.jpg"} width={"15"} height={iconSize} />
-                        <img src={symbolMap[type]} width={iconSize} height={iconSize} />
+                        <img src={symbolMap[type]} width={iconSize} height={iconSize} alt="" />
+                        <img src={"/Blank.jpg"} width={"15"} height={iconSize} alt="" />
+                        <img src={symbolMap[type]} width={iconSize} height={iconSize} alt="" />
                     </Box>
                 )}
             </CardActionArea>
