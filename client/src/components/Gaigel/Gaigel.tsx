@@ -57,6 +57,10 @@ const Gaigel: React.FC<Props> = () => {
         new Array(0).fill({ type: "", value: "" })
     );
 
+    const login = () => {
+        setLoggedIn(true);
+    };
+
     // MARK: playCard
     const playCard = (type: string, value: string) => {
         // The array of played cards is filled up with empty entries in PlayingField.tsx in order to make empty GaigelCards
@@ -144,7 +148,7 @@ const Gaigel: React.FC<Props> = () => {
             container
         >
             {!loggedIn ? (
-                <LandingPage />
+                <LandingPage login={login} />
             ) : (
                 <>
                     <Control beginGame={beginGame}></Control>
