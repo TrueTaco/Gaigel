@@ -26,6 +26,7 @@ server.listen(port, () => {
 let players = [];
 let talon = [];
 let currentGameState = "Waiting";
+let currentGame;
 let trumpCard;
 let i = 0;
 
@@ -53,40 +54,63 @@ io.on("connection", (socket) => {
             io.to(player.socket.id).emit("setYourCards", player.cards);
         });
 
+        io.to(players[0].socket.id).emit("openOpening", "");
+
         io.emit("setTalon", talon);
     });
 
     socket.on("playCard", (data) => {
         // console.log(`Somebody played this card: ${data.type} ${data.value}`);
-        currentGame.playedCards.push(data);
-        io.emit("setPlayedCards", currentGame.playedCards);
+        console.log(players);
+        let player = players.find((element) => element.socket == socket);
+        if (currentGame.order[0] === player && player != undefined) {
+            switch (currentGame.opening) {
+                case "AndereAlteHat":
+                    processAndereAlteHat(socket, data, player);
+                    break;
+                case "GeElfen":
+                    break;
+                case "HöherHat":
+                    break;
+                case "AufDissle":
+                    break;
+                default:
+                    player.cards.filter((element) => element != data); // WICHTIG => kann man bei gaigel zweimal die Selbe karte auf der hand haben
+                    player.playedCard = data;
+                    currentGame.playedCards.push(data);
+                    io.emit("setPlayedCards", currentGame.playedCards);
+                    currentGame.order.shift();
+                    break;
+            }
+        } else {
+            io.emit("setPlayedCards", currentGame.playedCards);
+            socket.emit("setYourCards", player.cards);
+        }
     });
 
     socket.on("AndereAlteHat", () => {
-        console.log("AndereAlteHat");
-        io.to(socket.id).emit("closeOpening", "");
-        // Set GameOpening
-    });
-
-    socket.on("AndereAlteHat", () => {
+        currentGame.opening = "AndereAlteHat";
         console.log("AndereAlteHat");
         io.to(socket.id).emit("closeOpening", "");
         // Set GameOpening
     });
 
     socket.on("GeElfen", () => {
+        currentGame.opening = "GeElfen";
         console.log("GeElfen");
         io.to(socket.id).emit("closeOpening", "");
         // Set GameOpening
     });
 
     socket.on("HöherHat", () => {
+        currentGame.opening = "HöherHat";
         console.log("HöherHat");
         io.to(socket.id).emit("closeOpening", "");
         // Set GameOpening
     });
 
     socket.on("AufDissle", () => {
+        currentGame.opening = "AufDissle";
         console.log("AufDissle");
         io.to(socket.id).emit("closeOpening", "");
         // Set GameOpening
@@ -101,6 +125,31 @@ io.on("connection", (socket) => {
         console.log(`${players.length} | Client disconnected (${socket.id})`);
     });
 });
+
+function processAndereAlteHat(socket, data, player) {
+    if (player === currentGame.players[0]) {
+        if (data.value === "A") {
+            player.playedCard = data;
+            currentGame.playedCards.push(data);
+            io.emit("setPlayedCards", currentGame.playedCards);
+            currentGame.order.shift();
+        } else {
+            io.emit("setPlayedCards", currentGame.playedCards);
+        }
+    } else {
+        player.playedCard = data;
+        currentGame.playedCards.push(data);
+        io.emit("setPlayedCards", currentGame.playedCards);
+        currentGame.order.shift();
+    }
+    console.log(currentGame.order.length);
+    if (currentGame.order.length === 0) {
+        if (currentGame.playedCards.filter((card) => card.value === "A").length > 1) {
+            console.log(players[0] + " Won");
+            console.log(players);
+        }
+    }
+}
 
 function createTalon() {
     let types = ["Eichel", "Blatt", "Herz", "Schellen"];

@@ -30,7 +30,7 @@ interface CardProps {
 const Gaigel: React.FC<Props> = () => {
     // MARK: States
     const classes = useStyles();
-    const [opening, setOpening] = useState(true);
+    const [opening, setOpening] = useState(false);
     // Latest response from server (For debugging purposes)
     const [response, setResponse] = useState("");
     const [socket, setSocket] = useState();
@@ -137,6 +137,12 @@ const Gaigel: React.FC<Props> = () => {
         newSocket.on("setPlayedCards", (data: any) => {
             console.log("Played cards set");
             setPlayedCards(data);
+            console.log(playedCards);
+        });
+
+        newSocket.on("openOpening", (data: any) => {
+            console.log("Closed Opening");
+            setOpening(true);
         });
 
         newSocket.on("closeOpening", (data: any) => {
