@@ -1,10 +1,11 @@
 // MARK: Imports
-import { useEffect, useRef, useState } from "react";
-import socketIOClient, { Socket } from "socket.io-client";
+import { useEffect, useState } from "react";
+import socketIOClient from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 
+import LandingPage from "./LandingPage";
 import Talon from "./Talon";
 import TrumpCard from "./TrumpCard";
 import PlayedCards from "./PlayedCards";
@@ -32,10 +33,14 @@ interface CardProps {
 const Gaigel: React.FC<Props> = () => {
     // MARK: States
     const classes = useStyles();
+
+    // Boolean for deciding on whether to show the landing page or the game
+    const [loggedIn, setLoggedIn] = useState<boolean>(false);
+
     const [opening, setOpening] = useState(false);
     // Latest response from server (For debugging purposes)
     const [response, setResponse] = useState("");
-    const [socket, setSocket] = useState();
+    const [socket, setSocket] = useState(null);
 
     // Amount of players that are currently playing
     const [playerCount, setPlayerCount] = useState<number>(0);
@@ -63,6 +68,14 @@ const Gaigel: React.FC<Props> = () => {
             return;
         }
         setNoAceWarning(false);
+    };
+
+    const login = () => {
+        setLoggedIn(true);
+    };
+
+    const drawCard = () => {
+        console.log("Want to draw card");
     };
 
     // MARK: playCard
@@ -182,97 +195,6 @@ const Gaigel: React.FC<Props> = () => {
         return () => newSocket.close();
     }, [setSocket]);
 
-    // MARK: Legacy functions
-    const createTalon = () => {
-        let types: string[] = ["Eichel", "Blatt", "Herz", "Schellen"];
-        // let types: string[] = ["Eichel"];
-        let values: string[] = ["7", "U", "O", "K", "10", "A"];
-        let newTalon: CardProps[] = [];
-
-        types.forEach((type) =>
-            values.forEach((value) => {
-                newTalon.push({ type: type, value: value });
-            })
-        );
-
-        newTalon.push(...newTalon);
-        fisherYatesShuffle(newTalon);
-
-        setTalonCards(newTalon);
-    };
-
-    // Reliable shuffling algorithm
-    // Source: https://www.delftstack.com/de/howto/javascript/shuffle-array-javascript/
-    const fisherYatesShuffle = (arr: CardProps[]) => {
-        for (let i = arr.length - 1; i > 0; i--) {
-            let j = Math.floor(Math.random() * (i + 1));
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-    };
-
-    const drawCard = (amount: number) => {
-        if (yourCards.length < 5 && talonCards.length > 0) {
-            // Gets last cards of the talon array and removes them
-            let drawnCards: CardProps[] = talonCards.slice(talonCards.length - amount);
-            setTalonCards(talonCards.slice(0, talonCards.length - amount));
-
-            let newUserCards: CardProps[] = yourCards;
-            drawnCards.forEach((card) => {
-                newUserCards.push(card);
-            });
-
-            newUserCards.sort((a, b): number => {
-                const points = new Map();
-                points.set("7", 0);
-                points.set("U", 2);
-                points.set("O", 3);
-                points.set("K", 4);
-                points.set("10", 10);
-                points.set("A", 11);
-                if (points.get(a.value) < points.get(b.value)) {
-                    return -1;
-                }
-                if (points.get(a.value) > points.get(b.value)) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            });
-
-            newUserCards.sort((a, b): number => {
-                //"Eichel", "Blatt", "Herz", "Schellen"
-                const trump = new Map();
-                trump.set("Eichel", 0);
-                trump.set("Blatt", 1);
-                trump.set("Herz", 2);
-                trump.set("Schellen", 3);
-
-                if (trumpCard.type === a.type || trumpCard.type === b.type) {
-                    trump.set(trumpCard.type, 5);
-                }
-
-                if (trump.get(a.value) < trump.get(b.value)) {
-                    return -1;
-                }
-                if (trump.get(a.value) > trump.get(b.value)) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            });
-
-            // Gives drawn cards to player
-            setYourCards(newUserCards);
-        }
-    };
-
-    const chooseTrumpCard = () => {
-        let newTrumpCard: CardProps = talonCards[talonCards.length - 1];
-        setTalonCards(talonCards.slice(0, talonCards.length - 1));
-
-        setTrumpCard(newTrumpCard);
-    };
-
     // MARK: Return
     // <Typography>|{response}|</Typography>
     // @ts-ignore
@@ -283,33 +205,39 @@ const Gaigel: React.FC<Props> = () => {
             alignContent="space-around"
             container
         >
-            <Control beginGame={beginGame}></Control>
+            {!loggedIn ? (
+                <LandingPage login={login} />
+            ) : (
+                <>
+                    <Control beginGame={beginGame}></Control>
 
-            <Grid justifyContent="center" alignItems="center" container>
-                <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
-                <TrumpCard trumpCard={trumpCard} />
-            </Grid>
-            <PlayedCards playedCards={playedCards} playerCount={playerCount} />
-            <Snackbar
-                open={noAceWarning}
-                autoHideDuration={3000}
-                onClose={closeNoAceWarning}
-                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-                //message="Sie haben kein Ass sie können dieses Opening nicht spielen"
-            >
-                <Alert onClose={closeNoAceWarning} severity="warning">
-                    Sie haben kein Ass. Sie können dieses Opening nicht spielen.
-                </Alert>
-            </Snackbar>
-            {opening && (
-                <Opening
-                    AndereAlteHat={AndereAlteHat}
-                    GeElfen={GeElfen}
-                    HöherHat={HöherHat}
-                    AufDissle={AufDissle}
-                ></Opening>
+                    <Grid justifyContent="center" alignItems="center" container>
+                        <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
+                        <TrumpCard trumpCard={trumpCard} />
+                    </Grid>
+                    <PlayedCards playedCards={playedCards} playerCount={playerCount} />
+                    <Snackbar
+                        open={noAceWarning}
+                        autoHideDuration={3000}
+                        onClose={closeNoAceWarning}
+                        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+                        //message="Sie haben kein Ass sie können dieses Opening nicht spielen"
+                    >
+                        <Alert onClose={closeNoAceWarning} severity="warning">
+                            Sie haben kein Ass. Sie können dieses Opening nicht spielen.
+                        </Alert>
+                    </Snackbar>
+                    {opening && (
+                        <Opening
+                            AndereAlteHat={AndereAlteHat}
+                            GeElfen={GeElfen}
+                            HöherHat={HöherHat}
+                            AufDissle={AufDissle}
+                        ></Opening>
+                    )}
+                    <YourCards userCards={yourCards} playCard={playCard} />
+                </>
             )}
-            <YourCards userCards={yourCards} playCard={playCard} />
         </Grid>
     );
 };
