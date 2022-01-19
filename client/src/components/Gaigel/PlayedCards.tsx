@@ -43,7 +43,7 @@ const PlayedCards: React.FC<Props> = ({ playedCards, playerCount }) => {
 
     return (
         <Grid container justifyContent="center" className={classes.root}>
-            <Typography className={classes.header}>Played cards</Typography>
+            <Typography className={classes.header}>Gespielte Karten</Typography>
 
             <Grid container spacing={2} justifyContent="center">
                 {cards.map((card) => {

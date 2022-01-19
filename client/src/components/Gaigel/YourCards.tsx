@@ -29,7 +29,7 @@ const YourCards: React.FC<Props> = ({ userCards, playCard }) => {
 
     return (
         <Grid container className={classes.root} justifyContent="center">
-            <Typography className={classes.header}>Your cards</Typography>
+            <Typography className={classes.header}>Deine Karten</Typography>
 
             <Grid container spacing={2} justifyContent="center">
                 {userCards.map((card) => {

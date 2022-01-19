@@ -24,7 +24,7 @@ const Control: React.FC<Props> = ({ beginGame }) => {
     return (
         <Grid className={classes.root}>
             <Button className={classes.beginGame} variant="contained" onClick={handleGameBegin}>
-                Start game
+                Spiel starten
             </Button>
         </Grid>
     );

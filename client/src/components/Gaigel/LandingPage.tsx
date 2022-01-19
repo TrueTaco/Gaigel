@@ -15,7 +15,7 @@ const LandingPage: React.FC<Props> = ({ login }) => {
     return (
         <>
             <Button variant="contained" onClick={login}>
-                Login
+                Einloggen
             </Button>
         </>
     );

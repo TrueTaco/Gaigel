@@ -54,7 +54,7 @@ const Talon: React.FC<Props> = ({ cardsLeft, drawCard }) => {
                     </Typography>
                 </CardActionArea>
             </Paper>
-            <Typography className={classes.counter}>Cards left: {cardsLeft}</Typography>
+            <Typography className={classes.counter}>Karten: {cardsLeft}</Typography>
         </Grid>
     );
 };
