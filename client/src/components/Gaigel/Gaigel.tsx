@@ -11,6 +11,8 @@ import PlayedCards from "./PlayedCards";
 import YourCards from "./YourCards";
 import Control from "./Control";
 import Opening from "./Opening";
+import { Snackbar } from "@material-ui/core";
+import Alert from "@material-ui/lab/Alert";
 
 // MARK: Styles
 const useStyles = makeStyles({
@@ -43,6 +45,8 @@ const Gaigel: React.FC<Props> = () => {
         new Array(0).fill({ type: "", value: "" })
     );
 
+    const [noAssWarning, setNoAssWarning] = useState(false);
+
     // The trump card
     const [trumpCard, setTrumpCard] = useState<CardProps>({ type: "", value: "" });
 
@@ -53,6 +57,13 @@ const Gaigel: React.FC<Props> = () => {
     const [yourCards, setYourCards] = useState<CardProps[]>(
         new Array(0).fill({ type: "", value: "" })
     );
+
+    const closeNoAssWarning = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === "clickaway") {
+            return;
+        }
+        setNoAssWarning(false);
+    };
 
     // MARK: playCard
     const playCard = (type: string, value: string) => {
@@ -77,13 +88,21 @@ const Gaigel: React.FC<Props> = () => {
     };
 
     const AndereAlteHat = () => {
-        // @ts-ignore
-        socket.emit("AndereAlteHat", "");
+        if (yourCards.filter((card) => card.value == "A").length > 0) {
+            // @ts-ignore
+            socket.emit("AndereAlteHat", "");
+        } else {
+            setNoAssWarning(true);
+        }
     };
 
     const GeElfen = () => {
-        // @ts-ignore
-        socket.emit("GeElfen", "");
+        if (yourCards.filter((card) => card.value == "A").length > 0) {
+            // @ts-ignore
+            socket.emit("GeElfen", "");
+        } else {
+            setNoAssWarning(true);
+        }
     };
 
     const HöherHat = () => {
@@ -122,6 +141,11 @@ const Gaigel: React.FC<Props> = () => {
         newSocket.on("setTalon", (data: any) => {
             console.log("Talon set");
             setTalonCards(data);
+        });
+
+        newSocket.on("setPlayerCount", (data: number) => {
+            console.log(data);
+            setPlayerCount(data);
         });
 
         newSocket.on("setTrumpCard", (data: any) => {
@@ -251,6 +275,7 @@ const Gaigel: React.FC<Props> = () => {
 
     // MARK: Return
     // <Typography>|{response}|</Typography>
+    // @ts-ignore
     return (
         <Grid
             className={classes.root}
@@ -265,6 +290,17 @@ const Gaigel: React.FC<Props> = () => {
                 <TrumpCard trumpCard={trumpCard} />
             </Grid>
             <PlayedCards playedCards={playedCards} playerCount={playerCount} />
+            <Snackbar
+                open={noAssWarning}
+                autoHideDuration={3000}
+                onClose={closeNoAssWarning}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+                //message="Sie haben kein Ass sie können dieses Opening nicht spielen"
+            >
+                <Alert onClose={closeNoAssWarning} severity="warning">
+                    Sie haben kein Ass sie können dieses Opening nicht spielen
+                </Alert>
+            </Snackbar>
             {opening && (
                 <Opening
                     AndereAlteHat={AndereAlteHat}

@@ -33,6 +33,7 @@ let i = 0;
 io.on("connection", (socket) => {
     players.push(new classes.Player(socket));
     console.log(`${players.length} | New client connected (${socket.id})`);
+    io.emit("setPlayerCount", players.length);
 
     let message = `Hello Client ${socket.id}`;
     socket.emit("onConnect", message);
@@ -42,10 +43,10 @@ io.on("connection", (socket) => {
         console.log("Game has been started");
 
         currentGame = new classes.Game(players, "123456");
+        currentGame.players[0].vorhand = true;
 
         createTalon();
         chooseTrumpCard();
-
         io.emit("setTalon", talon);
         io.emit("setTrumpCard", trumpCard);
 
@@ -61,7 +62,6 @@ io.on("connection", (socket) => {
 
     socket.on("playCard", (data) => {
         // console.log(`Somebody played this card: ${data.type} ${data.value}`);
-        console.log(players);
         let player = players.find((element) => element.socket == socket);
         if (currentGame.order[0] === player && player != undefined) {
             switch (currentGame.opening) {
@@ -69,13 +69,22 @@ io.on("connection", (socket) => {
                     processAndereAlteHat(socket, data, player);
                     break;
                 case "GeElfen":
+                    processGoElfen(socket, data, player);
                     break;
                 case "HöherHat":
                     break;
                 case "AufDissle":
                     break;
                 default:
-                    player.cards.filter((element) => element != data); // WICHTIG => kann man bei gaigel zweimal die Selbe karte auf der hand haben
+                    for (let i = 0; i < player.cards.length; i++) {
+                        if (
+                            data.type === player.cards[i].type &&
+                            data.value === player.cards[i].value
+                        ) {
+                            player.cards.splice(i, 1);
+                            break;
+                        }
+                    }
                     player.playedCard = data;
                     currentGame.playedCards.push(data);
                     io.emit("setPlayedCards", currentGame.playedCards);
@@ -142,12 +151,37 @@ function processAndereAlteHat(socket, data, player) {
         io.emit("setPlayedCards", currentGame.playedCards);
         currentGame.order.shift();
     }
-    console.log(currentGame.order.length);
     if (currentGame.order.length === 0) {
-        if (currentGame.playedCards.filter((card) => card.value === "A").length > 1) {
+        if (currentGame.playedCards.filter((card) => card.value === "A").length == 1) {
             console.log(players[0] + " Won");
-            console.log(players);
+        } else {
+            let winner = currentGame.players
+                .slice(1)
+                .filter((player) => player.playedCard == currentGame.playedCards[0]);
+
+            console.log(winner + "won (other dude)");
         }
+    }
+}
+
+function processGoElfen(socket, data, player) {
+    if (player === currentGame.players[0]) {
+        if (data.value === "A") {
+            player.playedCard = data;
+            currentGame.playedCards.push(data);
+            io.emit("setPlayedCards", currentGame.playedCards);
+            currentGame.order.shift();
+        } else {
+            io.emit("setPlayedCards", currentGame.playedCards);
+        }
+    } else {
+        player.playedCard = data;
+        currentGame.playedCards.push(data);
+        io.emit("setPlayedCards", currentGame.playedCards);
+        currentGame.order.shift();
+    }
+    if (currentGame.order.length === 0) {
+        console.log(players[0] + " Won");
     }
 }
 
