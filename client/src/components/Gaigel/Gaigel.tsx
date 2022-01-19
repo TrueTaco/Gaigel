@@ -38,14 +38,14 @@ const Gaigel: React.FC<Props> = () => {
     const [socket, setSocket] = useState();
 
     // Amount of players that are currently playing
-    const [playerCount, setPlayerCount] = useState<number>(4);
+    const [playerCount, setPlayerCount] = useState<number>(0);
 
     // The cards that can still be drawn from the talon
     const [talonCards, setTalonCards] = useState<CardProps[]>(
         new Array(0).fill({ type: "", value: "" })
     );
 
-    const [noAssWarning, setNoAssWarning] = useState(false);
+    const [noAceWarning, setNoAceWarning] = useState(false);
 
     // The trump card
     const [trumpCard, setTrumpCard] = useState<CardProps>({ type: "", value: "" });
@@ -58,11 +58,11 @@ const Gaigel: React.FC<Props> = () => {
         new Array(0).fill({ type: "", value: "" })
     );
 
-    const closeNoAssWarning = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    const closeNoAceWarning = (event?: React.SyntheticEvent | Event, reason?: string) => {
         if (reason === "clickaway") {
             return;
         }
-        setNoAssWarning(false);
+        setNoAceWarning(false);
     };
 
     // MARK: playCard
@@ -92,7 +92,7 @@ const Gaigel: React.FC<Props> = () => {
             // @ts-ignore
             socket.emit("AndereAlteHat", "");
         } else {
-            setNoAssWarning(true);
+            setNoAceWarning(true);
         }
     };
 
@@ -101,7 +101,7 @@ const Gaigel: React.FC<Props> = () => {
             // @ts-ignore
             socket.emit("GeElfen", "");
         } else {
-            setNoAssWarning(true);
+            setNoAceWarning(true);
         }
     };
 
@@ -291,14 +291,14 @@ const Gaigel: React.FC<Props> = () => {
             </Grid>
             <PlayedCards playedCards={playedCards} playerCount={playerCount} />
             <Snackbar
-                open={noAssWarning}
+                open={noAceWarning}
                 autoHideDuration={3000}
-                onClose={closeNoAssWarning}
+                onClose={closeNoAceWarning}
                 anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
                 //message="Sie haben kein Ass sie können dieses Opening nicht spielen"
             >
-                <Alert onClose={closeNoAssWarning} severity="warning">
-                    Sie haben kein Ass sie können dieses Opening nicht spielen
+                <Alert onClose={closeNoAceWarning} severity="warning">
+                    Sie haben kein Ass. Sie können dieses Opening nicht spielen.
                 </Alert>
             </Snackbar>
             {opening && (

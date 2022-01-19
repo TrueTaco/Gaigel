@@ -72,6 +72,7 @@ io.on("connection", (socket) => {
                     processGoElfen(socket, data, player);
                     break;
                 case "HöherHat":
+                    processHöherHat(socket, data, player);
                     break;
                 case "AufDissle":
                     break;
@@ -167,6 +168,42 @@ function processAndereAlteHat(socket, data, player) {
 function processGoElfen(socket, data, player) {
     if (player === currentGame.players[0]) {
         if (data.value === "A") {
+            player.playedCard = data;
+            currentGame.playedCards.push(data);
+            io.emit("setPlayedCards", currentGame.playedCards);
+            currentGame.order.shift();
+        } else {
+            io.emit("setPlayedCards", currentGame.playedCards);
+        }
+    } else {
+        player.playedCard = data;
+        currentGame.playedCards.push(data);
+        io.emit("setPlayedCards", currentGame.playedCards);
+        currentGame.order.shift();
+    }
+    if (currentGame.order.length === 0) {
+        let beginnerPlayer = currentGame.players.filter((player) => player.vorhand == true);
+        let notBeginnerPlayer = currentGame.players.filter((player) => player.vorhand == false);
+        let playerWithHighestPoints = null;
+        notBeginnerPlayer.forEach((player) => {
+            if (
+                player.playedCard.type === beginnerPlayer.Player.playedCard.type &&
+                player.playedCard.value > beginnerPlayer.Player.playedCard.value
+            ) {
+                playerWithHighestPoints = player;
+            }
+        });
+        if ((playerWithHighestPoints = null)) {
+            console.log(beginnerPlayer + "won");
+        } else {
+            console.log(playerWithHighestPoints + "won (other dude)");
+        }
+    }
+}
+
+function processHöherHat(socket, data, player) {
+    if (player === currentGame.players[0]) {
+        if (data.value !== "A" && data.type !== trumpCard.type) {
             player.playedCard = data;
             currentGame.playedCards.push(data);
             io.emit("setPlayedCards", currentGame.playedCards);
