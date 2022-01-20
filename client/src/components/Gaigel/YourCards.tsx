@@ -6,7 +6,7 @@ import GaigelCard from "./GaigelCard";
 
 const useStyles = makeStyles({
     root: {
-        marginTop: 100,
+        marginTop: 10,
     },
     header: {
         marginBottom: 10,

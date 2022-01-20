@@ -4,7 +4,6 @@ import { Grid } from "@material-ui/core";
 
 const useStyles = makeStyles({
     root: {
-        margin: 20,
         justifyContent: "space-evenly",
     },
     beginGame: {},

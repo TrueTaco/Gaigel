@@ -7,9 +7,7 @@ import Typography from "@material-ui/core/Typography";
 import GaigelCard from "./GaigelCard";
 
 const useStyles = makeStyles({
-    root: {
-        marginTop: 100,
-    },
+    root: {},
     header: {
         marginBottom: 10,
     },
