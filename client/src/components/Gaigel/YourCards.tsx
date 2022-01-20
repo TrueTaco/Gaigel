@@ -34,12 +34,13 @@ const YourCards: React.FC<Props> = ({ userCards, playCard }) => {
             <Grid container spacing={2} justifyContent="center">
                 {userCards.map((card) => {
                     i++;
+                    let currentClickable = card.type === "" ? false : true;
                     return (
                         <Grid item key={i}>
                             <GaigelCard
                                 type={card.type}
                                 value={card.value}
-                                clickable={true}
+                                clickable={currentClickable}
                                 playCard={playCard}
                             />
                         </Grid>
