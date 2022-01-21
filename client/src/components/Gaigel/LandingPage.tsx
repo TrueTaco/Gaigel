@@ -23,7 +23,7 @@ const useStyles = makeStyles({
 });
 
 interface Props {
-    login: () => void;
+    login: (username: string, lobbycode: string) => void;
 }
 
 const LandingPage: React.FC<Props> = ({ login }) => {
@@ -62,7 +62,14 @@ const LandingPage: React.FC<Props> = ({ login }) => {
                 inputProps={{ maxLength: 15 }}
             />
 
-            <Button variant="contained" onClick={login}>
+            <Button
+                variant="contained"
+                onClick={() => {
+                    if (username !== "" && lobbycode !== "") {
+                        login(username, lobbycode);
+                    }
+                }}
+            >
                 Einloggen
             </Button>
         </Box>

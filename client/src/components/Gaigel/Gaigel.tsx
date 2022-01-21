@@ -95,8 +95,9 @@ const Gaigel: React.FC<Props> = () => {
         setNoAceWarning(false);
     };
 
-    const login = () => {
+    const login = (username: string, lobbycode: string) => {
         setLoggedIn(true);
+        console.log(`${username} wants to join lobby ${lobbycode}`);
     };
 
     const drawCard = () => {
