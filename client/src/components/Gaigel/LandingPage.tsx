@@ -2,10 +2,24 @@ import { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
-import Grid from "@material-ui/core/Grid";
+import Box from "@material-ui/core/Grid";
+import Paper from "@material-ui/core/Paper";
 
 const useStyles = makeStyles({
-    root: {},
+    root: {
+        padding: 15,
+        borderRadius: 10,
+        backgroundColor: "#ffffff",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        gap: "20px",
+    },
+    textField: {
+        backgroundColor: "#ffffff",
+        borderRadius: 4,
+        fontSize: 5,
+    },
 });
 
 interface Props {
@@ -26,39 +40,32 @@ const LandingPage: React.FC<Props> = ({ login }) => {
     };
 
     return (
-        <Grid
-            container
-            className={classes.root}
-            justifyContent="center"
-            alignItems="center"
-            alignContent="center"
-            direction="column"
-            spacing={3}
-        >
-            <Grid item>
-                <TextField
-                    required
-                    autoFocus
-                    variant="outlined"
-                    onChange={handleUsernameChange}
-                    inputProps={{ maxLength: 15 }}
-                />
-            </Grid>
-            <Grid item>
-                <TextField
-                    required
-                    autoFocus
-                    variant="outlined"
-                    onChange={handleLobbycodeChange}
-                    inputProps={{ maxLength: 15 }}
-                />
-            </Grid>
-            <Grid item>
-                <Button variant="contained" onClick={login}>
-                    Einloggen
-                </Button>
-            </Grid>
-        </Grid>
+        <Box className={classes.root}>
+            <TextField
+                className={classes.textField}
+                color="primary"
+                required
+                autoFocus
+                variant="outlined"
+                label="Nutzername"
+                onChange={handleUsernameChange}
+                inputProps={{ maxLength: 15 }}
+            />
+
+            <TextField
+                className={classes.textField}
+                required
+                autoFocus
+                variant="outlined"
+                label="Lobbycode"
+                onChange={handleLobbycodeChange}
+                inputProps={{ maxLength: 15 }}
+            />
+
+            <Button variant="contained" onClick={login}>
+                Einloggen
+            </Button>
+        </Box>
     );
 };
 

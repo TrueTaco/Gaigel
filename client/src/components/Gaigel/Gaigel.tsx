@@ -19,13 +19,10 @@ import Alert from "@material-ui/lab/Alert";
 // MARK: Styles
 const useStyles = makeStyles({
     root: {
-        // minHeight: "100vh",
-        // height: "100%",
         height: "100vh",
-        padding: 10,
-        backgroundColor: "#7c5439",
-        border: "10px solid #53362b",
-        boxShadow: "0 0 0 20px #53362b",
+        paddingLeft: 20,
+        paddingRight: 20,
+        // boxShadow: "0 0 0 5px #53362b",
         borderRadius: 20,
         display: "flex",
         flexDirection: "column",
@@ -33,14 +30,13 @@ const useStyles = makeStyles({
         alignContent: "space-around",
         alignItems: "center",
     },
-
     playingField: {
         padding: 10,
         paddingTop: 10,
         paddingBottom: 20,
         backgroundColor: "#1E7307",
         border: "5px solid #185905",
-        boxShadow: "0 0 0 5px #185905",
+        // boxShadow: "0 0 0 5px #185905",
         borderRadius: 20,
         display: "flex",
         flexDirection: "column",
@@ -64,7 +60,7 @@ const Gaigel: React.FC<Props> = () => {
     const classes = useStyles();
 
     // Boolean for deciding on whether to show the landing page or the game
-    const [loggedIn, setLoggedIn] = useState<boolean>(true);
+    const [loggedIn, setLoggedIn] = useState<boolean>(false);
 
     const [opening, setOpening] = useState(false);
     // Latest response from server (For debugging purposes)
@@ -72,7 +68,7 @@ const Gaigel: React.FC<Props> = () => {
     const [socket, setSocket] = useState(null);
 
     // Amount of players that are currently playing
-    const [playerCount, setPlayerCount] = useState<number>(6);
+    const [playerCount, setPlayerCount] = useState<number>(2);
 
     // The cards that can still be drawn from the talon
     const [talonCards, setTalonCards] = useState<CardProps[]>(
@@ -228,41 +224,46 @@ const Gaigel: React.FC<Props> = () => {
     // <Typography>|{response}|</Typography>
     // @ts-ignore
     return (
-        <Box className={classes.root}>
+        <Box
+            className={classes.root}
+            style={{
+                backgroundColor: !loggedIn ? "#313131" : "#7c5439",
+                border: !loggedIn ? "none" : "10px solid #53362b",
+            }}
+        >
             {!loggedIn ? (
                 <LandingPage login={login} />
             ) : (
                 <>
                     <Control beginGame={beginGame}></Control>
-
                     <Box className={classes.playingField}>
                         <Box className={classes.talonAndTrump}>
                             <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
                             <TrumpCard trumpCard={trumpCard} />
                         </Box>
 
-                        <Snackbar
-                            open={noAceWarning}
-                            autoHideDuration={3000}
-                            onClose={closeNoAceWarning}
-                            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-                            //message="Sie haben kein Ass sie können dieses Opening nicht spielen"
-                        >
-                            <Alert onClose={closeNoAceWarning} severity="warning">
-                                Sie haben kein Ass. Sie können dieses Opening nicht spielen.
-                            </Alert>
-                        </Snackbar>
-                        {opening && (
-                            <Opening
-                                AndereAlteHat={AndereAlteHat}
-                                GeElfen={GeElfen}
-                                HöherHat={HöherHat}
-                                AufDissle={AufDissle}
-                            ></Opening>
-                        )}
-
                         <PlayedCards playedCards={playedCards} playerCount={playerCount} />
                     </Box>
+                    <Snackbar
+                        open={noAceWarning}
+                        autoHideDuration={3000}
+                        onClose={closeNoAceWarning}
+                        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+                        //message="Sie haben kein Ass sie können dieses Opening nicht spielen"
+                    >
+                        <Alert onClose={closeNoAceWarning} severity="warning">
+                            Sie haben kein Ass. Sie können dieses Opening nicht spielen.
+                        </Alert>
+                    </Snackbar>
+                    {opening && (
+                        <Opening
+                            AndereAlteHat={AndereAlteHat}
+                            GeElfen={GeElfen}
+                            HöherHat={HöherHat}
+                            AufDissle={AufDissle}
+                        ></Opening>
+                    )}
+                    <YourCards userCards={yourCards} playCard={playCard} />
                 </>
             )}
         </Box>

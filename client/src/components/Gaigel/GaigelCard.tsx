@@ -6,8 +6,8 @@ import CardActionArea from "@material-ui/core/CardActionArea";
 
 const useStyles = makeStyles({
     root: {
-        width: 50,
-        height: 75,
+        width: 40,
+        height: 60,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -19,8 +19,8 @@ const useStyles = makeStyles({
     },
     cardIcons: {
         flex: 1,
-        width: 50,
-        height: 50,
+        width: 40,
+        height: 40,
         resizeMode: "contain",
     },
 });
@@ -39,7 +39,7 @@ interface Hash {
 const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard }) => {
     const classes = useStyles();
     const symbolMap: Hash = {};
-    const iconSize = 13;
+    const iconSize = 10;
     symbolMap["Eichel"] = "/Eichel.png";
     symbolMap["Blatt"] = "/Blatt.png";
     symbolMap["Herz"] = "/Herz.png";
