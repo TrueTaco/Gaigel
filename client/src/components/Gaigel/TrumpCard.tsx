@@ -35,7 +35,7 @@ const TrumpCard: React.FC<Props> = ({ trumpCard }) => {
 
     return (
         <Grid className={classes.root}>
-            <Typography className={classes.header}>Trump</Typography>
+            <Typography className={classes.header}>Trumpf</Typography>
             <GaigelCard type={trumpCard.type} value={trumpCard.value} clickable={false} />
             <Typography className={classes.footer}>{emptyChar}</Typography>
         </Grid>

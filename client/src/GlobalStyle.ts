@@ -25,13 +25,15 @@ const GlobalStyle = createGlobalStyle`
    }
 
    /* This is here to make my eyes hurt less at night */
-   body{
-      /* background-color: #292929; */
+   body {
+      background-color: #313131;
+      display: flex;
+      justify-content: center;
    }
 
-   /* html {
-        font-size: 62.5%;
-   } */
+   html {
+        /* font-size: 62.5%; */
+   }
    `;
 
 export default GlobalStyle;

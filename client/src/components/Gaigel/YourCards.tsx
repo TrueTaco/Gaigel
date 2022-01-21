@@ -1,15 +1,25 @@
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
+import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 
 import GaigelCard from "./GaigelCard";
 
 const useStyles = makeStyles({
     root: {
-        marginTop: 100,
+        margin: 20,
+        padding: 10,
+        backgroundColor: "#575757",
+        border: "5px solid #303030",
+        boxShadow: "0 0 0 5px #303030",
+        borderRadius: 20,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
     },
     header: {
         marginBottom: 10,
+        color: "white",
     },
 });
 
@@ -27,26 +37,33 @@ const YourCards: React.FC<Props> = ({ userCards, playCard }) => {
     const classes = useStyles();
     let i: number = 0;
 
-    return (
-        <Grid container className={classes.root} justifyContent="center">
-            <Typography className={classes.header}>Your cards</Typography>
+    let filledUserCards: CardProps[] = userCards.slice();
 
-            <Grid container spacing={2} justifyContent="center">
-                {userCards.map((card) => {
+    for (let q = filledUserCards.length; q < 5; q++) {
+        filledUserCards.splice(filledUserCards.length, 0, { type: "", value: "" });
+    }
+
+    return (
+        <Box className={classes.root}>
+            <Typography className={classes.header}>Deine Karten</Typography>
+
+            <Grid container spacing={1} justifyContent="center">
+                {filledUserCards.map((card) => {
                     i++;
+                    let currentClickable = card.type === "" ? false : true;
                     return (
                         <Grid item key={i}>
                             <GaigelCard
                                 type={card.type}
                                 value={card.value}
-                                clickable={true}
+                                clickable={currentClickable}
                                 playCard={playCard}
                             />
                         </Grid>
                     );
                 })}
             </Grid>
-        </Grid>
+        </Box>
     );
 };
 

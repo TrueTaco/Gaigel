@@ -2,13 +2,16 @@ import { useEffect, useState } from "react";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
+import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 
 import GaigelCard from "./GaigelCard";
 
 const useStyles = makeStyles({
     root: {
-        marginTop: 100,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
     },
     header: {
         marginBottom: 10,
@@ -42,10 +45,10 @@ const PlayedCards: React.FC<Props> = ({ playedCards, playerCount }) => {
     }, [playedCards, playerCount]);
 
     return (
-        <Grid container justifyContent="center" className={classes.root}>
-            <Typography className={classes.header}>Played cards</Typography>
+        <Box className={classes.root}>
+            <Typography className={classes.header}>Gespielte Karten</Typography>
 
-            <Grid container spacing={2} justifyContent="center">
+            <Grid container spacing={1} justifyContent="center">
                 {cards.map((card) => {
                     i++;
                     return (
@@ -55,7 +58,7 @@ const PlayedCards: React.FC<Props> = ({ playedCards, playerCount }) => {
                     );
                 })}
             </Grid>
-        </Grid>
+        </Box>
     );
 };
 

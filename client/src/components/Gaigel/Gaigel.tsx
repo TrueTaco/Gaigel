@@ -11,6 +11,7 @@ import TrumpCard from "./TrumpCard";
 import PlayedCards from "./PlayedCards";
 import YourCards from "./YourCards";
 import Control from "./Control";
+import { Box, Typography } from "@material-ui/core";
 import Opening from "./Opening";
 import { Snackbar } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
@@ -18,8 +19,32 @@ import Alert from "@material-ui/lab/Alert";
 // MARK: Styles
 const useStyles = makeStyles({
     root: {
-        margin: 10,
-        marginTop: 50,
+        height: "100vh",
+        paddingLeft: 20,
+        paddingRight: 20,
+        // boxShadow: "0 0 0 5px #53362b",
+        borderRadius: 20,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-around",
+        alignContent: "space-around",
+        alignItems: "center",
+    },
+    playingField: {
+        padding: 10,
+        paddingTop: 10,
+        paddingBottom: 20,
+        backgroundColor: "#1E7307",
+        border: "5px solid #185905",
+        // boxShadow: "0 0 0 5px #185905",
+        borderRadius: 20,
+        display: "flex",
+        flexDirection: "column",
+        gap: "20px",
+    },
+    talonAndTrump: {
+        display: "flex",
+        justifyContent: "center",
     },
 });
 
@@ -43,7 +68,7 @@ const Gaigel: React.FC<Props> = () => {
     const [socket, setSocket] = useState(null);
 
     // Amount of players that are currently playing
-    const [playerCount, setPlayerCount] = useState<number>(0);
+    const [playerCount, setPlayerCount] = useState<number>(2);
 
     // The cards that can still be drawn from the talon
     const [talonCards, setTalonCards] = useState<CardProps[]>(
@@ -60,7 +85,7 @@ const Gaigel: React.FC<Props> = () => {
 
     // The cards that the user currently has
     const [yourCards, setYourCards] = useState<CardProps[]>(
-        new Array(0).fill({ type: "", value: "" })
+        new Array(5).fill({ type: "", value: "" })
     );
 
     const closeNoAceWarning = (event?: React.SyntheticEvent | Event, reason?: string) => {
@@ -70,8 +95,9 @@ const Gaigel: React.FC<Props> = () => {
         setNoAceWarning(false);
     };
 
-    const login = () => {
+    const login = (username: string, lobbycode: string) => {
         setLoggedIn(true);
+        console.log(`${username} wants to join lobby ${lobbycode}`);
     };
 
     const drawCard = () => {
@@ -199,23 +225,26 @@ const Gaigel: React.FC<Props> = () => {
     // <Typography>|{response}|</Typography>
     // @ts-ignore
     return (
-        <Grid
+        <Box
             className={classes.root}
-            justifyContent="center"
-            alignContent="space-around"
-            container
+            style={{
+                backgroundColor: !loggedIn ? "#313131" : "#7c5439",
+                border: !loggedIn ? "none" : "10px solid #53362b",
+            }}
         >
             {!loggedIn ? (
                 <LandingPage login={login} />
             ) : (
                 <>
                     <Control beginGame={beginGame}></Control>
+                    <Box className={classes.playingField}>
+                        <Box className={classes.talonAndTrump}>
+                            <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
+                            <TrumpCard trumpCard={trumpCard} />
+                        </Box>
 
-                    <Grid justifyContent="center" alignItems="center" container>
-                        <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
-                        <TrumpCard trumpCard={trumpCard} />
-                    </Grid>
-                    <PlayedCards playedCards={playedCards} playerCount={playerCount} />
+                        <PlayedCards playedCards={playedCards} playerCount={playerCount} />
+                    </Box>
                     <Snackbar
                         open={noAceWarning}
                         autoHideDuration={3000}
@@ -238,7 +267,7 @@ const Gaigel: React.FC<Props> = () => {
                     <YourCards userCards={yourCards} playCard={playCard} />
                 </>
             )}
-        </Grid>
+        </Box>
     );
 };
 

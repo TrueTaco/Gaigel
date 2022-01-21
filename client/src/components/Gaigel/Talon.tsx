@@ -17,8 +17,8 @@ const useStyles = makeStyles({
         display: "flex",
     },
     paper: {
-        width: 50,
-        height: 75,
+        width: 40,
+        height: 60,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -49,12 +49,10 @@ const Talon: React.FC<Props> = ({ cardsLeft, drawCard }) => {
                         drawCard(1);
                     }}
                 >
-                    <Typography variant="h4" align="center">
-                        <img src={"/cardBacksite_02.png"} width={"60"} height={"90"} alt="" />
-                    </Typography>
+                    <img src={"/cardBacksite_02.png"} width={"40"} height={"60"} alt="" />
                 </CardActionArea>
             </Paper>
-            <Typography className={classes.counter}>Cards left: {cardsLeft}</Typography>
+            <Typography className={classes.counter}>Karten: {cardsLeft}</Typography>
         </Grid>
     );
 };
