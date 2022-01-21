@@ -12,6 +12,9 @@ import PlayedCards from "./PlayedCards";
 import YourCards from "./YourCards";
 import Control from "./Control";
 import { Box, Typography } from "@material-ui/core";
+import Opening from "./Opening";
+import { Snackbar } from "@material-ui/core";
+import Alert from "@material-ui/lab/Alert";
 
 // MARK: Styles
 const useStyles = makeStyles({
@@ -63,6 +66,7 @@ const Gaigel: React.FC<Props> = () => {
     // Boolean for deciding on whether to show the landing page or the game
     const [loggedIn, setLoggedIn] = useState<boolean>(true);
 
+    const [opening, setOpening] = useState(false);
     // Latest response from server (For debugging purposes)
     const [response, setResponse] = useState("");
     const [socket, setSocket] = useState(null);
@@ -75,6 +79,8 @@ const Gaigel: React.FC<Props> = () => {
         new Array(0).fill({ type: "", value: "" })
     );
 
+    const [noAceWarning, setNoAceWarning] = useState(false);
+
     // The trump card
     const [trumpCard, setTrumpCard] = useState<CardProps>({ type: "", value: "" });
 
@@ -86,8 +92,19 @@ const Gaigel: React.FC<Props> = () => {
         new Array(5).fill({ type: "", value: "" })
     );
 
+    const closeNoAceWarning = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === "clickaway") {
+            return;
+        }
+        setNoAceWarning(false);
+    };
+
     const login = () => {
         setLoggedIn(true);
+    };
+
+    const drawCard = () => {
+        console.log("Want to draw card");
     };
 
     // MARK: playCard
@@ -112,14 +129,38 @@ const Gaigel: React.FC<Props> = () => {
         }
     };
 
+    const AndereAlteHat = () => {
+        if (yourCards.filter((card) => card.value == "A").length > 0) {
+            // @ts-ignore
+            socket.emit("AndereAlteHat", "");
+        } else {
+            setNoAceWarning(true);
+        }
+    };
+
+    const GeElfen = () => {
+        if (yourCards.filter((card) => card.value == "A").length > 0) {
+            // @ts-ignore
+            socket.emit("GeElfen", "");
+        } else {
+            setNoAceWarning(true);
+        }
+    };
+
+    const HöherHat = () => {
+        // @ts-ignore
+        socket.emit("HöherHat", "");
+    };
+
+    const AufDissle = () => {
+        // @ts-ignore
+        socket.emit("AufDissle", "");
+    };
+
     const beginGame = () => {
         console.log("Game begins");
         // @ts-ignore
         socket.emit("gameBegin", "");
-    };
-
-    const drawCard = () => {
-        console.log("Want to draw card");
     };
 
     // MARK: useEffect
@@ -144,6 +185,11 @@ const Gaigel: React.FC<Props> = () => {
             setTalonCards(data);
         });
 
+        newSocket.on("setPlayerCount", (data: number) => {
+            console.log(data);
+            setPlayerCount(data);
+        });
+
         newSocket.on("setTrumpCard", (data: any) => {
             console.log("Trumpcard set");
             setTrumpCard(data);
@@ -157,6 +203,17 @@ const Gaigel: React.FC<Props> = () => {
         newSocket.on("setPlayedCards", (data: any) => {
             console.log("Played cards set");
             setPlayedCards(data);
+            console.log(playedCards);
+        });
+
+        newSocket.on("openOpening", (data: any) => {
+            console.log("Closed Opening");
+            setOpening(true);
+        });
+
+        newSocket.on("closeOpening", (data: any) => {
+            console.log("Closed Opening");
+            setOpening(false);
         });
 
         newSocket.on("template", (data: string) => {
@@ -169,6 +226,7 @@ const Gaigel: React.FC<Props> = () => {
 
     // MARK: Return
     // <Typography>|{response}|</Typography>
+    // @ts-ignore
     return (
         <Box className={classes.root}>
             {!loggedIn ? (
@@ -183,10 +241,28 @@ const Gaigel: React.FC<Props> = () => {
                             <TrumpCard trumpCard={trumpCard} />
                         </Box>
 
+                        <Snackbar
+                            open={noAceWarning}
+                            autoHideDuration={3000}
+                            onClose={closeNoAceWarning}
+                            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+                            //message="Sie haben kein Ass sie können dieses Opening nicht spielen"
+                        >
+                            <Alert onClose={closeNoAceWarning} severity="warning">
+                                Sie haben kein Ass. Sie können dieses Opening nicht spielen.
+                            </Alert>
+                        </Snackbar>
+                        {opening && (
+                            <Opening
+                                AndereAlteHat={AndereAlteHat}
+                                GeElfen={GeElfen}
+                                HöherHat={HöherHat}
+                                AufDissle={AufDissle}
+                            ></Opening>
+                        )}
+
                         <PlayedCards playedCards={playedCards} playerCount={playerCount} />
                     </Box>
-
-                    <YourCards userCards={yourCards} playCard={playCard} />
                 </>
             )}
         </Box>
