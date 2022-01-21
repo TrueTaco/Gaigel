@@ -48,7 +48,6 @@ const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard }) => {
     return (
         <Paper
             className={classes.root}
-            style={{ border: type === "" ? "1px dashed lightgrey" : "" }}
             onClick={() => {
                 if (clickable && typeof playCard !== "undefined") playCard(type, value);
             }}

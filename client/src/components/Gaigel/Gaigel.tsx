@@ -19,16 +19,33 @@ const useStyles = makeStyles({
         // minHeight: "100vh",
         // height: "100%",
         height: "100vh",
-        backgroundColor: "#999",
+        padding: 10,
+        backgroundColor: "#7c5439",
+        border: "10px solid #53362b",
+        boxShadow: "0 0 0 20px #53362b",
+        borderRadius: 20,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-around",
         alignContent: "space-around",
         alignItems: "center",
     },
-    item: {
+
+    playingField: {
+        padding: 10,
+        paddingTop: 10,
+        paddingBottom: 20,
+        backgroundColor: "#1E7307",
+        border: "5px solid #185905",
+        boxShadow: "0 0 0 5px #185905",
+        borderRadius: 20,
         display: "flex",
-        flex: 1,
+        flexDirection: "column",
+        gap: "20px",
+    },
+    talonAndTrump: {
+        display: "flex",
+        justifyContent: "center",
     },
 });
 
@@ -51,7 +68,7 @@ const Gaigel: React.FC<Props> = () => {
     const [socket, setSocket] = useState(null);
 
     // Amount of players that are currently playing
-    const [playerCount, setPlayerCount] = useState<number>(4);
+    const [playerCount, setPlayerCount] = useState<number>(6);
 
     // The cards that can still be drawn from the talon
     const [talonCards, setTalonCards] = useState<CardProps[]>(
@@ -153,31 +170,21 @@ const Gaigel: React.FC<Props> = () => {
     // MARK: Return
     // <Typography>|{response}|</Typography>
     return (
-        <Box
-            className={classes.root}
-            // display="flex"
-            // justifyContent="center"
-            // alignItems="center"
-            // direction="column"
-            // spacing={3}
-        >
+        <Box className={classes.root}>
             {!loggedIn ? (
                 <LandingPage login={login} />
             ) : (
                 <>
                     <Control beginGame={beginGame}></Control>
 
-                    <Grid
-                        justifyContent="center"
-                        alignItems="center"
-                        container
-                        style={{ marginTop: 10 }}
-                    >
-                        <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
-                        <TrumpCard trumpCard={trumpCard} />
-                    </Grid>
+                    <Box className={classes.playingField}>
+                        <Box className={classes.talonAndTrump}>
+                            <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
+                            <TrumpCard trumpCard={trumpCard} />
+                        </Box>
 
-                    <PlayedCards playedCards={playedCards} playerCount={playerCount} />
+                        <PlayedCards playedCards={playedCards} playerCount={playerCount} />
+                    </Box>
 
                     <YourCards userCards={yourCards} playCard={playCard} />
                 </>
