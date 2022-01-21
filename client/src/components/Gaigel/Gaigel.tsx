@@ -11,12 +11,19 @@ import TrumpCard from "./TrumpCard";
 import PlayedCards from "./PlayedCards";
 import YourCards from "./YourCards";
 import Control from "./Control";
+import { Box, Typography } from "@material-ui/core";
 
 // MARK: Styles
 const useStyles = makeStyles({
     root: {
-        margin: 10,
-        marginTop: 50,
+        // minHeight: "100vh",
+        // height: "100%",
+        height: "100vh",
+        backgroundColor: "#999",
+    },
+    item: {
+        display: "flex",
+        flex: 1,
     },
 });
 
@@ -32,7 +39,7 @@ const Gaigel: React.FC<Props> = () => {
     const classes = useStyles();
 
     // Boolean for deciding on whether to show the landing page or the game
-    const [loggedIn, setLoggedIn] = useState<boolean>(false);
+    const [loggedIn, setLoggedIn] = useState<boolean>(true);
 
     // Latest response from server (For debugging purposes)
     const [response, setResponse] = useState("");
@@ -54,7 +61,7 @@ const Gaigel: React.FC<Props> = () => {
 
     // The cards that the user currently has
     const [yourCards, setYourCards] = useState<CardProps[]>(
-        new Array(0).fill({ type: "", value: "" })
+        new Array(5).fill({ type: "", value: "" })
     );
 
     const login = () => {
@@ -143,22 +150,36 @@ const Gaigel: React.FC<Props> = () => {
     return (
         <Grid
             className={classes.root}
-            justifyContent="center"
-            alignContent="space-around"
             container
+            justifyContent="center"
+            alignItems="center"
+            direction="column"
+            spacing={3}
         >
             {!loggedIn ? (
                 <LandingPage login={login} />
             ) : (
                 <>
-                    <Control beginGame={beginGame}></Control>
-
-                    <Grid justifyContent="center" alignItems="center" container>
-                        <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
-                        <TrumpCard trumpCard={trumpCard} />
+                    <Grid className={classes.item} item>
+                        <Control beginGame={beginGame}></Control>
                     </Grid>
-                    <PlayedCards playedCards={playedCards} playerCount={playerCount} />
-                    <YourCards userCards={yourCards} playCard={playCard} />
+                    <Grid className={classes.item} item>
+                        <Grid
+                            justifyContent="center"
+                            alignItems="center"
+                            container
+                            style={{ marginTop: 10 }}
+                        >
+                            <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
+                            <TrumpCard trumpCard={trumpCard} />
+                        </Grid>
+                    </Grid>
+                    <Grid className={classes.item} item>
+                        <PlayedCards playedCards={playedCards} playerCount={playerCount} />
+                    </Grid>
+                    <Grid className={classes.item} item>
+                        <YourCards userCards={yourCards} playCard={playCard} />
+                    </Grid>
                 </>
             )}
         </Grid>
