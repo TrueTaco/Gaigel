@@ -20,6 +20,11 @@ const useStyles = makeStyles({
         // height: "100%",
         height: "100vh",
         backgroundColor: "#999",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-around",
+        alignContent: "space-around",
+        alignItems: "center",
     },
     item: {
         display: "flex",
@@ -148,41 +153,36 @@ const Gaigel: React.FC<Props> = () => {
     // MARK: Return
     // <Typography>|{response}|</Typography>
     return (
-        <Grid
+        <Box
             className={classes.root}
-            container
-            justifyContent="center"
-            alignItems="center"
-            direction="column"
-            spacing={3}
+            // display="flex"
+            // justifyContent="center"
+            // alignItems="center"
+            // direction="column"
+            // spacing={3}
         >
             {!loggedIn ? (
                 <LandingPage login={login} />
             ) : (
                 <>
-                    <Grid className={classes.item} item>
-                        <Control beginGame={beginGame}></Control>
+                    <Control beginGame={beginGame}></Control>
+
+                    <Grid
+                        justifyContent="center"
+                        alignItems="center"
+                        container
+                        style={{ marginTop: 10 }}
+                    >
+                        <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
+                        <TrumpCard trumpCard={trumpCard} />
                     </Grid>
-                    <Grid className={classes.item} item>
-                        <Grid
-                            justifyContent="center"
-                            alignItems="center"
-                            container
-                            style={{ marginTop: 10 }}
-                        >
-                            <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
-                            <TrumpCard trumpCard={trumpCard} />
-                        </Grid>
-                    </Grid>
-                    <Grid className={classes.item} item>
-                        <PlayedCards playedCards={playedCards} playerCount={playerCount} />
-                    </Grid>
-                    <Grid className={classes.item} item>
-                        <YourCards userCards={yourCards} playCard={playCard} />
-                    </Grid>
+
+                    <PlayedCards playedCards={playedCards} playerCount={playerCount} />
+
+                    <YourCards userCards={yourCards} playCard={playCard} />
                 </>
             )}
-        </Grid>
+        </Box>
     );
 };
 

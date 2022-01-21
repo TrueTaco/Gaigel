@@ -1,11 +1,13 @@
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import { Grid } from "@material-ui/core";
+import { Box } from "@material-ui/core";
 
 const useStyles = makeStyles({
     root: {
-        marginTop: 30,
-        justifyContent: "space-evenly",
+        display: "flex",
+        justifyContent: "center",
+        alignContent: "center",
+        alignItems: "center",
     },
     beginGame: {},
 });
@@ -22,11 +24,11 @@ const Control: React.FC<Props> = ({ beginGame }) => {
     };
 
     return (
-        <Grid className={classes.root}>
+        <Box className={classes.root}>
             <Button className={classes.beginGame} variant="contained" onClick={handleGameBegin}>
                 Spiel starten
             </Button>
-        </Grid>
+        </Box>
     );
 };
 
