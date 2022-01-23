@@ -110,6 +110,10 @@ const Gaigel: React.FC<Props> = () => {
         setLoggedIn(false);
     };
 
+    const getReady = () => {
+        console.log(`Player wants to get ready`);
+    };
+
     const drawCard = () => {
         console.log("Want to draw card");
     };
@@ -245,7 +249,11 @@ const Gaigel: React.FC<Props> = () => {
             {!loggedIn ? (
                 <LandingPage login={login} />
             ) : !gameStarted ? (
-                <LobbyPage backToLogin={backToLogin} playerNames={playerNames} />
+                <LobbyPage
+                    backToLogin={backToLogin}
+                    playerNames={playerNames}
+                    getReady={getReady}
+                />
             ) : (
                 <>
                     <Control beginGame={beginGame}></Control>

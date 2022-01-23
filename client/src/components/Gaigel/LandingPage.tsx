@@ -6,6 +6,7 @@ import Box from "@material-ui/core/Grid";
 
 const useStyles = makeStyles({
     root: {
+        minWidth: "300px",
         padding: 15,
         borderRadius: 10,
         backgroundColor: "#ffffff",

@@ -18,6 +18,8 @@ const useStyles = makeStyles({
     },
     control: {
         display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
     },
     playerList: {
         padding: 15,
@@ -26,14 +28,19 @@ const useStyles = makeStyles({
         justifyContent: "center",
         gap: "10px",
     },
+    playerInformation: {
+        display: "flex",
+        justifyContent: "space-between",
+    },
 });
 
 interface Props {
     backToLogin: () => void;
     playerNames: string[];
+    getReady: () => void;
 }
 
-const LobbyPage: React.FC<Props> = ({ backToLogin, playerNames }) => {
+const LobbyPage: React.FC<Props> = ({ backToLogin, playerNames, getReady }) => {
     const classes = useStyles();
 
     return (
@@ -42,14 +49,29 @@ const LobbyPage: React.FC<Props> = ({ backToLogin, playerNames }) => {
                 <IconButton onClick={backToLogin}>
                     <ArrowBackIcon />
                 </IconButton>
+                <Typography>2 / 3 sind bereit</Typography>
             </Box>
 
             <Box className={classes.playerList}>
                 {playerNames.map((playerName) => {
                     console.log(playerName);
-                    return <Typography>{playerName}</Typography>;
+                    let randomNumber = Math.floor(Math.random() * 3);
+                    let winString = "Siege";
+                    if (randomNumber === 1) winString = "Sieg";
+                    return (
+                        <Box className={classes.playerInformation}>
+                            <Typography>{playerName}</Typography>
+                            <Typography>
+                                {randomNumber} {winString}
+                            </Typography>
+                        </Box>
+                    );
                 })}
             </Box>
+
+            <Button variant="contained" onClick={getReady}>
+                Bereit
+            </Button>
         </Box>
     );
 };
