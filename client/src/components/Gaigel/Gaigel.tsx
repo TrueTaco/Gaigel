@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import socketIOClient from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
 
 import LandingPage from "./LandingPage";
 import Talon from "./Talon";
@@ -11,10 +10,11 @@ import TrumpCard from "./TrumpCard";
 import PlayedCards from "./PlayedCards";
 import YourCards from "./YourCards";
 import Control from "./Control";
-import { Box, Typography } from "@material-ui/core";
+import { Box } from "@material-ui/core";
 import Opening from "./Opening";
 import { Snackbar } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
+import LobbyPage from "./LobbyPage";
 
 // MARK: Styles
 const useStyles = makeStyles({
@@ -59,8 +59,14 @@ const Gaigel: React.FC<Props> = () => {
     // MARK: States
     const classes = useStyles();
 
-    // Boolean for deciding on whether to show the landing page or the game
-    const [loggedIn, setLoggedIn] = useState<boolean>(false);
+    // Boolean for deciding on whether to show the landing page or the lobby
+    const [loggedIn, setLoggedIn] = useState<boolean>(true);
+
+    // Boolean for deciding on whether to show the lobby page or the game
+    const [gameStarted, setGameStarted] = useState<boolean>(false);
+
+    // Array with all the players that are connected to the same lobby
+    const [playerNames, setPlayerNames] = useState<string[]>(["Georg", "Micha", "Luise"]);
 
     const [opening, setOpening] = useState(false);
     // Latest response from server (For debugging purposes)
@@ -100,6 +106,10 @@ const Gaigel: React.FC<Props> = () => {
         console.log(`${username} wants to join lobby ${lobbycode}`);
     };
 
+    const backToLogin = () => {
+        setLoggedIn(false);
+    };
+
     const drawCard = () => {
         console.log("Want to draw card");
     };
@@ -127,7 +137,7 @@ const Gaigel: React.FC<Props> = () => {
     };
 
     const AndereAlteHat = () => {
-        if (yourCards.filter((card) => card.value == "A").length > 0) {
+        if (yourCards.filter((card) => card.value === "A").length > 0) {
             // @ts-ignore
             socket.emit("AndereAlteHat", "");
         } else {
@@ -136,7 +146,7 @@ const Gaigel: React.FC<Props> = () => {
     };
 
     const GeElfen = () => {
-        if (yourCards.filter((card) => card.value == "A").length > 0) {
+        if (yourCards.filter((card) => card.value === "A").length > 0) {
             // @ts-ignore
             socket.emit("GeElfen", "");
         } else {
@@ -228,12 +238,14 @@ const Gaigel: React.FC<Props> = () => {
         <Box
             className={classes.root}
             style={{
-                backgroundColor: !loggedIn ? "#313131" : "#7c5439",
-                border: !loggedIn ? "none" : "10px solid #53362b",
+                backgroundColor: !loggedIn || !gameStarted ? "#313131" : "#7c5439",
+                border: !loggedIn || !gameStarted ? "none" : "10px solid #53362b",
             }}
         >
             {!loggedIn ? (
                 <LandingPage login={login} />
+            ) : !gameStarted ? (
+                <LobbyPage backToLogin={backToLogin} playerNames={playerNames} />
             ) : (
                 <>
                     <Control beginGame={beginGame}></Control>

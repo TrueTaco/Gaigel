@@ -3,7 +3,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Box from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
 
 const useStyles = makeStyles({
     root: {
@@ -18,7 +17,6 @@ const useStyles = makeStyles({
     textField: {
         backgroundColor: "#ffffff",
         borderRadius: 4,
-        fontSize: 5,
     },
 });
 
