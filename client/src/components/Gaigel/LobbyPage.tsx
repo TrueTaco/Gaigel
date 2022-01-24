@@ -19,6 +19,7 @@ const useStyles = makeStyles({
         alignItems: "center",
     },
     playerList: {
+        marginBottom: 10,
         padding: 15,
         display: "flex",
         flexDirection: "column",
@@ -29,6 +30,10 @@ const useStyles = makeStyles({
         display: "flex",
         justifyContent: "space-between",
     },
+    readyInformation: {
+        display: "flex",
+        justifyContent: "center",
+    },
 });
 
 interface PlayerProps {
@@ -37,11 +42,19 @@ interface PlayerProps {
 }
 interface Props {
     backToLogin: () => void;
+    lobbycode: string;
     playerInformation: PlayerProps[];
+    amountReadyPlayers: number;
     getReady: () => void;
 }
 
-const LobbyPage: React.FC<Props> = ({ backToLogin, playerInformation, getReady }) => {
+const LobbyPage: React.FC<Props> = ({
+    backToLogin,
+    lobbycode,
+    playerInformation,
+    amountReadyPlayers,
+    getReady,
+}) => {
     const classes = useStyles();
 
     return (
@@ -50,7 +63,7 @@ const LobbyPage: React.FC<Props> = ({ backToLogin, playerInformation, getReady }
                 <IconButton onClick={backToLogin}>
                     <ArrowBackIcon />
                 </IconButton>
-                <Typography>2 / 3 sind bereit</Typography>
+                <Typography>Lobbycode: {lobbycode}</Typography>
             </Box>
 
             <Box className={classes.playerList}>
@@ -62,14 +75,18 @@ const LobbyPage: React.FC<Props> = ({ backToLogin, playerInformation, getReady }
                     return (
                         <Box className={classes.playerInformation} key={key}>
                             <Typography>{player.username}</Typography>
-                            <Typography>
+                            <Typography style={{ marginLeft: 10 }}>
                                 {player.wins} {winString}
                             </Typography>
                         </Box>
                     );
                 })}
             </Box>
-
+            <Box className={classes.readyInformation}>
+                <Typography>
+                    {amountReadyPlayers} / {playerInformation.length} sind bereit
+                </Typography>
+            </Box>
             <Button variant="contained" onClick={getReady}>
                 Bereit
             </Button>

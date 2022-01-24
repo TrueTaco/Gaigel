@@ -9,6 +9,7 @@ class Player {
     constructor(socket) {
         this.username = "";
         this.lobbycode = "";
+        this.ready = false;
         this.wins = 0;
         this.vorhand = false;
         this.playedCard = {};

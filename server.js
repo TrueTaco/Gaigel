@@ -66,10 +66,18 @@ io.on("connection", (socket) => {
         }
         socket.join(data.lobbycode);
         io.in(data.lobbycode).emit("playerInformation", playerInformation);
+        shareLobbyInformation(currentPlayer.lobbycode);
     });
 
     socket.on("backToLogin", () => {
         resetPlayer(socket);
+    });
+
+    socket.on("getReady", () => {
+        let currentPlayer = players.find((element) => element.socket.id === socket.id);
+        currentPlayer.ready = true;
+
+        shareLobbyInformation(currentPlayer.lobbycode);
     });
 
     // GAME BEGIN
@@ -171,6 +179,21 @@ io.on("connection", (socket) => {
     });
 });
 
+function shareLobbyInformation(lobbycode) {
+    if (lobbycode === "") return;
+    let currentGame = games.find((element) => element.lobbycode === lobbycode);
+
+    let amountReadyPlayers = 0;
+    currentGame.players.map((player) => {
+        if (player.ready) amountReadyPlayers++;
+    });
+
+    io.in(lobbycode).emit("lobbyInformation", {
+        lobbycode: lobbycode,
+        amountReadyPlayers: amountReadyPlayers,
+    });
+}
+
 function resetPlayer(socket) {
     let currentPlayer = players.find((element) => element.socket === socket);
 
@@ -189,6 +212,8 @@ function resetPlayer(socket) {
         });
         io.in(currentPlayer.lobbycode).emit("playerInformation", playerInformation);
 
+        shareLobbyInformation(currentGame.lobbycode);
+
         if (currentGame.players.length < 1) {
             games = games.filter((game) => game.lobbycode !== currentGame.lobbycode);
         }
@@ -198,6 +223,7 @@ function resetPlayer(socket) {
     currentPlayer.username = "";
     currentPlayer.lobbycode = "";
     currentPlayer.wins = 0;
+    currentPlayer.ready = false;
 }
 
 function processAndereAlteHat(socket, data, player) {

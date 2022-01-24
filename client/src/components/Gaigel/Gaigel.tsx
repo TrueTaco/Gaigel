@@ -71,6 +71,12 @@ const Gaigel: React.FC<Props> = () => {
     // Array with all the players that are connected to the same lobby
     const [playerInformation, setPlayerInformation] = useState<PlayerProps[]>([]);
 
+    // Number of players in current lobby that are ready
+    const [lobbyInformation, setLobbyInformation] = useState<any>({
+        lobbycode: "",
+        amountReadyPlayers: 0,
+    });
+
     const [opening, setOpening] = useState(false);
     // Latest response from server (For debugging purposes)
     const [response, setResponse] = useState("");
@@ -119,7 +125,8 @@ const Gaigel: React.FC<Props> = () => {
     };
 
     const getReady = () => {
-        console.log(`Player wants to get ready`);
+        // @ts-ignore
+        socket.emit("getReady", "");
     };
 
     const drawCard = () => {
@@ -197,6 +204,10 @@ const Gaigel: React.FC<Props> = () => {
             setPlayerInformation(data);
         });
 
+        newSocket.on("lobbyInformation", (data: any) => {
+            setLobbyInformation(data);
+        });
+
         newSocket.on("setTalon", (data: any) => {
             console.log("Talon set");
             setTalonCards(data);
@@ -257,7 +268,9 @@ const Gaigel: React.FC<Props> = () => {
             ) : !gameStarted ? (
                 <LobbyPage
                     backToLogin={backToLogin}
+                    lobbycode={lobbyInformation.lobbycode}
                     playerInformation={playerInformation}
+                    amountReadyPlayers={lobbyInformation.amountReadyPlayers}
                     getReady={getReady}
                 />
             ) : (
