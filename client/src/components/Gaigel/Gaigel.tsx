@@ -9,10 +9,8 @@ import Talon from "./Talon";
 import TrumpCard from "./TrumpCard";
 import PlayedCards from "./PlayedCards";
 import YourCards from "./YourCards";
-import Control from "./Control";
-import { Box } from "@material-ui/core";
+import { Box, Snackbar } from "@material-ui/core";
 import Opening from "./Opening";
-import { Snackbar } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import LobbyPage from "./LobbyPage";
 

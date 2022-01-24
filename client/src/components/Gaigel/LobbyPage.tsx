@@ -1,8 +1,5 @@
 import { makeStyles } from "@material-ui/core/styles";
-import Box from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
-import IconButton from "@material-ui/core/IconButton";
+import { Box, Typography, Button, IconButton } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 
 const useStyles = makeStyles({
@@ -58,7 +55,6 @@ const LobbyPage: React.FC<Props> = ({ backToLogin, playerInformation, getReady }
 
             <Box className={classes.playerList}>
                 {playerInformation.map((player) => {
-                    console.log(player);
                     let winString;
                     if (player.wins === 1) winString = "Sieg";
                     else winString = "Siege";
