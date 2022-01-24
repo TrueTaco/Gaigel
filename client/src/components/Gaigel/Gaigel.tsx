@@ -9,10 +9,8 @@ import Talon from "./Talon";
 import TrumpCard from "./TrumpCard";
 import PlayedCards from "./PlayedCards";
 import YourCards from "./YourCards";
-import Control from "./Control";
-import { Box } from "@material-ui/core";
+import { Box, Snackbar } from "@material-ui/core";
 import Opening from "./Opening";
-import { Snackbar } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import LobbyPage from "./LobbyPage";
 
@@ -55,6 +53,11 @@ interface CardProps {
     value: string;
 }
 
+interface PlayerProps {
+    username: string;
+    wins: number;
+}
+
 const Gaigel: React.FC<Props> = () => {
     // MARK: States
     const classes = useStyles();
@@ -66,7 +69,7 @@ const Gaigel: React.FC<Props> = () => {
     const [gameStarted, setGameStarted] = useState<boolean>(false);
 
     // Array with all the players that are connected to the same lobby
-    const [playerNames, setPlayerNames] = useState<string[]>(["Georg", "Micha", "Luise"]);
+    const [playerInformation, setPlayerInformation] = useState<PlayerProps[]>([]);
 
     const [opening, setOpening] = useState(false);
     // Latest response from server (For debugging purposes)
@@ -190,6 +193,10 @@ const Gaigel: React.FC<Props> = () => {
             setResponse(data);
         });
 
+        newSocket.on("playerInformation", (data: any) => {
+            setPlayerInformation(data);
+        });
+
         newSocket.on("setTalon", (data: any) => {
             console.log("Talon set");
             setTalonCards(data);
@@ -250,7 +257,7 @@ const Gaigel: React.FC<Props> = () => {
             ) : !gameStarted ? (
                 <LobbyPage
                     backToLogin={backToLogin}
-                    playerNames={playerNames}
+                    playerInformation={playerInformation}
                     getReady={getReady}
                 />
             ) : (
