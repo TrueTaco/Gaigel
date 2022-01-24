@@ -57,7 +57,7 @@ const LandingPage: React.FC<Props> = ({ login }) => {
                 variant="outlined"
                 label="Lobbycode"
                 onChange={handleLobbycodeChange}
-                inputProps={{ maxLength: 15 }}
+                inputProps={{ maxLength: 10 }}
             />
 
             <Button
