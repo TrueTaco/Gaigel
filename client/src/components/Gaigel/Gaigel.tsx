@@ -60,7 +60,7 @@ const Gaigel: React.FC<Props> = () => {
     const classes = useStyles();
 
     // Boolean for deciding on whether to show the landing page or the lobby
-    const [loggedIn, setLoggedIn] = useState<boolean>(true);
+    const [loggedIn, setLoggedIn] = useState<boolean>(false);
 
     // Boolean for deciding on whether to show the lobby page or the game
     const [gameStarted, setGameStarted] = useState<boolean>(false);
@@ -103,11 +103,16 @@ const Gaigel: React.FC<Props> = () => {
 
     const login = (username: string, lobbycode: string) => {
         setLoggedIn(true);
-        console.log(`${username} wants to join lobby ${lobbycode}`);
+
+        // @ts-ignore
+        socket.emit("joinLobby", { username: username, lobbycode: lobbycode });
     };
 
     const backToLogin = () => {
         setLoggedIn(false);
+
+        // @ts-ignore
+        socket.emit("backToLogin", "");
     };
 
     const getReady = () => {
@@ -166,12 +171,6 @@ const Gaigel: React.FC<Props> = () => {
     const AufDissle = () => {
         // @ts-ignore
         socket.emit("AufDissle", "");
-    };
-
-    const beginGame = () => {
-        console.log("Game begins");
-        // @ts-ignore
-        socket.emit("gameBegin", "");
     };
 
     // MARK: useEffect
@@ -256,7 +255,6 @@ const Gaigel: React.FC<Props> = () => {
                 />
             ) : (
                 <>
-                    <Control beginGame={beginGame}></Control>
                     <Box className={classes.playingField}>
                         <Box className={classes.talonAndTrump}>
                             <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
