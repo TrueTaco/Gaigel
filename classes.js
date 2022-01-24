@@ -7,20 +7,22 @@ class Card {
 
 class Player {
     constructor(socket) {
+        this.username = "";
+        this.lobbycode = "";
         this.vorhand = false;
-        this.socket = socket;
-        this.cards = [];
         this.playedCard = {};
+        this.cards = [];
+        this.socket = socket;
     }
 }
 
 class Game {
     constructor(players, lobbycode) {
         this.opening = "";
-        this.players = players;
         this.lobbycode = lobbycode;
         this.playedCards = [];
-        this.order = players.slice();
+        this.players = players;
+        this.order = [];
     }
 }
 
