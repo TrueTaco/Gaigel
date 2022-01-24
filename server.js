@@ -44,16 +44,28 @@ io.on("connection", (socket) => {
         currentPlayer.username = data.username;
         currentPlayer.lobbycode = data.lobbycode;
 
+        let playerInformation;
+
         if (!games.find((element) => element.lobbycode === data.lobbycode)) {
             console.log(`Creating game with lobbycode ${data.lobbycode}`);
 
             let newGame = new classes.Game([currentPlayer], data.lobbycode);
             games.push(newGame);
+
+            playerInformation = newGame.players.map((player) => {
+                return { username: player.username, wins: player.wins };
+            });
         } else {
             console.log(`Found game with lobby ${data.lobbycode}`);
             let currentGame = games.find((element) => element.lobbycode === data.lobbycode);
             currentGame.players.push(currentPlayer);
+
+            playerInformation = currentGame.players.map((player) => {
+                return { username: player.username, wins: player.wins };
+            });
         }
+        socket.join(data.lobbycode);
+        io.in(data.lobbycode).emit("playerInformation", playerInformation);
     });
 
     socket.on("backToLogin", () => {
@@ -165,10 +177,17 @@ function resetPlayer(socket) {
     // Remove player from his lobby
     if (currentPlayer.lobbycode !== "") {
         let currentGame = games.find((element) => element.lobbycode === currentPlayer.lobbycode);
+
         currentGame.players = currentGame.players.filter(
             (player) => player.socket.id !== socket.id
         );
         currentGame.order = currentGame.order.filter((player) => player.socket.id !== socket.id);
+
+        // Send new playerLists to all other players
+        playerInformation = currentGame.players.map((player) => {
+            return { username: player.username, wins: player.wins };
+        });
+        io.in(currentPlayer.lobbycode).emit("playerInformation", playerInformation);
 
         if (currentGame.players.length < 1) {
             games = games.filter((game) => game.lobbycode !== currentGame.lobbycode);
@@ -178,6 +197,7 @@ function resetPlayer(socket) {
     // Reset player information
     currentPlayer.username = "";
     currentPlayer.lobbycode = "";
+    currentPlayer.wins = 0;
 }
 
 function processAndereAlteHat(socket, data, player) {

@@ -34,13 +34,17 @@ const useStyles = makeStyles({
     },
 });
 
+interface PlayerProps {
+    username: string;
+    wins: number;
+}
 interface Props {
     backToLogin: () => void;
-    playerNames: string[];
+    playerInformation: PlayerProps[];
     getReady: () => void;
 }
 
-const LobbyPage: React.FC<Props> = ({ backToLogin, playerNames, getReady }) => {
+const LobbyPage: React.FC<Props> = ({ backToLogin, playerInformation, getReady }) => {
     const classes = useStyles();
 
     return (
@@ -53,16 +57,17 @@ const LobbyPage: React.FC<Props> = ({ backToLogin, playerNames, getReady }) => {
             </Box>
 
             <Box className={classes.playerList}>
-                {playerNames.map((playerName) => {
-                    console.log(playerName);
-                    let randomNumber = Math.floor(Math.random() * 3);
-                    let winString = "Siege";
-                    if (randomNumber === 1) winString = "Sieg";
+                {playerInformation.map((player) => {
+                    console.log(player);
+                    let winString;
+                    if (player.wins === 1) winString = "Sieg";
+                    else winString = "Siege";
+                    let key = Math.random();
                     return (
-                        <Box className={classes.playerInformation}>
-                            <Typography>{playerName}</Typography>
+                        <Box className={classes.playerInformation} key={key}>
+                            <Typography>{player.username}</Typography>
                             <Typography>
-                                {randomNumber} {winString}
+                                {player.wins} {winString}
                             </Typography>
                         </Box>
                     );
