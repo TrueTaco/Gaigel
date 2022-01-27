@@ -70,28 +70,6 @@ io.on("connection", (socket) => {
         shareLobbyInformation(currentPlayer.lobbycode);
     });
 
-    // GAME BEGIN
-    socket.on("gameBegin", () => {
-        console.log("Game has been started");
-
-        deprecatedCurrentGame = new classes.Game(players, "123456");
-        deprecatedCurrentGame.players[0].vorhand = true;
-
-        createTalon();
-        chooseTrumpCard();
-        io.emit("setTalon", deprecatedTalon);
-        io.emit("setTrumpCard", deprecatedTrumpCard);
-
-        players.forEach((player) => {
-            drawCard(5, player);
-            io.to(player.socket.id).emit("setYourCards", player.cards);
-        });
-
-        io.to(players[0].socket.id).emit("openOpening", "");
-
-        io.emit("setTalon", deprecatedTalon);
-    });
-
     socket.on("playCard", (data) => {
         // console.log(`Somebody played this card: ${data.type} ${data.value}`);
         let player = players.find((element) => element.socket == socket);
@@ -202,16 +180,20 @@ function tryToStartGame(lobbycode) {
 
     // START A GAME
 
+    currentGame.players[0].vorhand = true;
+
     currentGame.talon = createTalon();
-    io.in(lobbycode).emit("setTrumpCard", currentGame.talon);
+    io.in(lobbycode).emit("setTalon", currentGame.talon);
 
     currentGame.trumpCard = chooseTrumpCard(lobbycode);
-    io.in(lobbycode).emit("setTalon", currentGame.trumpCard);
+    io.in(lobbycode).emit("setTrumpCard", currentGame.trumpCard);
 
     currentGame.players.forEach((player) => {
         drawCard(lobbycode, 5, player);
         io.to(player.socket.id).emit("setYourCards", player.cards);
     });
+
+    io.in(lobbycode).emit("setTalon", currentGame.talon);
 
     io.to(currentGame.players[0].socket.id).emit("openOpening", "");
 
