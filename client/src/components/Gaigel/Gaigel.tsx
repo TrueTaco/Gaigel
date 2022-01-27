@@ -119,6 +119,7 @@ const Gaigel: React.FC<Props> = () => {
 
     const backToLogin = () => {
         setLoggedIn(false);
+        setGameStarted(false);
 
         // @ts-ignore
         socket.emit("backToLogin", "");
@@ -206,6 +207,10 @@ const Gaigel: React.FC<Props> = () => {
 
         newSocket.on("lobbyInformation", (data: any) => {
             setLobbyInformation(data);
+        });
+
+        newSocket.on("startGame", (data: any) => {
+            setGameStarted(true);
         });
 
         newSocket.on("setTalon", (data: any) => {

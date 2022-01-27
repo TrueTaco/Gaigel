@@ -24,11 +24,11 @@ server.listen(port, () => {
 
 // MARK: Sockets
 let players = [];
-let talon = [];
+let deprecatedTalon = [];
 let deprecatedCurrentGameState = "Waiting";
 let games = [];
 let deprecatedCurrentGame; // Should be replaced
-let trumpCard;
+let deprecatedTrumpCard;
 let i = 0;
 
 io.on("connection", (socket) => {
@@ -89,8 +89,8 @@ io.on("connection", (socket) => {
 
         createTalon();
         chooseTrumpCard();
-        io.emit("setTalon", talon);
-        io.emit("setTrumpCard", trumpCard);
+        io.emit("setTalon", deprecatedTalon);
+        io.emit("setTrumpCard", deprecatedTrumpCard);
 
         players.forEach((player) => {
             drawCard(5, player);
@@ -99,7 +99,7 @@ io.on("connection", (socket) => {
 
         io.to(players[0].socket.id).emit("openOpening", "");
 
-        io.emit("setTalon", talon);
+        io.emit("setTalon", deprecatedTalon);
     });
 
     socket.on("playCard", (data) => {
@@ -178,6 +178,29 @@ io.on("connection", (socket) => {
         console.log(`${players.length} | Client disconnected (${socket.id})`);
     });
 });
+// MARK: Currently working on
+function tryToStartGame(lobbycode) {
+    let currentGame = games.find((element) => element.lobbycode === lobbycode);
+    let amountPlayers = 0;
+    let amountReadyPlayers = 0;
+
+    currentGame.players.map((player) => {
+        if (player.ready) amountReadyPlayers++;
+        amountPlayers++;
+    });
+
+    console.log(
+        `Trying to start a game for lobbycode ${lobbycode} | ${amountPlayers} - ${amountReadyPlayers}`
+    );
+    if (amountPlayers === 0) return;
+    if (amountPlayers !== amountReadyPlayers) return;
+
+    currentGame.trumpCard = chooseTrumpCard();
+    currentGame.talon = createTalon();
+
+    io.in(lobbycode).emit("startGame", "");
+    console.log(`Started a game for lobbycode ${lobbycode}`);
+}
 
 function shareLobbyInformation(lobbycode) {
     if (lobbycode === "") return;
@@ -192,6 +215,8 @@ function shareLobbyInformation(lobbycode) {
         lobbycode: lobbycode,
         amountReadyPlayers: amountReadyPlayers,
     });
+
+    tryToStartGame(lobbycode);
 }
 
 function resetPlayer(socket) {
@@ -297,7 +322,7 @@ function processGeElfen(socket, data, player) {
 
 function processHöherHat(socket, data, player) {
     if (player === deprecatedCurrentGame.players[0]) {
-        if (data.value !== "A" && data.type !== trumpCard.type) {
+        if (data.value !== "A" && data.type !== deprecatedTrumpCard.type) {
             player.playedCard = data;
             deprecatedCurrentGame.playedCards.push(data);
             io.emit("setPlayedCards", deprecatedCurrentGame.playedCards);
@@ -329,7 +354,8 @@ function createTalon() {
     );
     newTalon.push(...newTalon);
     newTalon = fisherYatesShuffle(newTalon);
-    talon = newTalon;
+    // TODO: This line can be removed
+    deprecatedTalon = newTalon;
     return newTalon;
 }
 
@@ -344,18 +370,19 @@ function fisherYatesShuffle(arr) {
 }
 
 function chooseTrumpCard() {
-    let newTrumpCard = talon[talon.length - 1];
-    talon.slice(0, talon.length - 1);
+    let newTrumpCard = deprecatedTalon[deprecatedTalon.length - 1];
+    deprecatedTalon.slice(0, deprecatedTalon.length - 1);
 
-    trumpCard = newTrumpCard;
-    return trumpCard;
+    // TODO: This line can be removed
+    deprecatedTrumpCard = newTrumpCard;
+    return deprecatedTrumpCard;
 }
 
 function drawCard(amount, player) {
-    if (player.cards.length < 5 && talon.length > 0) {
-        // Gets last cards of the talon array and removes them
-        let drawnCards = talon.slice(talon.length - amount);
-        talon = talon.slice(0, talon.length - amount);
+    if (player.cards.length < 5 && deprecatedTalon.length > 0) {
+        // Gets last cards of the deprecatedTalon array and removes them
+        let drawnCards = deprecatedTalon.slice(deprecatedTalon.length - amount);
+        deprecatedTalon = deprecatedTalon.slice(0, deprecatedTalon.length - amount);
 
         let newUserCards = player.cards;
         drawnCards.forEach((card) => {
@@ -388,8 +415,8 @@ function drawCard(amount, player) {
             trump.set("Herz", 2);
             trump.set("Schellen", 3);
 
-            if (trumpCard.type === a.type || trumpCard.type === b.type) {
-                trump.set(trumpCard.type, 5);
+            if (deprecatedTrumpCard.type === a.type || deprecatedTrumpCard.type === b.type) {
+                trump.set(deprecatedTrumpCard.type, 5);
             }
 
             if (trump.get(a.value) < trump.get(b.value)) {
