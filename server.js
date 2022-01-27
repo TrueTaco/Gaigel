@@ -48,24 +48,14 @@ io.on("connection", (socket) => {
 
         if (!games.find((element) => element.lobbycode === data.lobbycode)) {
             console.log(`Creating game with lobbycode ${data.lobbycode}`);
-
             let newGame = new classes.Game([currentPlayer], data.lobbycode);
             games.push(newGame);
-
-            playerInformation = newGame.players.map((player) => {
-                return { username: player.username, wins: player.wins };
-            });
         } else {
             console.log(`Found game with lobby ${data.lobbycode}`);
             let currentGame = games.find((element) => element.lobbycode === data.lobbycode);
             currentGame.players.push(currentPlayer);
-
-            playerInformation = currentGame.players.map((player) => {
-                return { username: player.username, wins: player.wins };
-            });
         }
         socket.join(data.lobbycode);
-        io.in(data.lobbycode).emit("playerInformation", playerInformation);
         shareLobbyInformation(currentPlayer.lobbycode);
     });
 
@@ -206,6 +196,11 @@ function shareLobbyInformation(lobbycode) {
     if (lobbycode === "") return;
     let currentGame = games.find((element) => element.lobbycode === lobbycode);
 
+    // Send new playerLists to all other players
+    playerInformation = currentGame.players.map((player) => {
+        return { username: player.username, wins: player.wins };
+    });
+
     let amountReadyPlayers = 0;
     currentGame.players.map((player) => {
         if (player.ready) amountReadyPlayers++;
@@ -214,6 +209,7 @@ function shareLobbyInformation(lobbycode) {
     io.in(lobbycode).emit("lobbyInformation", {
         lobbycode: lobbycode,
         amountReadyPlayers: amountReadyPlayers,
+        playerInformation: playerInformation,
     });
 
     tryToStartGame(lobbycode);
@@ -230,12 +226,6 @@ function resetPlayer(socket) {
             (player) => player.socket.id !== socket.id
         );
         currentGame.order = currentGame.order.filter((player) => player.socket.id !== socket.id);
-
-        // Send new playerLists to all other players
-        playerInformation = currentGame.players.map((player) => {
-            return { username: player.username, wins: player.wins };
-        });
-        io.in(currentPlayer.lobbycode).emit("playerInformation", playerInformation);
 
         shareLobbyInformation(currentGame.lobbycode);
 

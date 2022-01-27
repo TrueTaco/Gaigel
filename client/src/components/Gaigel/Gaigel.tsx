@@ -68,13 +68,11 @@ const Gaigel: React.FC<Props> = () => {
     // Boolean for deciding on whether to show the lobby page or the game
     const [gameStarted, setGameStarted] = useState<boolean>(false);
 
-    // Array with all the players that are connected to the same lobby
-    const [playerInformation, setPlayerInformation] = useState<PlayerProps[]>([]);
-
-    // Number of players in current lobby that are ready
+    // All needed information about the joined lobby
     const [lobbyInformation, setLobbyInformation] = useState<any>({
         lobbycode: "",
         amountReadyPlayers: 0,
+        playerInformation: [],
     });
 
     const [opening, setOpening] = useState(false);
@@ -201,10 +199,6 @@ const Gaigel: React.FC<Props> = () => {
             setResponse(data);
         });
 
-        newSocket.on("playerInformation", (data: any) => {
-            setPlayerInformation(data);
-        });
-
         newSocket.on("lobbyInformation", (data: any) => {
             setLobbyInformation(data);
         });
@@ -274,7 +268,7 @@ const Gaigel: React.FC<Props> = () => {
                 <LobbyPage
                     backToLogin={backToLogin}
                     lobbycode={lobbyInformation.lobbycode}
-                    playerInformation={playerInformation}
+                    playerInformation={lobbyInformation.playerInformation}
                     amountReadyPlayers={lobbyInformation.amountReadyPlayers}
                     getReady={getReady}
                 />
