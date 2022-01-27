@@ -95,8 +95,10 @@ io.on("connection", (socket) => {
     socket.on("playCard", (data) => {
         // console.log(`Somebody played this card: ${data.type} ${data.value}`);
         let player = players.find((element) => element.socket == socket);
-        if (deprecatedCurrentGame.order[0] === player && player != undefined) {
-            switch (deprecatedCurrentGame.opening) {
+        let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
+
+        if (currentGame.order[0] === player && player != undefined) {
+            switch (currentGame.opening) {
                 case "AndereAlteHat":
                     processAndereAlteHat(socket, data, player);
                     break;
@@ -119,40 +121,52 @@ io.on("connection", (socket) => {
                         }
                     }
                     player.playedCard = data;
-                    deprecatedCurrentGame.playedCards.push(data);
-                    io.emit("setPlayedCards", deprecatedCurrentGame.playedCards);
-                    deprecatedCurrentGame.order.shift();
+                    currentGame.playedCards.push(data);
+                    io.emit("setPlayedCards", currentGame.playedCards);
+                    currentGame.order.shift();
                     break;
             }
         } else {
-            io.emit("setPlayedCards", deprecatedCurrentGame.playedCards);
+            io.emit("setPlayedCards", currentGame.playedCards);
             socket.emit("setYourCards", player.cards);
         }
     });
 
     socket.on("AndereAlteHat", () => {
-        deprecatedCurrentGame.opening = "AndereAlteHat";
+        let player = players.find((element) => element.socket == socket);
+        let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
+
+        currentGame.opening = "AndereAlteHat";
         console.log("AndereAlteHat");
         io.to(socket.id).emit("closeOpening", "");
         // Set GameOpening
     });
 
     socket.on("GeElfen", () => {
-        deprecatedCurrentGame.opening = "GeElfen";
+        let player = players.find((element) => element.socket == socket);
+        let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
+
+        currentGame.opening = "GeElfen";
         console.log("GeElfen");
         io.to(socket.id).emit("closeOpening", "");
         // Set GameOpening
     });
 
     socket.on("HöherHat", () => {
-        deprecatedCurrentGame.opening = "HöherHat";
+        let player = players.find((element) => element.socket == socket);
+        let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
+
+        currentGame.opening = "HöherHat";
         console.log("HöherHat");
         io.to(socket.id).emit("closeOpening", "");
         // Set GameOpening
     });
 
     socket.on("AufDissle", () => {
-        deprecatedCurrentGame.opening = "AufDissle";
+        let player = players.find((element) => element.socket == socket);
+        let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
+
+        currentGame.opening = "AufDissle";
         console.log("AufDissle");
         io.to(socket.id).emit("closeOpening", "");
         // Set GameOpening
@@ -182,11 +196,24 @@ function tryToStartGame(lobbycode) {
     console.log(
         `Trying to start a game for lobbycode ${lobbycode} | ${amountPlayers} - ${amountReadyPlayers}`
     );
+
     if (amountPlayers === 0) return;
     if (amountPlayers !== amountReadyPlayers) return;
 
-    currentGame.trumpCard = chooseTrumpCard();
+    // START A GAME
+
     currentGame.talon = createTalon();
+    io.in(lobbycode).emit("setTrumpCard", currentGame.talon);
+
+    currentGame.trumpCard = chooseTrumpCard(lobbycode);
+    io.in(lobbycode).emit("setTalon", currentGame.trumpCard);
+
+    currentGame.players.forEach((player) => {
+        drawCard(lobbycode, 5, player);
+        io.to(player.socket.id).emit("setYourCards", player.cards);
+    });
+
+    io.to(currentGame.players[0].socket.id).emit("openOpening", "");
 
     io.in(lobbycode).emit("startGame", "");
     console.log(`Started a game for lobbycode ${lobbycode}`);
@@ -344,8 +371,7 @@ function createTalon() {
     );
     newTalon.push(...newTalon);
     newTalon = fisherYatesShuffle(newTalon);
-    // TODO: This line can be removed
-    deprecatedTalon = newTalon;
+
     return newTalon;
 }
 
@@ -359,20 +385,22 @@ function fisherYatesShuffle(arr) {
     return arr;
 }
 
-function chooseTrumpCard() {
-    let newTrumpCard = deprecatedTalon[deprecatedTalon.length - 1];
-    deprecatedTalon.slice(0, deprecatedTalon.length - 1);
+function chooseTrumpCard(lobbycode) {
+    let currentGame = games.find((element) => element.lobbycode === lobbycode);
 
-    // TODO: This line can be removed
-    deprecatedTrumpCard = newTrumpCard;
-    return deprecatedTrumpCard;
+    let newTrumpCard = currentGame.talon[currentGame.talon.length - 1];
+    currentGame.talon.slice(0, currentGame.talon.length - 1);
+
+    return newTrumpCard;
 }
 
-function drawCard(amount, player) {
-    if (player.cards.length < 5 && deprecatedTalon.length > 0) {
+function drawCard(lobbycode, amount, player) {
+    let currentGame = games.find((element) => element.lobbycode === lobbycode);
+
+    if (player.cards.length < 5 && currentGame.talon.length > 0) {
         // Gets last cards of the deprecatedTalon array and removes them
-        let drawnCards = deprecatedTalon.slice(deprecatedTalon.length - amount);
-        deprecatedTalon = deprecatedTalon.slice(0, deprecatedTalon.length - amount);
+        let drawnCards = currentGame.talon.slice(currentGame.talon.length - amount);
+        currentGame.talon = currentGame.talon.slice(0, currentGame.talon.length - amount);
 
         let newUserCards = player.cards;
         drawnCards.forEach((card) => {
@@ -398,17 +426,15 @@ function drawCard(amount, player) {
         });
 
         newUserCards.sort((a, b) => {
-            //"Eichel", "Blatt", "Herz", "Schellen"
             const trump = new Map();
             trump.set("Eichel", 0);
             trump.set("Blatt", 1);
             trump.set("Herz", 2);
             trump.set("Schellen", 3);
 
-            if (deprecatedTrumpCard.type === a.type || deprecatedTrumpCard.type === b.type) {
-                trump.set(deprecatedTrumpCard.type, 5);
+            if (currentGame.talon.type === a.type || currentGame.talon.type === b.type) {
+                trump.set(currentGame.talon.type, 5);
             }
-
             if (trump.get(a.value) < trump.get(b.value)) {
                 return -1;
             }
@@ -420,5 +446,3 @@ function drawCard(amount, player) {
         });
     }
 }
-
-createTalon();

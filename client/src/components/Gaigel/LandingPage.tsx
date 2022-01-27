@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 
-import { Button, TextField, Box } from "@material-ui/core";
+import { Button, TextField, Box, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles({
     root: {
@@ -39,6 +39,10 @@ const LandingPage: React.FC<Props> = ({ login }) => {
 
     return (
         <Box className={classes.root}>
+            <Typography>
+                Für dumme Leute: Gebt halt nen Lobbycode ein, wenn ihr eine Lobby erstellen wollt.
+                Nein
+            </Typography>
             <TextField
                 className={classes.textField}
                 color="primary"
