@@ -40,8 +40,6 @@ io.on("connection", (socket) => {
         currentPlayer.username = data.username;
         currentPlayer.lobbycode = data.lobbycode;
 
-        let playerInformation;
-
         if (!games.find((element) => element.lobbycode === data.lobbycode)) {
             console.log(`Creating game with lobbycode ${data.lobbycode}`);
             let newGame = new classes.Game([currentPlayer], data.lobbycode);
@@ -67,11 +65,12 @@ io.on("connection", (socket) => {
     });
 
     socket.on("playCard", (data) => {
-        // console.log(`Somebody played this card: ${data.type} ${data.value}`);
+        console.log(`Somebody played this card: ${data.type} ${data.value}`);
         let player = players.find((element) => element.socket == socket);
         let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
 
-        if (currentGame.order[0] === player && player != undefined) {
+        if (currentGame.order[0] === player && player !== undefined) {
+            console.log("yee");
             switch (currentGame.opening) {
                 case "AndereAlteHat":
                     processAndereAlteHat(socket, data, player, currentGame);
@@ -177,6 +176,7 @@ function tryToStartGame(lobbycode) {
 
     // START A GAME
 
+    currentGame.order = currentGame.players.slice();
     currentGame.players[0].vorhand = true;
 
     currentGame.talon = createTalon();

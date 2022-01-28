@@ -234,7 +234,7 @@ const Gaigel: React.FC<Props> = () => {
         });
 
         newSocket.on("openOpening", (data: any) => {
-            console.log("Closed Opening");
+            console.log("Open Opening");
             setOpening(true);
         });
 
