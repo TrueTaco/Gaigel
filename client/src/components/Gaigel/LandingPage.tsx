@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 
 import { Button, TextField, Box, Typography } from "@material-ui/core";
@@ -6,6 +6,7 @@ import { Button, TextField, Box, Typography } from "@material-ui/core";
 const useStyles = makeStyles({
     root: {
         minWidth: "300px",
+        maxWidth: "420px",
         padding: 15,
         borderRadius: 10,
         backgroundColor: "#ffffff",
@@ -13,6 +14,9 @@ const useStyles = makeStyles({
         flexDirection: "column",
         justifyContent: "center",
         gap: "20px",
+    },
+    info: {
+        textAlign: "center",
     },
     textField: {
         backgroundColor: "#ffffff",
@@ -37,11 +41,29 @@ const LandingPage: React.FC<Props> = ({ login }) => {
         setLobbycode(event.target.value as string);
     };
 
+    const handleLogin = () => {
+        if (username !== "" && lobbycode !== "") {
+            login(username, lobbycode);
+        }
+    };
+
+    useEffect(() => {
+        const listener = (event: any) => {
+            if (event.code === "Enter" || event.code === "NumpadEnter") {
+                handleLogin();
+            }
+        };
+        document.addEventListener("keydown", listener);
+        return () => {
+            document.removeEventListener("keydown", listener);
+        };
+    });
+
     return (
         <Box className={classes.root}>
-            <Typography>
-                Für dumme Leute: Gebt halt nen Lobbycode ein, wenn ihr eine Lobby erstellen wollt.
-                Nein
+            <Typography className={classes.info}>
+                Tipp: Bei einem bisher nicht verwendeten Lobbycode wird automatisch eine neue Lobby
+                erstellt.
             </Typography>
             <TextField
                 className={classes.textField}
@@ -64,15 +86,8 @@ const LandingPage: React.FC<Props> = ({ login }) => {
                 inputProps={{ maxLength: 10 }}
             />
 
-            <Button
-                variant="contained"
-                onClick={() => {
-                    if (username !== "" && lobbycode !== "") {
-                        login(username, lobbycode);
-                    }
-                }}
-            >
-                Einloggen
+            <Button variant="contained" onClick={handleLogin}>
+                Beitreten
             </Button>
         </Box>
     );

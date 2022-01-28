@@ -25,7 +25,6 @@ server.listen(port, () => {
 // MARK: Sockets
 let players = [];
 let deprecatedTalon = [];
-let deprecatedCurrentGameState = "Waiting";
 let games = [];
 let deprecatedCurrentGame; // Should be replaced
 let deprecatedTrumpCard;
@@ -100,12 +99,13 @@ io.on("connection", (socket) => {
                     }
                     player.playedCard = data;
                     currentGame.playedCards.push(data);
-                    io.emit("setPlayedCards", currentGame.playedCards);
+                    io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
+
                     currentGame.order.shift();
                     break;
             }
         } else {
-            io.emit("setPlayedCards", currentGame.playedCards);
+            io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
             socket.emit("setYourCards", player.cards);
         }
     });
@@ -160,7 +160,7 @@ io.on("connection", (socket) => {
         console.log(`${players.length} | Client disconnected (${socket.id})`);
     });
 });
-// MARK: Currently working on
+
 function tryToStartGame(lobbycode) {
     let currentGame = games.find((element) => element.lobbycode === lobbycode);
     let amountPlayers = 0;
