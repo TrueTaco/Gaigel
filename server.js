@@ -24,11 +24,7 @@ server.listen(port, () => {
 
 // MARK: Sockets
 let players = [];
-let talon = [];
-let deprecatedCurrentGameState = "Waiting";
 let games = [];
-let deprecatedCurrentGame; // Should be replaced
-let trumpCard;
 let i = 0;
 
 io.on("connection", (socket) => {
@@ -44,28 +40,16 @@ io.on("connection", (socket) => {
         currentPlayer.username = data.username;
         currentPlayer.lobbycode = data.lobbycode;
 
-        let playerInformation;
-
         if (!games.find((element) => element.lobbycode === data.lobbycode)) {
             console.log(`Creating game with lobbycode ${data.lobbycode}`);
-
             let newGame = new classes.Game([currentPlayer], data.lobbycode);
             games.push(newGame);
-
-            playerInformation = newGame.players.map((player) => {
-                return { username: player.username, wins: player.wins };
-            });
         } else {
             console.log(`Found game with lobby ${data.lobbycode}`);
             let currentGame = games.find((element) => element.lobbycode === data.lobbycode);
             currentGame.players.push(currentPlayer);
-
-            playerInformation = currentGame.players.map((player) => {
-                return { username: player.username, wins: player.wins };
-            });
         }
         socket.join(data.lobbycode);
-        io.in(data.lobbycode).emit("playerInformation", playerInformation);
         shareLobbyInformation(currentPlayer.lobbycode);
     });
 
@@ -80,41 +64,22 @@ io.on("connection", (socket) => {
         shareLobbyInformation(currentPlayer.lobbycode);
     });
 
-    // GAME BEGIN
-    socket.on("gameBegin", () => {
-        console.log("Game has been started");
-
-        deprecatedCurrentGame = new classes.Game(players, "123456");
-        deprecatedCurrentGame.players[0].vorhand = true;
-
-        createTalon();
-        chooseTrumpCard();
-        io.emit("setTalon", talon);
-        io.emit("setTrumpCard", trumpCard);
-
-        players.forEach((player) => {
-            drawCard(5, player);
-            io.to(player.socket.id).emit("setYourCards", player.cards);
-        });
-
-        io.to(players[0].socket.id).emit("openOpening", "");
-
-        io.emit("setTalon", talon);
-    });
-
     socket.on("playCard", (data) => {
-        // console.log(`Somebody played this card: ${data.type} ${data.value}`);
+        console.log(`Somebody played this card: ${data.type} ${data.value}`);
         let player = players.find((element) => element.socket == socket);
-        if (deprecatedCurrentGame.order[0] === player && player != undefined) {
-            switch (deprecatedCurrentGame.opening) {
+        let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
+
+        if (currentGame.order[0] === player && player !== undefined) {
+            console.log("yee");
+            switch (currentGame.opening) {
                 case "AndereAlteHat":
-                    processAndereAlteHat(socket, data, player);
+                    processAndereAlteHat(socket, data, player, currentGame);
                     break;
                 case "GeElfen":
-                    processGeElfen(socket, data, player);
+                    processGeElfen(socket, data, player, currentGame);
                     break;
                 case "HöherHat":
-                    processHöherHat(socket, data, player);
+                    processHöherHat(socket, data, player, currentGame);
                     break;
                 case "AufDissle":
                     break;
@@ -129,40 +94,53 @@ io.on("connection", (socket) => {
                         }
                     }
                     player.playedCard = data;
-                    deprecatedCurrentGame.playedCards.push(data);
-                    io.emit("setPlayedCards", deprecatedCurrentGame.playedCards);
-                    deprecatedCurrentGame.order.shift();
+                    currentGame.playedCards.push(data);
+                    io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
+
+                    currentGame.order.shift();
                     break;
             }
         } else {
-            io.emit("setPlayedCards", deprecatedCurrentGame.playedCards);
+            io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
             socket.emit("setYourCards", player.cards);
         }
     });
 
     socket.on("AndereAlteHat", () => {
-        deprecatedCurrentGame.opening = "AndereAlteHat";
+        let player = players.find((element) => element.socket == socket);
+        let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
+
+        currentGame.opening = "AndereAlteHat";
         console.log("AndereAlteHat");
         io.to(socket.id).emit("closeOpening", "");
         // Set GameOpening
     });
 
     socket.on("GeElfen", () => {
-        deprecatedCurrentGame.opening = "GeElfen";
+        let player = players.find((element) => element.socket == socket);
+        let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
+
+        currentGame.opening = "GeElfen";
         console.log("GeElfen");
         io.to(socket.id).emit("closeOpening", "");
         // Set GameOpening
     });
 
     socket.on("HöherHat", () => {
-        deprecatedCurrentGame.opening = "HöherHat";
+        let player = players.find((element) => element.socket == socket);
+        let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
+
+        currentGame.opening = "HöherHat";
         console.log("HöherHat");
         io.to(socket.id).emit("closeOpening", "");
         // Set GameOpening
     });
 
     socket.on("AufDissle", () => {
-        deprecatedCurrentGame.opening = "AufDissle";
+        let player = players.find((element) => element.socket == socket);
+        let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
+
+        currentGame.opening = "AufDissle";
         console.log("AufDissle");
         io.to(socket.id).emit("closeOpening", "");
         // Set GameOpening
@@ -179,9 +157,55 @@ io.on("connection", (socket) => {
     });
 });
 
+function tryToStartGame(lobbycode) {
+    let currentGame = games.find((element) => element.lobbycode === lobbycode);
+    let amountPlayers = 0;
+    let amountReadyPlayers = 0;
+
+    currentGame.players.map((player) => {
+        if (player.ready) amountReadyPlayers++;
+        amountPlayers++;
+    });
+
+    console.log(
+        `Trying to start a game for lobbycode ${lobbycode} | ${amountPlayers} - ${amountReadyPlayers}`
+    );
+
+    if (amountPlayers === 0) return;
+    if (amountPlayers !== amountReadyPlayers) return;
+
+    // START A GAME
+
+    currentGame.order = currentGame.players.slice();
+    currentGame.players[0].vorhand = true;
+
+    currentGame.talon = createTalon();
+    io.in(lobbycode).emit("setTalon", currentGame.talon);
+
+    currentGame.trumpCard = chooseTrumpCard(lobbycode);
+    io.in(lobbycode).emit("setTrumpCard", currentGame.trumpCard);
+
+    currentGame.players.forEach((player) => {
+        drawCard(lobbycode, 5, player);
+        io.to(player.socket.id).emit("setYourCards", player.cards);
+    });
+
+    io.in(lobbycode).emit("setTalon", currentGame.talon);
+
+    io.to(currentGame.players[0].socket.id).emit("openOpening", "");
+
+    io.in(lobbycode).emit("startGame", "");
+    console.log(`Started a game for lobbycode ${lobbycode}`);
+}
+
 function shareLobbyInformation(lobbycode) {
     if (lobbycode === "") return;
     let currentGame = games.find((element) => element.lobbycode === lobbycode);
+
+    // Send new playerLists to all other players
+    playerInformation = currentGame.players.map((player) => {
+        return { username: player.username, wins: player.wins };
+    });
 
     let amountReadyPlayers = 0;
     currentGame.players.map((player) => {
@@ -191,7 +215,10 @@ function shareLobbyInformation(lobbycode) {
     io.in(lobbycode).emit("lobbyInformation", {
         lobbycode: lobbycode,
         amountReadyPlayers: amountReadyPlayers,
+        playerInformation: playerInformation,
     });
+
+    tryToStartGame(lobbycode);
 }
 
 function resetPlayer(socket) {
@@ -205,12 +232,6 @@ function resetPlayer(socket) {
             (player) => player.socket.id !== socket.id
         );
         currentGame.order = currentGame.order.filter((player) => player.socket.id !== socket.id);
-
-        // Send new playerLists to all other players
-        playerInformation = currentGame.players.map((player) => {
-            return { username: player.username, wins: player.wins };
-        });
-        io.in(currentPlayer.lobbycode).emit("playerInformation", playerInformation);
 
         shareLobbyInformation(currentGame.lobbycode);
 
@@ -226,58 +247,58 @@ function resetPlayer(socket) {
     currentPlayer.ready = false;
 }
 
-function processAndereAlteHat(socket, data, player) {
-    if (player === deprecatedCurrentGame.players[0]) {
+function processAndereAlteHat(socket, data, player, currentGame) {
+    if (player === currentGame.players[0]) {
         if (data.value === "A") {
             player.playedCard = data;
-            deprecatedCurrentGame.playedCards.push(data);
-            io.emit("setPlayedCards", deprecatedCurrentGame.playedCards);
-            deprecatedCurrentGame.order.shift();
+            currentGame.playedCards.push(data);
+            io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
+
+            currentGame.order.shift();
         } else {
-            io.emit("setPlayedCards", deprecatedCurrentGame.playedCards);
+            io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
         }
     } else {
         player.playedCard = data;
-        deprecatedCurrentGame.playedCards.push(data);
-        io.emit("setPlayedCards", deprecatedCurrentGame.playedCards);
-        deprecatedCurrentGame.order.shift();
+        currentGame.playedCards.push(data);
+        io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
+
+        currentGame.order.shift();
     }
-    if (deprecatedCurrentGame.order.length === 0) {
-        if (deprecatedCurrentGame.playedCards.filter((card) => card.value === "A").length == 1) {
+    if (currentGame.order.length === 0) {
+        if (currentGame.playedCards.filter((card) => card.value === "A").length == 1) {
             console.log(players[0] + " Won");
         } else {
-            let winner = deprecatedCurrentGame.players
+            let winner = currentGame.players
                 .slice(1)
-                .filter((player) => player.playedCard == deprecatedCurrentGame.playedCards[0]);
+                .filter((player) => player.playedCard == currentGame.playedCards[0]);
 
             console.log(winner + "won (other dude)");
         }
     }
 }
 
-function processGeElfen(socket, data, player) {
-    if (player === deprecatedCurrentGame.players[0]) {
+function processGeElfen(socket, data, player, currentGame) {
+    if (player === currentGame.players[0]) {
         if (data.value === "A") {
             player.playedCard = data;
-            deprecatedCurrentGame.playedCards.push(data);
-            io.emit("setPlayedCards", deprecatedCurrentGame.playedCards);
-            deprecatedCurrentGame.order.shift();
+            currentGame.playedCards.push(data);
+            io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
+
+            currentGame.order.shift();
         } else {
-            io.emit("setPlayedCards", deprecatedCurrentGame.playedCards);
+            io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
         }
     } else {
         player.playedCard = data;
-        deprecatedCurrentGame.playedCards.push(data);
-        io.emit("setPlayedCards", deprecatedCurrentGame.playedCards);
-        deprecatedCurrentGame.order.shift();
+        currentGame.playedCards.push(data);
+        io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
+
+        currentGame.order.shift();
     }
-    if (deprecatedCurrentGame.order.length === 0) {
-        let beginnerPlayer = deprecatedCurrentGame.players.filter(
-            (player) => player.vorhand == true
-        );
-        let notBeginnerPlayer = deprecatedCurrentGame.players.filter(
-            (player) => player.vorhand == false
-        );
+    if (currentGame.order.length === 0) {
+        let beginnerPlayer = currentGame.players.filter((player) => player.vorhand == true);
+        let notBeginnerPlayer = currentGame.players.filter((player) => player.vorhand == false);
         let playerWithHighestPoints = null;
         notBeginnerPlayer.forEach((player) => {
             if (
@@ -295,23 +316,25 @@ function processGeElfen(socket, data, player) {
     }
 }
 
-function processHöherHat(socket, data, player) {
-    if (player === deprecatedCurrentGame.players[0]) {
-        if (data.value !== "A" && data.type !== trumpCard.type) {
+function processHöherHat(socket, data, player, currentGame) {
+    if (player === currentGame.players[0]) {
+        if (data.value !== "A" && data.type !== currentGame.trumpCard.type) {
             player.playedCard = data;
-            deprecatedCurrentGame.playedCards.push(data);
-            io.emit("setPlayedCards", deprecatedCurrentGame.playedCards);
-            deprecatedCurrentGame.order.shift();
+            currentGame.playedCards.push(data);
+            io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
+
+            currentGame.order.shift();
         } else {
-            io.emit("setPlayedCards", deprecatedCurrentGame.playedCards);
+            io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
         }
     } else {
         player.playedCard = data;
-        deprecatedCurrentGame.playedCards.push(data);
-        io.emit("setPlayedCards", deprecatedCurrentGame.playedCards);
-        deprecatedCurrentGame.order.shift();
+        currentGame.playedCards.push(data);
+        io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
+
+        currentGame.order.shift();
     }
-    if (deprecatedCurrentGame.order.length === 0) {
+    if (currentGame.order.length === 0) {
         console.log(players[0] + " Won");
     }
 }
@@ -329,7 +352,7 @@ function createTalon() {
     );
     newTalon.push(...newTalon);
     newTalon = fisherYatesShuffle(newTalon);
-    talon = newTalon;
+
     return newTalon;
 }
 
@@ -343,19 +366,22 @@ function fisherYatesShuffle(arr) {
     return arr;
 }
 
-function chooseTrumpCard() {
-    let newTrumpCard = talon[talon.length - 1];
-    talon.slice(0, talon.length - 1);
+function chooseTrumpCard(lobbycode) {
+    let currentGame = games.find((element) => element.lobbycode === lobbycode);
 
-    trumpCard = newTrumpCard;
-    return trumpCard;
+    let newTrumpCard = currentGame.talon[currentGame.talon.length - 1];
+    currentGame.talon.slice(0, currentGame.talon.length - 1);
+
+    return newTrumpCard;
 }
 
-function drawCard(amount, player) {
-    if (player.cards.length < 5 && talon.length > 0) {
-        // Gets last cards of the talon array and removes them
-        let drawnCards = talon.slice(talon.length - amount);
-        talon = talon.slice(0, talon.length - amount);
+function drawCard(lobbycode, amount, player) {
+    let currentGame = games.find((element) => element.lobbycode === lobbycode);
+
+    if (player.cards.length < 5 && currentGame.talon.length > 0) {
+        // Gets last cards of the deprecatedTalon array and removes them
+        let drawnCards = currentGame.talon.slice(currentGame.talon.length - amount);
+        currentGame.talon = currentGame.talon.slice(0, currentGame.talon.length - amount);
 
         let newUserCards = player.cards;
         drawnCards.forEach((card) => {
@@ -381,17 +407,15 @@ function drawCard(amount, player) {
         });
 
         newUserCards.sort((a, b) => {
-            //"Eichel", "Blatt", "Herz", "Schellen"
             const trump = new Map();
             trump.set("Eichel", 0);
             trump.set("Blatt", 1);
             trump.set("Herz", 2);
             trump.set("Schellen", 3);
 
-            if (trumpCard.type === a.type || trumpCard.type === b.type) {
-                trump.set(trumpCard.type, 5);
+            if (currentGame.talon.type === a.type || currentGame.talon.type === b.type) {
+                trump.set(currentGame.talon.type, 5);
             }
-
             if (trump.get(a.value) < trump.get(b.value)) {
                 return -1;
             }
@@ -403,5 +427,3 @@ function drawCard(amount, player) {
         });
     }
 }
-
-createTalon();

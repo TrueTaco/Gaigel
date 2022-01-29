@@ -20,8 +20,11 @@ class Player {
 
 class Game {
     constructor(players, lobbycode) {
-        this.opening = "";
+        this.ongoing = false;
         this.lobbycode = lobbycode;
+        this.trumpCard;
+        this.opening = "";
+        this.talon = [];
         this.playedCards = [];
         this.players = players;
         this.order = [];

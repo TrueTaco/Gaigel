@@ -13,6 +13,7 @@ import { Box, Snackbar } from "@material-ui/core";
 import Opening from "./Opening";
 import Alert from "@material-ui/lab/Alert";
 import LobbyPage from "./LobbyPage";
+import PlayerList from "./PlayerList";
 
 // MARK: Styles
 const useStyles = makeStyles({
@@ -68,13 +69,11 @@ const Gaigel: React.FC<Props> = () => {
     // Boolean for deciding on whether to show the lobby page or the game
     const [gameStarted, setGameStarted] = useState<boolean>(false);
 
-    // Array with all the players that are connected to the same lobby
-    const [playerInformation, setPlayerInformation] = useState<PlayerProps[]>([]);
-
-    // Number of players in current lobby that are ready
+    // All needed information about the joined lobby
     const [lobbyInformation, setLobbyInformation] = useState<any>({
         lobbycode: "",
         amountReadyPlayers: 0,
+        playerInformation: [],
     });
 
     const [opening, setOpening] = useState(false);
@@ -119,6 +118,7 @@ const Gaigel: React.FC<Props> = () => {
 
     const backToLogin = () => {
         setLoggedIn(false);
+        setGameStarted(false);
 
         // @ts-ignore
         socket.emit("backToLogin", "");
@@ -200,12 +200,12 @@ const Gaigel: React.FC<Props> = () => {
             setResponse(data);
         });
 
-        newSocket.on("playerInformation", (data: any) => {
-            setPlayerInformation(data);
-        });
-
         newSocket.on("lobbyInformation", (data: any) => {
             setLobbyInformation(data);
+        });
+
+        newSocket.on("startGame", (data: any) => {
+            setGameStarted(true);
         });
 
         newSocket.on("setTalon", (data: any) => {
@@ -235,7 +235,7 @@ const Gaigel: React.FC<Props> = () => {
         });
 
         newSocket.on("openOpening", (data: any) => {
-            console.log("Closed Opening");
+            console.log("Open Opening");
             setOpening(true);
         });
 
@@ -269,12 +269,17 @@ const Gaigel: React.FC<Props> = () => {
                 <LobbyPage
                     backToLogin={backToLogin}
                     lobbycode={lobbyInformation.lobbycode}
-                    playerInformation={playerInformation}
+                    playerInformation={lobbyInformation.playerInformation}
                     amountReadyPlayers={lobbyInformation.amountReadyPlayers}
                     getReady={getReady}
                 />
             ) : (
                 <>
+                    <PlayerList
+                        playerlist={lobbyInformation.playerInformation.map(
+                            (element: any) => element.username
+                        )}
+                    />
                     <Box className={classes.playingField}>
                         <Box className={classes.talonAndTrump}>
                             <Talon cardsLeft={talonCards.length} drawCard={drawCard} />

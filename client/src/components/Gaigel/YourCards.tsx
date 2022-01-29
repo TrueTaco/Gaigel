@@ -10,7 +10,6 @@ const useStyles = makeStyles({
         padding: 10,
         backgroundColor: "#575757",
         border: "5px solid #303030",
-        boxShadow: "0 0 0 5px #303030",
         borderRadius: 20,
         display: "flex",
         flexDirection: "column",

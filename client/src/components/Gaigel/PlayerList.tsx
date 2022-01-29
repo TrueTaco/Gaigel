@@ -1,71 +1,52 @@
-import { useState } from "react";
-import Box from "@material-ui/core/Box";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemAvatar from "@material-ui/core/ListItemAvatar";
-import ListItemText from "@material-ui/core/ListItemText";
-import Avatar from "@material-ui/core/Avatar";
-import Grid from "@material-ui/core/Grid";
-import PersonIcon from "@material-ui/icons/Person";
 import { makeStyles } from "@material-ui/core/styles";
+import { Box, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles({
     root: {
-        flexGrow: 1,
-        maxWidth: 752,
+        margin: 20,
+        padding: 10,
+        backgroundColor: "#575757",
+        border: "5px solid #303030",
+        borderRadius: 20,
+        color: "#ffffff",
+        display: "flex",
+        justifyContent: "space-between",
+        alignContent: "center",
+        alignItems: "center",
+        gap: "10px",
+    },
+    name: {
+        padding: 5,
+        paddingTop: 2,
+        paddingBottom: 2,
+        borderRadius: 8,
     },
 });
 
 interface Props {
-    name: string;
+    playerlist: string[];
 }
 
-const PlayerList: React.FC<Props> = ({ name }) => {
+const PlayerList: React.FC<Props> = ({ playerlist }) => {
     const classes = useStyles();
-    const [dense, setDense] = useState(false);
-    const [secondary, setSecondary] = useState(false);
+
+    // TODO: Replace the random highlighting with the actual player whose turn it is
+    let randomHighlight = Math.floor(Math.random() * playerlist.length * 1);
+    let i = -1;
 
     return (
         <Box className={classes.root}>
-            <Grid container spacing={2}>
-                <Grid item>
-                    <List dense={dense}>
-                        <ListItem>
-                            <ListItemAvatar>
-                                <Avatar>
-                                    <PersonIcon />
-                                </Avatar>
-                            </ListItemAvatar>
-                            <ListItemText
-                                primary={name}
-                                secondary={secondary ? "Secondary text" : null}
-                            />
-                        </ListItem>
-                        <ListItem>
-                            <ListItemAvatar>
-                                <Avatar>
-                                    <PersonIcon />
-                                </Avatar>
-                            </ListItemAvatar>
-                            <ListItemText
-                                primary={name}
-                                secondary={secondary ? "Secondary text" : null}
-                            />
-                        </ListItem>
-                        <ListItem>
-                            <ListItemAvatar>
-                                <Avatar>
-                                    <PersonIcon />
-                                </Avatar>
-                            </ListItemAvatar>
-                            <ListItemText
-                                primary={name}
-                                secondary={secondary ? "Secondary text" : null}
-                            />
-                        </ListItem>
-                    </List>
-                </Grid>
-            </Grid>
+            {playerlist.map((name) => {
+                i++;
+                return (
+                    <Typography
+                        className={classes.name}
+                        style={{ border: randomHighlight === i ? "2px solid #ffe600" : "none" }}
+                    >
+                        {name}
+                    </Typography>
+                );
+            })}
         </Box>
     );
 };
