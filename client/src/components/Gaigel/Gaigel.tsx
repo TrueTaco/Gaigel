@@ -13,6 +13,7 @@ import { Box, Snackbar } from "@material-ui/core";
 import Opening from "./Opening";
 import Alert from "@material-ui/lab/Alert";
 import LobbyPage from "./LobbyPage";
+import PlayerList from "./PlayerList";
 
 // MARK: Styles
 const useStyles = makeStyles({
@@ -274,6 +275,11 @@ const Gaigel: React.FC<Props> = () => {
                 />
             ) : (
                 <>
+                    <PlayerList
+                        playerlist={lobbyInformation.playerInformation.map(
+                            (element: any) => element.username
+                        )}
+                    />
                     <Box className={classes.playingField}>
                         <Box className={classes.talonAndTrump}>
                             <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
