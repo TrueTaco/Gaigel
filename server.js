@@ -69,8 +69,7 @@ io.on("connection", (socket) => {
         let player = players.find((element) => element.socket == socket);
         let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
 
-        if (currentGame.order[0] === player && player !== undefined) {
-            console.log("yee");
+        if (currentGame !== undefined && currentGame.order[0] === player && player !== undefined) {
             switch (currentGame.opening) {
                 case "AndereAlteHat":
                     processAndereAlteHat(socket, data, player, currentGame);
@@ -98,6 +97,9 @@ io.on("connection", (socket) => {
                     io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
 
                     currentGame.order.shift();
+                    if (currentGame.order.length < 1) {
+                        // TODO: Do whatever needs to be done after each round
+                    }
                     break;
             }
         } else {
@@ -176,6 +178,7 @@ function tryToStartGame(lobbycode) {
 
     // START A GAME
 
+    currentGame.ongoing = true;
     currentGame.order = currentGame.players.slice();
     currentGame.players[0].vorhand = true;
 
