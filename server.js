@@ -83,11 +83,20 @@ io.on("connection", (socket) => {
                 case "AufDissle":
                     break;
                 default:
+                    // TODO: Richtige Stichvergabe, Order neu setzen, Spielfeld leeren, Karten ziehen
+                    // Remove played card from backend array
+
+                    let adadasd = player.cards.findIndex(
+                        (element) => element.type === data.type && element.valule === data.value
+                    );
+                    console.log(`With findIndex: ${adadasd}`);
+
                     for (let i = 0; i < player.cards.length; i++) {
                         if (
                             data.type === player.cards[i].type &&
                             data.value === player.cards[i].value
                         ) {
+                            console.log(`With for loop: ${i}`);
                             player.cards.splice(i, 1);
                             break;
                         }
@@ -246,38 +255,74 @@ function resetPlayer(socket) {
     // Reset player information
     currentPlayer.username = "";
     currentPlayer.lobbycode = "";
-    currentPlayer.wins = 0;
     currentPlayer.ready = false;
+    currentPlayer.wins = 0;
+    currentPlayer.score = 0;
+    currentPlayer.vorhand = false;
+    currentPlayer.playedCard = {};
+    currentPlayer.cards = [];
+}
+
+function calculateScore(cards) {
+    const pointsMap = new Map();
+    pointsMap.set("7", 0);
+    pointsMap.set("U", 2);
+    pointsMap.set("O", 3);
+    pointsMap.set("K", 4);
+    pointsMap.set("10", 10);
+    pointsMap.set("A", 11);
+
+    let points = 0;
+    cards.forEach(function (card) {
+        points += points.get(card.value);
+    });
+    return points;
+}
+
+function declinePlayedCard(socket, player, currentGame) {
+    io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
+    socket.emit("setYourCards", player.cards);
+}
+
+function acceptPlayedCard(socket, player, currentGame, data) {
+    player.playedCard = data;
+    let cardIndex = player.cards.findIndex((element) => element === data);
+    player.cards.splice(cardIndex, 1);
+    socket.emit("setYourCards", player.cards);
+
+    currentGame.playedCards.push(data);
+    io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
+    currentGame.order.shift();
+}
+
+function endOpening(currentGame, winnerIndex) {
+    currentGame.players[winnerIndex].score += calculateScore(currentGame.playedCards);
+    currentGame.opening = "";
 }
 
 function processAndereAlteHat(socket, data, player, currentGame) {
-    if (player === currentGame.players[0]) {
-        if (data.value === "A") {
-            player.playedCard = data;
-            currentGame.playedCards.push(data);
-            io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
-
-            currentGame.order.shift();
-        } else {
-            io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
-        }
+    if (player === currentGame.players[0] && data.value !== "A") {
+        // If vorhand plays not allowed card
+        declinePlayedCard(socket, player, currentGame);
     } else {
-        player.playedCard = data;
-        currentGame.playedCards.push(data);
-        io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
-
-        currentGame.order.shift();
+        // If allowed card is played
+        acceptPlayedCard(socket, player, currentGame, data);
     }
-    if (currentGame.order.length === 0) {
-        if (currentGame.playedCards.filter((card) => card.value === "A").length == 1) {
-            console.log(players[0] + " Won");
-        } else {
-            let winner = currentGame.players
-                .slice(1)
-                .filter((player) => player.playedCard == currentGame.playedCards[0]);
 
-            console.log(winner + "won (other dude)");
+    if (currentGame.order.length === 0) {
+        // If currrent round is over
+        let winnerIndex = 0;
+        if (
+            currentGame.playedCards.filter(
+                (card) => card.value === "A" && card.type === currentGame.playedCards[0].type
+            ).length !== 1
+        ) {
+            // If somebody else played the same ace
+            winnerIndex = currentGame.players
+                .slice(1)
+                .findIndex((player) => player.playedCard == currentGame.playedCards[0]);
         }
+        endOpening(currentGame, winnerIndex);
     }
 }
 
@@ -316,6 +361,7 @@ function processGeElfen(socket, data, player, currentGame) {
         } else {
             console.log(playerWithHighestPoints + "won (other dude)");
         }
+        currentGame.opening = "";
     }
 }
 
@@ -338,7 +384,8 @@ function processHöherHat(socket, data, player, currentGame) {
         currentGame.order.shift();
     }
     if (currentGame.order.length === 0) {
-        console.log(players[0] + " Won");
+        console.log(currentGame.players[0] + " Won");
+        currentGame.opening = "";
     }
 }
 
