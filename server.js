@@ -274,7 +274,7 @@ function calculateScore(cards) {
 
     let points = 0;
     cards.forEach(function (card) {
-        points += points.get(card.value);
+        points += pointsMap.get(card.value);
     });
     return points;
 }
@@ -320,31 +320,40 @@ function processAndereAlteHat(socket, data, player, currentGame) {
             // If somebody else played the same ace
             winnerIndex = currentGame.players
                 .slice(1)
-                .findIndex((player) => player.playedCard == currentGame.playedCards[0]);
+                .findIndex(
+                    (player) =>
+                        player.playedCard.type == currentGame.playedCards[0].type &&
+                        player.playedCard.value == currentGame.playedCards[0].value
+                );
         }
         endOpening(currentGame, winnerIndex);
     }
 }
 
 function processGeElfen(socket, data, player, currentGame) {
-    if (player === currentGame.players[0]) {
-        if (data.value === "A") {
-            player.playedCard = data;
-            currentGame.playedCards.push(data);
-            io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
-
-            currentGame.order.shift();
-        } else {
-            io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
-        }
+    if (player === currentGame.players[0] && data.value !== "A") {
+        declinePlayedCard(socket, player, currentGame);
     } else {
-        player.playedCard = data;
-        currentGame.playedCards.push(data);
-        io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
-
-        currentGame.order.shift();
+        acceptPlayedCard(socket, player, currentGame, data);
     }
     if (currentGame.order.length === 0) {
+        endOpening(currentGame, 0);
+    }
+}
+
+function processHöherHat(socket, data, player, currentGame) {
+    if (
+        player === currentGame.players[0] &&
+        data.value !== "A" &&
+        data.type !== currentGame.trumpCard.type
+    ) {
+        declinePlayedCard(socket, player, currentGame);
+    } else {
+        acceptPlayedCard(socket, player, currentGame, data);
+    }
+
+    if (currentGame.order.length === 0) {
+        let winnerIndex = 0;
         let beginnerPlayer = currentGame.players.filter((player) => player.vorhand == true);
         let notBeginnerPlayer = currentGame.players.filter((player) => player.vorhand == false);
         let playerWithHighestPoints = null;
@@ -365,32 +374,9 @@ function processGeElfen(socket, data, player, currentGame) {
     }
 }
 
-function processHöherHat(socket, data, player, currentGame) {
-    if (player === currentGame.players[0]) {
-        if (data.value !== "A" && data.type !== currentGame.trumpCard.type) {
-            player.playedCard = data;
-            currentGame.playedCards.push(data);
-            io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
-
-            currentGame.order.shift();
-        } else {
-            io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
-        }
-    } else {
-        player.playedCard = data;
-        currentGame.playedCards.push(data);
-        io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
-
-        currentGame.order.shift();
-    }
-    if (currentGame.order.length === 0) {
-        console.log(currentGame.players[0] + " Won");
-        currentGame.opening = "";
-    }
-}
-
 function createTalon() {
-    let types = ["Eichel", "Blatt", "Herz", "Schellen"];
+    //let types = ["Eichel", "Blatt", "Herz", "Schellen"];
+    let types = ["Eichel"];
     // let types: string[] = ["Eichel"];
     let values = ["7", "U", "O", "K", "10", "A"];
     let newTalon = [];
