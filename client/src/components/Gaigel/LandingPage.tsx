@@ -73,7 +73,7 @@ const LandingPage: React.FC<Props> = ({ login }) => {
                 variant="outlined"
                 label="Nutzername"
                 onChange={handleUsernameChange}
-                inputProps={{ maxLength: 15 }}
+                inputProps={{ maxLength: 10 }}
             />
 
             <TextField

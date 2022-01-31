@@ -14,10 +14,12 @@ import Opening from "./Opening";
 import Alert from "@material-ui/lab/Alert";
 import LobbyPage from "./LobbyPage";
 import PlayerList from "./PlayerList";
+import GameInformation from "./GameInformation";
 
 // MARK: Styles
 const useStyles = makeStyles({
     root: {
+        // color: "white",
         height: "100vh",
         paddingLeft: 20,
         paddingRight: 20,
@@ -39,7 +41,7 @@ const useStyles = makeStyles({
         borderRadius: 20,
         display: "flex",
         flexDirection: "column",
-        gap: "20px",
+        gap: "10px",
     },
     talonAndTrump: {
         display: "flex",
@@ -110,6 +112,7 @@ const Gaigel: React.FC<Props> = () => {
 
     const login = (username: string, lobbycode: string) => {
         setLoggedIn(true);
+        setOwnUsername(username);
 
         // @ts-ignore
         socket.emit("joinLobby", { username: username, lobbycode: lobbycode });
@@ -269,6 +272,10 @@ const Gaigel: React.FC<Props> = () => {
                 />
             ) : (
                 <>
+                    <GameInformation
+                        username={ownUsername}
+                        lobbycode={lobbyInformation.lobbycode}
+                    />
                     <PlayerList
                         playerlist={lobbyInformation.playerInformation.map(
                             (element: any) => element.username

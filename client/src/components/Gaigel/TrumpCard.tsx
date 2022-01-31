@@ -7,6 +7,7 @@ import GaigelCard from "./GaigelCard";
 
 const useStyles = makeStyles({
     root: {
+        color: "white",
         width: 100,
         display: "flex",
         flexDirection: "column",
