@@ -72,8 +72,8 @@ io.on("connection", (socket) => {
     });
 
     socket.on("playCard", (data) => {
-        console.log(`Somebody played this card: ${data.type} ${data.value}`);
         let player = players.find((element) => element.socket == socket);
+        console.log(`${player.username} played this card: ${data.type} ${data.value}`);
         let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
 
         if (currentGame !== undefined && currentGame.order[0] === player && player !== undefined) {
@@ -90,37 +90,34 @@ io.on("connection", (socket) => {
                 case "AufDissle":
                     break;
                 default:
-                    // TODO: Richtige Stichvergabe, Order neu setzen, Spielfeld leeren, Karten ziehen
-                    // Remove played card from backend array
+                    // Normalround
+                    acceptPlayedCard(socket, player, currentGame, data);
+                    if (currentGame.order.length === 0) {
+                        // If currrent round is over
+                        let playerWithHighestPoints = player;
+                        currentGame.players.forEach(function (player) {
+                            if (
+                                (player.playedCard.type ===
+                                    playerWithHighestPoints.playedCard.type ||
+                                    player.playedCard.type === currentGame.trumpCard.type) &&
+                                pointsMap.get(player.playedCard.value) >
+                                    pointsMap.get(playerWithHighestPoints.playedCard.value)
+                            ) {
+                                playerWithHighestPoints = player;
+                            }
+                        });
+                        console.log(currentGame.players);
+                        console.log(playerWithHighestPoints.username);
 
-                    let adadasd = player.cards.findIndex(
-                        (element) => element.type === data.type && element.valule === data.value
-                    );
-                    console.log(`With findIndex: ${adadasd}`);
-
-                    for (let i = 0; i < player.cards.length; i++) {
-                        if (
-                            data.type === player.cards[i].type &&
-                            data.value === player.cards[i].value
-                        ) {
-                            console.log(`With for loop: ${i}`);
-                            player.cards.splice(i, 1);
-                            break;
-                        }
-                    }
-                    player.playedCard = data;
-                    currentGame.playedCards.push(data);
-                    io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
-
-                    currentGame.order.shift();
-                    if (currentGame.order.length < 1) {
-                        // TODO: Do whatever needs to be done after each round
+                        let winnerIndex = currentGame.players.findIndex(
+                            (player) => player === playerWithHighestPoints
+                        );
+                        endOpening(currentGame, winnerIndex);
                     }
                     break;
             }
         } else {
-            io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
-            socket.emit("setYourCards", player.cards);
+            declinePlayedCard(socket, player, currentGame, data);
         }
     });
 
@@ -295,9 +292,23 @@ function acceptPlayedCard(socket, player, currentGame, data) {
 }
 
 function endOpening(currentGame, winnerIndex) {
-    console.log(players[winnerIndex].username + " won");
+    console.log("Winnerindex" + winnerIndex);
+    console.log(currentGame.players[winnerIndex].username + " won");
     currentGame.players[winnerIndex].score += calculateScore(currentGame.playedCards);
     currentGame.opening = "";
+    // Create new-order
+    let winner = currentGame.players[winnerIndex];
+    while (winner != currentGame.players[0]) {
+        currentGame.players.push(currentGame.players.shift());
+    }
+    currentGame.order = currentGame.players.slice();
+
+    currentGame.playedCards = [];
+
+    currentGame.players.forEach((player) => {
+        drawCard(currentGame.lobbycode, 1, player);
+        io.to(player.socket.id).emit("setYourCards", player.cards);
+    });
 }
 
 function processAndereAlteHat(socket, data, player, currentGame) {
@@ -360,15 +371,16 @@ function processHöherHat(socket, data, player, currentGame) {
         notBeginnerPlayers.forEach((player) => {
             if (
                 player.playedCard.type === beginnerPlayer.playedCard.type &&
-                pointsMap.get(player.playedCard.value) > pointsMap.get(beginnerPlayer.playedCard)
+                pointsMap.get(player.playedCard.value) >
+                    pointsMap.get(playerWithHighestPoints.playedCard.value)
             ) {
                 playerWithHighestPoints = player;
             }
         });
         if (playerWithHighestPoints != beginnerPlayer) {
-            winnerIndex = currentGame.players
-                .slice(1)
-                .findIndex((player) => player === playerWithHighestPoints);
+            winnerIndex = currentGame.players.findIndex(
+                (player) => player === playerWithHighestPoints
+            );
         }
         endOpening(currentGame, winnerIndex);
         currentGame.opening = "";
