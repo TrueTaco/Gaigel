@@ -295,6 +295,7 @@ function acceptPlayedCard(socket, player, currentGame, data) {
 }
 
 function endOpening(currentGame, winnerIndex) {
+    console.log(players[winnerIndex].username + " won");
     currentGame.players[winnerIndex].score += calculateScore(currentGame.playedCards);
     currentGame.opening = "";
 }
@@ -352,25 +353,19 @@ function processHöherHat(socket, data, player, currentGame) {
 
     if (currentGame.order.length === 0) {
         let winnerIndex = 0;
-        let beginnerPlayer = currentGame.players.filter((player) => player.vorhand == true);
+        let beginnerPlayer = currentGame.players.find((player) => player.vorhand == true);
         let notBeginnerPlayers = currentGame.players.filter((player) => player.vorhand == false);
-        let playerWithHighestPoints = null;
+        let playerWithHighestPoints = beginnerPlayer;
 
         notBeginnerPlayers.forEach((player) => {
             if (
                 player.playedCard.type === beginnerPlayer.playedCard.type &&
-                pointsMap.get(player.playedCard.value) >
-                    pointsMap.get(beginnerPlayer.playedCard.value)
+                pointsMap.get(player.playedCard.value) > pointsMap.get(beginnerPlayer.playedCard)
             ) {
-                if (!playerWithHighestPoints) {
-                    playerWithHighestPoints = player;
-                } else if (playerWithHighestPoints.playedCard.value > player.playedCard.value) {
-                    playerWithHighestPoints = player;
-                }
+                playerWithHighestPoints = player;
             }
         });
-        if ((playerWithHighestPoints = null)) {
-        } else {
+        if (playerWithHighestPoints != beginnerPlayer) {
             winnerIndex = currentGame.players
                 .slice(1)
                 .findIndex((player) => player === playerWithHighestPoints);
@@ -381,8 +376,7 @@ function processHöherHat(socket, data, player, currentGame) {
 }
 
 function createTalon() {
-    //let types = ["Eichel", "Blatt", "Herz", "Schellen"];
-    let types = ["Eichel"];
+    let types = ["Eichel", "Blatt", "Herz", "Schellen"];
     // let types: string[] = ["Eichel"];
     let values = ["7", "U", "O", "K", "10", "A"];
     let newTalon = [];
