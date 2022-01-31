@@ -25,6 +25,13 @@ server.listen(port, () => {
 // MARK: Sockets
 let players = [];
 let games = [];
+const pointsMap = new Map();
+pointsMap.set("7", 0);
+pointsMap.set("U", 2);
+pointsMap.set("O", 3);
+pointsMap.set("K", 4);
+pointsMap.set("10", 10);
+pointsMap.set("A", 11);
 let i = 0;
 
 io.on("connection", (socket) => {
@@ -264,14 +271,6 @@ function resetPlayer(socket) {
 }
 
 function calculateScore(cards) {
-    const pointsMap = new Map();
-    pointsMap.set("7", 0);
-    pointsMap.set("U", 2);
-    pointsMap.set("O", 3);
-    pointsMap.set("K", 4);
-    pointsMap.set("10", 10);
-    pointsMap.set("A", 11);
-
     let points = 0;
     cards.forEach(function (card) {
         points += pointsMap.get(card.value);
@@ -344,8 +343,7 @@ function processGeElfen(socket, data, player, currentGame) {
 function processHöherHat(socket, data, player, currentGame) {
     if (
         player === currentGame.players[0] &&
-        data.value !== "A" &&
-        data.type !== currentGame.trumpCard.type
+        (data.value === "A" || data.type === currentGame.trumpCard.type)
     ) {
         declinePlayedCard(socket, player, currentGame);
     } else {
@@ -355,21 +353,29 @@ function processHöherHat(socket, data, player, currentGame) {
     if (currentGame.order.length === 0) {
         let winnerIndex = 0;
         let beginnerPlayer = currentGame.players.filter((player) => player.vorhand == true);
-        let notBeginnerPlayer = currentGame.players.filter((player) => player.vorhand == false);
+        let notBeginnerPlayers = currentGame.players.filter((player) => player.vorhand == false);
         let playerWithHighestPoints = null;
-        notBeginnerPlayer.forEach((player) => {
+
+        notBeginnerPlayers.forEach((player) => {
             if (
-                player.playedCard.type === beginnerPlayer.Player.playedCard.type &&
-                player.playedCard.value > beginnerPlayer.Player.playedCard.value
+                player.playedCard.type === beginnerPlayer.playedCard.type &&
+                pointsMap.get(player.playedCard.value) >
+                    pointsMap.get(beginnerPlayer.playedCard.value)
             ) {
-                playerWithHighestPoints = player;
+                if (!playerWithHighestPoints) {
+                    playerWithHighestPoints = player;
+                } else if (playerWithHighestPoints.playedCard.value > player.playedCard.value) {
+                    playerWithHighestPoints = player;
+                }
             }
         });
         if ((playerWithHighestPoints = null)) {
-            console.log(beginnerPlayer + "won");
         } else {
-            console.log(playerWithHighestPoints + "won (other dude)");
+            winnerIndex = currentGame.players
+                .slice(1)
+                .findIndex((player) => player === playerWithHighestPoints);
         }
+        endOpening(currentGame, winnerIndex);
         currentGame.opening = "";
     }
 }
