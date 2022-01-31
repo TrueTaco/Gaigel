@@ -4,6 +4,7 @@ import { Grid, Paper, CardActionArea, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles({
     root: {
+        color: "white",
         width: 100,
         display: "flex",
         flexDirection: "column",

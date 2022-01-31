@@ -3,7 +3,6 @@ import { Box, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles({
     root: {
-        margin: 20,
         padding: 10,
         backgroundColor: "#575757",
         border: "5px solid #303030",

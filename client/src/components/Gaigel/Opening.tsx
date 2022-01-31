@@ -1,18 +1,14 @@
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import { Box, Paper, Typography } from "@material-ui/core";
+import { Box, ButtonGroup, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles({
     root: {
-        margin: 20,
-        alignContent: "center",
-        justifyContent: "space-around",
+        color: "white",
     },
     header: {
-        margin: 20,
+        marginBottom: 10,
         textAlign: "center",
-        fontSize: 16,
-        fontWeight: "bold",
     },
 });
 
@@ -45,20 +41,20 @@ const Opening: React.FC<Props> = ({ GeElfen, AndereAlteHat, HöherHat, AufDissle
     return (
         <Box className={classes.root}>
             <Typography className={classes.header}> Eröffnung</Typography>
-            <Paper>
-                <Button variant="contained" onClick={handleAndereAlteHat}>
+            <ButtonGroup>
+                <Button variant="contained" size="small" onClick={handleAndereAlteHat}>
                     Andere Alte hat
                 </Button>
-                <Button variant="contained" onClick={handleGeElfen}>
+                <Button variant="contained" size="small" onClick={handleGeElfen}>
                     Ge-Elfen
                 </Button>
-                <Button variant="contained" onClick={handleHöherHat}>
+                <Button variant="contained" size="small" onClick={handleHöherHat}>
                     Höher hat
                 </Button>
-                <Button variant="contained" onClick={handleAufDissle}>
+                <Button variant="contained" size="small" onClick={handleAufDissle}>
                     Auf Dissle
                 </Button>
-            </Paper>
+            </ButtonGroup>
         </Box>
     );
 };
