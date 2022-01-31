@@ -106,8 +106,6 @@ io.on("connection", (socket) => {
                                 playerWithHighestPoints = player;
                             }
                         });
-                        console.log(currentGame.players);
-                        console.log(playerWithHighestPoints.username);
 
                         let winnerIndex = currentGame.players.findIndex(
                             (player) => player === playerWithHighestPoints
@@ -292,7 +290,6 @@ function acceptPlayedCard(socket, player, currentGame, data) {
 }
 
 function endOpening(currentGame, winnerIndex) {
-    console.log("Winnerindex" + winnerIndex);
     console.log(currentGame.players[winnerIndex].username + " won");
     currentGame.players[winnerIndex].score += calculateScore(currentGame.playedCards);
     currentGame.opening = "";
@@ -309,6 +306,7 @@ function endOpening(currentGame, winnerIndex) {
         drawCard(currentGame.lobbycode, 1, player);
         io.to(player.socket.id).emit("setYourCards", player.cards);
     });
+    io.in(currentGame.lobbycode).emit("setTalon", currentGame.talon);
 }
 
 function processAndereAlteHat(socket, data, player, currentGame) {
