@@ -37,7 +37,6 @@ let i = 0;
 io.on("connection", (socket) => {
     players.push(new classes.Player(socket));
     console.log(`${players.length} | New client connected (${socket.id})`);
-    io.emit("setPlayerCount", players.length);
 
     let message = `Hello Client ${socket.id}`;
     socket.emit("onConnect", message);
