@@ -4,15 +4,24 @@ import { Box, Paper, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles({
     root: {
-        margin: 20,
+        margin: 10,
         alignContent: "center",
         justifyContent: "space-around",
+        padding: 10,
+        backgroundColor: "#575757",
+        border: "5px solid #303030",
+        borderRadius: 20,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
     },
     header: {
         margin: 20,
         textAlign: "center",
         fontSize: 16,
         fontWeight: "bold",
+        marginBottom: 10,
+        color: "white",
     },
 });
 

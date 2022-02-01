@@ -4,6 +4,7 @@ const http = require("http");
 const socketIO = require("socket.io");
 
 const classes = require("./classes.js");
+const opening = require("./client/src/components/Gaigel/Opening");
 
 // MARK: Server Initialization
 const app = express();
@@ -91,6 +92,14 @@ io.on("connection", (socket) => {
                     break;
                 default:
                     // Normalround
+                    if (
+                        player.vorhand == true &&
+                        opening == "AufDissle" &&
+                        player.cards.filter((card) => card.value == player.cards[0].value)
+                            .length === 5
+                    ) {
+                        // Player won
+                    }
                     acceptPlayedCard(socket, player, currentGame, data);
                     if (currentGame.order.length === 0) {
                         // If currrent round is over
@@ -291,8 +300,18 @@ function acceptPlayedCard(socket, player, currentGame, data) {
 
 function endOpening(currentGame, winnerIndex) {
     console.log(currentGame.players[winnerIndex].username + " won");
+
+    if (currentGame.players[winnerIndex].vorhand == true && opening == "AufDissle") {
+        // Player lost
+    }
+
     currentGame.players[winnerIndex].score += calculateScore(currentGame.playedCards);
+    if (currentGame.players[winnerIndex].score >= 101 || currentGame.talon.length == 0) {
+        // endGame();
+    }
+
     currentGame.opening = "";
+
     // Create new-order
     let winner = currentGame.players[winnerIndex];
     while (winner != currentGame.players[0]) {
