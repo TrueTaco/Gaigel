@@ -193,6 +193,11 @@ function tryToStartGame(lobbycode) {
 
     if (amountPlayers === 0) return;
     if (amountPlayers !== amountReadyPlayers) return;
+    if (![2, 3, 4, 6].includes(amountPlayers)) {
+        console.log("Playercount sucks");
+        io.in(lobbycode).emit("setWarningType", "falsePlayercount");
+        return;
+    }
 
     // START A GAME
 

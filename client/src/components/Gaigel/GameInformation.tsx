@@ -22,6 +22,7 @@ const GameInformation: React.FC<Props> = ({ username, lobbycode }) => {
     return (
         <Box className={classes.root}>
             <Typography>{username}</Typography>
+            <Typography>32</Typography>
             <Typography>{lobbycode}</Typography>
         </Box>
     );

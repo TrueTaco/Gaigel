@@ -23,6 +23,10 @@ const Popup: React.FC<Props> = ({ snackbarType, type, reset }) => {
         case "notYourTurn":
             message = "Sie sind nicht an der Reihe. Sie können jetzt keine Karte spielen.";
             break;
+        case "falsePlayercount":
+            message =
+                "Mit dieser Anzahl an Spielern lässt sich kein Spiel starten. Für ein Spiel werden 2, 3, 4 oder 6 Spieler benötigt.";
+            break;
         default:
             break;
     }
@@ -30,7 +34,7 @@ const Popup: React.FC<Props> = ({ snackbarType, type, reset }) => {
     return (
         <Snackbar
             open={type !== ""}
-            autoHideDuration={5000}
+            autoHideDuration={4000}
             onClose={reset}
             anchorOrigin={{
                 vertical: snackbarType === "warning" ? "bottom" : "top",

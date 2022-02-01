@@ -209,6 +209,10 @@ const Gaigel: React.FC<Props> = () => {
             setLobbyInformation(data);
         });
 
+        newSocket.on("setWarningType", (data: any) => {
+            setWarningType(data);
+        });
+
         newSocket.on("startGame", (data: any) => {
             setGameStarted(true);
         });
@@ -296,9 +300,6 @@ const Gaigel: React.FC<Props> = () => {
                         />
                     </Box>
 
-                    <Popup snackbarType="info" type={infoType} reset={resetInfo} />
-                    <Popup snackbarType="warning" type={warningType} reset={resetWarning} />
-
                     {opening && (
                         <Opening
                             AndereAlteHat={AndereAlteHat}
@@ -310,6 +311,9 @@ const Gaigel: React.FC<Props> = () => {
                     <YourCards userCards={yourCards} playCard={playCard} />
                 </>
             )}
+
+            <Popup snackbarType="info" type={infoType} reset={resetInfo} />
+            <Popup snackbarType="warning" type={warningType} reset={resetWarning} />
         </Box>
     );
 };
