@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import socketIOClient from "socket.io-client";
 
+import { Box } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
 import LandingPage from "./LandingPage";
@@ -9,12 +10,11 @@ import Talon from "./Talon";
 import TrumpCard from "./TrumpCard";
 import PlayedCards from "./PlayedCards";
 import YourCards from "./YourCards";
-import { Box, Snackbar } from "@material-ui/core";
 import Opening from "./Opening";
-import Alert from "@material-ui/lab/Alert";
 import LobbyPage from "./LobbyPage";
 import PlayerList from "./PlayerList";
 import GameInformation from "./GameInformation";
+import Popup from "./Popup";
 
 // MARK: Styles
 const useStyles = makeStyles({
@@ -56,11 +56,6 @@ interface CardProps {
     value: string;
 }
 
-interface PlayerProps {
-    username: string;
-    wins: number;
-}
-
 const Gaigel: React.FC<Props> = () => {
     // MARK: States
     const classes = useStyles();
@@ -90,8 +85,6 @@ const Gaigel: React.FC<Props> = () => {
         new Array(0).fill({ type: "", value: "" })
     );
 
-    const [noAceWarning, setNoAceWarning] = useState(false);
-
     // The trump card
     const [trumpCard, setTrumpCard] = useState<CardProps>({ type: "", value: "" });
 
@@ -103,11 +96,21 @@ const Gaigel: React.FC<Props> = () => {
         new Array(5).fill({ type: "", value: "" })
     );
 
-    const closeNoAceWarning = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    const [warningType, setWarningType] = useState("");
+    const [infoType, setInfoType] = useState("");
+
+    const resetWarning = (event?: React.SyntheticEvent | Event, reason?: string) => {
         if (reason === "clickaway") {
             return;
         }
-        setNoAceWarning(false);
+        setWarningType("");
+    };
+
+    const resetInfo = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === "clickaway") {
+            return;
+        }
+        setInfoType("");
     };
 
     const login = (username: string, lobbycode: string) => {
@@ -150,7 +153,6 @@ const Gaigel: React.FC<Props> = () => {
         });
         setYourCards(yourCards.filter((card, index) => index !== playedCardIndex));
 
-
         setPlayedCards(() => [...actualPlayedCards, { type: type, value: value }]);
 
         let playedCard: CardProps = { type: type, value: value };
@@ -163,7 +165,7 @@ const Gaigel: React.FC<Props> = () => {
             // @ts-ignore
             socket.emit("AndereAlteHat", "");
         } else {
-            setNoAceWarning(true);
+            setWarningType("noAce");
         }
     };
 
@@ -172,7 +174,7 @@ const Gaigel: React.FC<Props> = () => {
             // @ts-ignore
             socket.emit("GeElfen", "");
         } else {
-            setNoAceWarning(true);
+            setWarningType("noAce");
         }
     };
 
@@ -293,17 +295,10 @@ const Gaigel: React.FC<Props> = () => {
                             playerCount={lobbyInformation.playerInformation.length}
                         />
                     </Box>
-                    <Snackbar
-                        open={noAceWarning}
-                        autoHideDuration={3000}
-                        onClose={closeNoAceWarning}
-                        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-                        //message="Sie haben kein Ass sie können dieses Opening nicht spielen"
-                    >
-                        <Alert onClose={closeNoAceWarning} severity="warning">
-                            Sie haben kein Ass. Sie können dieses Opening nicht spielen.
-                        </Alert>
-                    </Snackbar>
+
+                    <Popup snackbarType="info" type={infoType} reset={resetInfo} />
+                    <Popup snackbarType="warning" type={warningType} reset={resetWarning} />
+
                     {opening && (
                         <Opening
                             AndereAlteHat={AndereAlteHat}
