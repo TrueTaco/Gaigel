@@ -14,10 +14,12 @@ import Opening from "./Opening";
 import Alert from "@material-ui/lab/Alert";
 import LobbyPage from "./LobbyPage";
 import PlayerList from "./PlayerList";
+import GameInformation from "./GameInformation";
 
 // MARK: Styles
 const useStyles = makeStyles({
     root: {
+        // color: "white",
         height: "100vh",
         paddingLeft: 20,
         paddingRight: 20,
@@ -39,7 +41,7 @@ const useStyles = makeStyles({
         borderRadius: 20,
         display: "flex",
         flexDirection: "column",
-        gap: "20px",
+        gap: "10px",
     },
     talonAndTrump: {
         display: "flex",
@@ -69,6 +71,8 @@ const Gaigel: React.FC<Props> = () => {
     // Boolean for deciding on whether to show the lobby page or the game
     const [gameStarted, setGameStarted] = useState<boolean>(false);
 
+    const [ownUsername, setOwnUsername] = useState<string>("");
+
     // All needed information about the joined lobby
     const [lobbyInformation, setLobbyInformation] = useState<any>({
         lobbycode: "",
@@ -80,9 +84,6 @@ const Gaigel: React.FC<Props> = () => {
     // Latest response from server (For debugging purposes)
     const [response, setResponse] = useState("");
     const [socket, setSocket] = useState(null);
-
-    // Amount of players that are currently playing
-    const [playerCount, setPlayerCount] = useState<number>(2);
 
     // The cards that can still be drawn from the talon
     const [talonCards, setTalonCards] = useState<CardProps[]>(
@@ -111,6 +112,7 @@ const Gaigel: React.FC<Props> = () => {
 
     const login = (username: string, lobbycode: string) => {
         setLoggedIn(true);
+        setOwnUsername(username);
 
         // @ts-ignore
         socket.emit("joinLobby", { username: username, lobbycode: lobbycode });
@@ -141,11 +143,13 @@ const Gaigel: React.FC<Props> = () => {
         let actualPlayedCards: CardProps[] = playedCards.filter(
             (card) => card.type !== "" && card.value !== ""
         );
+
         // if (actualPlayedCards.length < playerCount) {
         let playedCardIndex: number = yourCards.findIndex((card) => {
             return card.type === type && card.value === value;
         });
         setYourCards(yourCards.filter((card, index) => index !== playedCardIndex));
+
 
         setPlayedCards(() => [...actualPlayedCards, { type: type, value: value }]);
 
@@ -212,11 +216,6 @@ const Gaigel: React.FC<Props> = () => {
             setTalonCards(data);
         });
 
-        newSocket.on("setPlayerCount", (data: number) => {
-            console.log(data);
-            setPlayerCount(data);
-        });
-
         newSocket.on("setTrumpCard", (data: any) => {
             console.log("Trumpcard set");
             setTrumpCard(data);
@@ -274,6 +273,10 @@ const Gaigel: React.FC<Props> = () => {
                 />
             ) : (
                 <>
+                    <GameInformation
+                        username={ownUsername}
+                        lobbycode={lobbyInformation.lobbycode}
+                    />
                     <PlayerList
                         playerlist={lobbyInformation.playerInformation.map(
                             (element: any) => element.username
@@ -285,7 +288,10 @@ const Gaigel: React.FC<Props> = () => {
                             <TrumpCard trumpCard={trumpCard} />
                         </Box>
 
-                        <PlayedCards playedCards={playedCards} playerCount={playerCount} />
+                        <PlayedCards
+                            playedCards={playedCards}
+                            playerCount={lobbyInformation.playerInformation.length}
+                        />
                     </Box>
                     <Snackbar
                         open={noAceWarning}

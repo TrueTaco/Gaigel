@@ -10,6 +10,7 @@ const useStyles = makeStyles({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        color: "white",
     },
     header: {
         marginBottom: 10,
