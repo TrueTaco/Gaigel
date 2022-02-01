@@ -14,14 +14,12 @@ const useStyles = makeStyles({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-
     },
     header: {
         marginBottom: 10,
         textAlign: "center",
         fontSize: 16,
         fontWeight: "bold",
-        marginBottom: 10,
         color: "white",
     },
 });

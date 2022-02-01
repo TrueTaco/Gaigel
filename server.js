@@ -4,7 +4,6 @@ const http = require("http");
 const socketIO = require("socket.io");
 
 const classes = require("./classes.js");
-const opening = require("./client/src/components/Gaigel/Opening");
 
 // MARK: Server Initialization
 const app = express();
@@ -93,7 +92,7 @@ io.on("connection", (socket) => {
                     // Normalround
                     if (
                         player.vorhand == true &&
-                        opening == "AufDissle" &&
+                        currentGame.opening == "AufDissle" &&
                         player.cards.filter((card) => card.value == player.cards[0].value)
                             .length === 5
                     ) {
@@ -300,7 +299,7 @@ function acceptPlayedCard(socket, player, currentGame, data) {
 function endOpening(currentGame, winnerIndex) {
     console.log(currentGame.players[winnerIndex].username + " won");
 
-    if (currentGame.players[winnerIndex].vorhand == true && opening == "AufDissle") {
+    if (currentGame.players[winnerIndex].vorhand == true && currentGame.opening == "AufDissle") {
         // Player lost
     }
 
