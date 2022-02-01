@@ -143,18 +143,19 @@ const Gaigel: React.FC<Props> = () => {
         let actualPlayedCards: CardProps[] = playedCards.filter(
             (card) => card.type !== "" && card.value !== ""
         );
-        if (actualPlayedCards.length < lobbyInformation.playerInformation.length) {
-            let playedCardIndex: number = yourCards.findIndex((card) => {
-                return card.type === type && card.value === value;
-            });
-            setYourCards(yourCards.filter((card, index) => index !== playedCardIndex));
 
-            setPlayedCards(() => [...actualPlayedCards, { type: type, value: value }]);
+        // if (actualPlayedCards.length < playerCount) {
+        let playedCardIndex: number = yourCards.findIndex((card) => {
+            return card.type === type && card.value === value;
+        });
+        setYourCards(yourCards.filter((card, index) => index !== playedCardIndex));
 
-            let playedCard: CardProps = { type: type, value: value };
-            // @ts-ignore
-            socket.emit("playCard", playedCard);
-        }
+
+        setPlayedCards(() => [...actualPlayedCards, { type: type, value: value }]);
+
+        let playedCard: CardProps = { type: type, value: value };
+        // @ts-ignore
+        socket.emit("playCard", playedCard);
     };
 
     const AndereAlteHat = () => {

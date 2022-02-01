@@ -4,11 +4,25 @@ import { Box, ButtonGroup, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles({
     root: {
-        color: "white",
+        margin: 10,
+        alignContent: "center",
+        justifyContent: "space-around",
+        padding: 10,
+        backgroundColor: "#575757",
+        border: "5px solid #303030",
+        borderRadius: 20,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+
     },
     header: {
         marginBottom: 10,
         textAlign: "center",
+        fontSize: 16,
+        fontWeight: "bold",
+        marginBottom: 10,
+        color: "white",
     },
 });
 
