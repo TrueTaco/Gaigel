@@ -68,6 +68,8 @@ const Gaigel: React.FC<Props> = () => {
 
     const [ownUsername, setOwnUsername] = useState<string>("");
 
+    const [score, setScore] = useState<number>(0);
+
     // All needed information about the joined lobby
     const [lobbyInformation, setLobbyInformation] = useState<any>({
         lobbycode: "",
@@ -213,6 +215,10 @@ const Gaigel: React.FC<Props> = () => {
             setWarningType(data);
         });
 
+        newSocket.on("setScore", (data: any) => {
+            setScore(data);
+        });
+
         newSocket.on("startGame", (data: any) => {
             setGameStarted(true);
         });
@@ -282,6 +288,7 @@ const Gaigel: React.FC<Props> = () => {
                     <GameInformation
                         username={ownUsername}
                         lobbycode={lobbyInformation.lobbycode}
+                        score={score}
                     />
                     <PlayerList
                         playerlist={lobbyInformation.playerInformation.map(

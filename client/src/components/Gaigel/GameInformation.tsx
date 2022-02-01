@@ -14,15 +14,16 @@ const useStyles = makeStyles({
 interface Props {
     username: string;
     lobbycode: string;
+    score: number;
 }
 
-const GameInformation: React.FC<Props> = ({ username, lobbycode }) => {
+const GameInformation: React.FC<Props> = ({ username, lobbycode, score }) => {
     const classes = useStyles();
 
     return (
         <Box className={classes.root}>
             <Typography>{username}</Typography>
-            <Typography>32</Typography>
+            <Typography>{score}</Typography>
             <Typography>{lobbycode}</Typography>
         </Box>
     );

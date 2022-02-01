@@ -193,8 +193,7 @@ function tryToStartGame(lobbycode) {
 
     if (amountPlayers === 0) return;
     if (amountPlayers !== amountReadyPlayers) return;
-    if (![2, 3, 4, 6].includes(amountPlayers)) {
-        console.log("Playercount sucks");
+    if (![1, 2, 3, 4, 6].includes(amountPlayers)) {
         io.in(lobbycode).emit("setWarningType", "falsePlayercount");
         return;
     }
@@ -312,6 +311,11 @@ function endOpening(currentGame, winnerIndex) {
     if (currentGame.players[winnerIndex].score >= 101 || currentGame.talon.length == 0) {
         // endGame();
     }
+
+    // Send scores to every player
+    currentGame.players.forEach((player) => {
+        player.socket.emit("setScore", player.score);
+    });
 
     currentGame.opening = "";
 
