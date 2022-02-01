@@ -123,6 +123,7 @@ io.on("connection", (socket) => {
             }
         } else {
             declinePlayedCard(socket, player, currentGame, data);
+            socket.emit("setWarningType", "notYourTurn");
         }
     });
 
@@ -339,6 +340,7 @@ function processAndereAlteHat(socket, data, player, currentGame) {
     if (player === currentGame.players[0] && data.value !== "A") {
         // If vorhand plays not allowed card
         declinePlayedCard(socket, player, currentGame);
+        socket.emit("setWarningType", "noAceButAceOpening");
     } else {
         // If allowed card is played
         acceptPlayedCard(socket, player, currentGame, data);
@@ -368,6 +370,7 @@ function processAndereAlteHat(socket, data, player, currentGame) {
 function processGeElfen(socket, data, player, currentGame) {
     if (player === currentGame.players[0] && data.value !== "A") {
         declinePlayedCard(socket, player, currentGame);
+        socket.emit("setWarningType", "noAceButAceOpening");
     } else {
         acceptPlayedCard(socket, player, currentGame, data);
     }
@@ -382,6 +385,7 @@ function processHöherHat(socket, data, player, currentGame) {
         (data.value === "A" || data.type === currentGame.trumpCard.type)
     ) {
         declinePlayedCard(socket, player, currentGame);
+        socket.emit("setWarningType", "aceOrTrumpInHöherHat");
     } else {
         acceptPlayedCard(socket, player, currentGame, data);
     }
