@@ -77,9 +77,14 @@ const Gaigel: React.FC<Props> = () => {
         playerInformation: [],
     });
 
-    const [opening, setOpening] = useState(false);
+    const [order, setOrder] = useState<string[]>([]);
+    const [playerWithTurn, setPlayerWithTurn] = useState<string>("");
+
+    const [opening, setOpening] = useState<boolean>(false);
+
     // Latest response from server (For debugging purposes)
     const [response, setResponse] = useState("");
+
     const [socket, setSocket] = useState(null);
 
     // The cards that can still be drawn from the talon
@@ -211,6 +216,14 @@ const Gaigel: React.FC<Props> = () => {
             setLobbyInformation(data);
         });
 
+        newSocket.on("setOrder", (data: any) => {
+            setOrder(data);
+        });
+
+        newSocket.on("setPlayerWithTurn", (data: any) => {
+            setPlayerWithTurn(data);
+        });
+
         newSocket.on("setWarningType", (data: any) => {
             setWarningType(data);
         });
@@ -290,11 +303,7 @@ const Gaigel: React.FC<Props> = () => {
                         lobbycode={lobbyInformation.lobbycode}
                         score={score}
                     />
-                    <PlayerList
-                        playerlist={lobbyInformation.playerInformation.map(
-                            (element: any) => element.username
-                        )}
-                    />
+                    <PlayerList order={order} playerWithTurn={playerWithTurn} />
                     <Box className={classes.playingField}>
                         <Box className={classes.talonAndTrump}>
                             <Talon cardsLeft={talonCards.length} drawCard={drawCard} />

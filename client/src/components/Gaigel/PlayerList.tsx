@@ -23,24 +23,21 @@ const useStyles = makeStyles({
 });
 
 interface Props {
-    playerlist: string[];
+    order: string[];
+    playerWithTurn: string;
 }
 
-const PlayerList: React.FC<Props> = ({ playerlist }) => {
+const PlayerList: React.FC<Props> = ({ order, playerWithTurn }) => {
     const classes = useStyles();
-
-    // TODO: Replace the random highlighting with the actual player whose turn it is
-    let randomHighlight = Math.floor(Math.random() * playerlist.length * 1);
-    let i = -1;
 
     return (
         <Box className={classes.root}>
-            {playerlist.map((name) => {
-                i++;
+            {order.map((name) => {
+                let turn = name === playerWithTurn;
                 return (
                     <Typography
                         className={classes.name}
-                        style={{ border: randomHighlight === i ? "2px solid #ffe600" : "none" }}
+                        style={{ border: turn ? "2px solid #ffe600" : "none" }}
                     >
                         {name}
                     </Typography>

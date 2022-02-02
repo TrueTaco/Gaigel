@@ -202,7 +202,12 @@ function tryToStartGame(lobbycode) {
     // START A GAME
 
     currentGame.ongoing = true;
+
     currentGame.order = currentGame.players.slice();
+    let orderUsernames = currentGame.order.map((player) => player.username);
+    io.in(lobbycode).emit("setOrder", orderUsernames);
+    io.in(currentGame.lobbycode).emit("setPlayerWithTurn", currentGame.order[0].username);
+
     currentGame.players[0].vorhand = true;
 
     currentGame.talon = createTalon();
@@ -298,7 +303,10 @@ function acceptPlayedCard(socket, player, currentGame, data) {
 
     currentGame.playedCards.push(data);
     io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
+
     currentGame.order.shift();
+    if (currentGame.order.length > 0)
+        io.in(currentGame.lobbycode).emit("setPlayerWithTurn", currentGame.order[0].username);
 }
 
 function endOpening(currentGame, winnerIndex) {
@@ -326,6 +334,9 @@ function endOpening(currentGame, winnerIndex) {
         currentGame.players.push(currentGame.players.shift());
     }
     currentGame.order = currentGame.players.slice();
+    let orderUsernames = currentGame.order.map((player) => player.username);
+    io.in(currentGame.lobbycode).emit("setOrder", orderUsernames);
+    io.in(currentGame.lobbycode).emit("setPlayerWithTurn", currentGame.order[0].username);
 
     currentGame.playedCards = [];
 
