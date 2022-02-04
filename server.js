@@ -311,6 +311,7 @@ function acceptPlayedCard(socket, player, currentGame, data) {
 
 function endOpening(currentGame, winnerIndex) {
     console.log(currentGame.players[winnerIndex].username + " won");
+    io.in(currentGame.lobbycode).emit("setInfoType", "somebodyWon");
 
     if (currentGame.players[winnerIndex].vorhand == true && currentGame.opening == "AufDissle") {
         // Player lost
@@ -340,11 +341,15 @@ function endOpening(currentGame, winnerIndex) {
 
     currentGame.playedCards = [];
 
-    currentGame.players.forEach((player) => {
-        drawCard(currentGame.lobbycode, 1, player);
-        io.to(player.socket.id).emit("setYourCards", player.cards);
-    });
-    io.in(currentGame.lobbycode).emit("setTalon", currentGame.talon);
+    setTimeout(() => {
+        currentGame.players.forEach((player) => {
+            drawCard(currentGame.lobbycode, 1, player);
+            io.to(player.socket.id).emit("setYourCards", player.cards);
+        });
+        io.in(currentGame.lobbycode).emit("setTalon", currentGame.talon);
+
+        io.in(currentGame.lobbycode).emit("setInfoType", "newCards");
+    }, 4000);
 }
 
 function processAndereAlteHat(socket, data, player, currentGame) {

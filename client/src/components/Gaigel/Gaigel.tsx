@@ -224,6 +224,10 @@ const Gaigel: React.FC<Props> = () => {
             setPlayerWithTurn(data);
         });
 
+        newSocket.on("setInfoType", (data: any) => {
+            setInfoType(data);
+        });
+
         newSocket.on("setWarningType", (data: any) => {
             setWarningType(data);
         });

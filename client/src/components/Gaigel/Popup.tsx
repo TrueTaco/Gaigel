@@ -45,6 +45,9 @@ const Popup: React.FC<Props> = ({ snackbarType, type, reset }) => {
         case "somebodyWon":
             message = "XY hat den Stich gewonnen.";
             break;
+        case "newCards":
+            message = "Es wurden neue Karten ausgeteilt.";
+            break;
         default:
             break;
     }
@@ -52,7 +55,7 @@ const Popup: React.FC<Props> = ({ snackbarType, type, reset }) => {
     return (
         <Snackbar
             open={type !== ""}
-            autoHideDuration={4000}
+            autoHideDuration={5000}
             onClose={reset}
             anchorOrigin={{
                 vertical: snackbarType === "warning" ? "bottom" : "top",
