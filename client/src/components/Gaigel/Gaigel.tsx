@@ -56,6 +56,11 @@ interface CardProps {
     value: string;
 }
 
+interface warningInfoProps {
+    type: string;
+    detail: string;
+}
+
 const Gaigel: React.FC<Props> = () => {
     // MARK: States
     const classes = useStyles();
@@ -77,9 +82,14 @@ const Gaigel: React.FC<Props> = () => {
         playerInformation: [],
     });
 
-    const [opening, setOpening] = useState(false);
+    const [order, setOrder] = useState<string[]>([]);
+    const [playerWithTurn, setPlayerWithTurn] = useState<string>("");
+
+    const [opening, setOpening] = useState<boolean>(false);
+
     // Latest response from server (For debugging purposes)
     const [response, setResponse] = useState("");
+
     const [socket, setSocket] = useState(null);
 
     // The cards that can still be drawn from the talon
@@ -98,21 +108,21 @@ const Gaigel: React.FC<Props> = () => {
         new Array(5).fill({ type: "", value: "" })
     );
 
-    const [warningType, setWarningType] = useState("");
-    const [infoType, setInfoType] = useState("");
+    const [warningType, setWarningType] = useState<warningInfoProps>({ type: "", detail: "" });
+    const [infoType, setInfoType] = useState<warningInfoProps>({ type: "", detail: "" });
 
     const resetWarning = (event?: React.SyntheticEvent | Event, reason?: string) => {
         if (reason === "clickaway") {
             return;
         }
-        setWarningType("");
+        setWarningType({ type: "", detail: "" });
     };
 
     const resetInfo = (event?: React.SyntheticEvent | Event, reason?: string) => {
         if (reason === "clickaway") {
             return;
         }
-        setInfoType("");
+        setInfoType({ type: "", detail: "" });
     };
 
     const login = (username: string, lobbycode: string) => {
@@ -167,7 +177,7 @@ const Gaigel: React.FC<Props> = () => {
             // @ts-ignore
             socket.emit("AndereAlteHat", "");
         } else {
-            setWarningType("noAce");
+            setWarningType({ type: "noAce", detail: "" });
         }
     };
 
@@ -176,7 +186,7 @@ const Gaigel: React.FC<Props> = () => {
             // @ts-ignore
             socket.emit("GeElfen", "");
         } else {
-            setWarningType("noAce");
+            setWarningType({ type: "noAce", detail: "" });
         }
     };
 
@@ -209,6 +219,18 @@ const Gaigel: React.FC<Props> = () => {
 
         newSocket.on("lobbyInformation", (data: any) => {
             setLobbyInformation(data);
+        });
+
+        newSocket.on("setOrder", (data: any) => {
+            setOrder(data);
+        });
+
+        newSocket.on("setPlayerWithTurn", (data: any) => {
+            setPlayerWithTurn(data);
+        });
+
+        newSocket.on("setInfoType", (data: any) => {
+            setInfoType(data);
         });
 
         newSocket.on("setWarningType", (data: any) => {
@@ -290,11 +312,7 @@ const Gaigel: React.FC<Props> = () => {
                         lobbycode={lobbyInformation.lobbycode}
                         score={score}
                     />
-                    <PlayerList
-                        playerlist={lobbyInformation.playerInformation.map(
-                            (element: any) => element.username
-                        )}
-                    />
+                    <PlayerList order={order} playerWithTurn={playerWithTurn} />
                     <Box className={classes.playingField}>
                         <Box className={classes.talonAndTrump}>
                             <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
@@ -319,8 +337,18 @@ const Gaigel: React.FC<Props> = () => {
                 </>
             )}
 
-            <Popup snackbarType="info" type={infoType} reset={resetInfo} />
-            <Popup snackbarType="warning" type={warningType} reset={resetWarning} />
+            <Popup
+                snackbarType="info"
+                type={infoType.type}
+                detail={infoType.detail}
+                reset={resetInfo}
+            />
+            <Popup
+                snackbarType="warning"
+                type={warningType.type}
+                detail={warningType.detail}
+                reset={resetWarning}
+            />
         </Box>
     );
 };

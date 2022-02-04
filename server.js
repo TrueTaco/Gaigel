@@ -123,7 +123,7 @@ io.on("connection", (socket) => {
             }
         } else {
             declinePlayedCard(socket, player, currentGame, data);
-            socket.emit("setWarningType", "notYourTurn");
+            socket.emit("setWarningType", { type: "notYourTurn", detail: "" });
         }
     });
 
@@ -195,14 +195,19 @@ function tryToStartGame(lobbycode) {
     if (amountPlayers === 0) return;
     if (amountPlayers !== amountReadyPlayers) return;
     if (![1, 2, 3, 4, 6].includes(amountPlayers)) {
-        io.in(lobbycode).emit("setWarningType", "falsePlayercount");
+        io.in(lobbycode).emit("setWarningType", { type: "falsePlayercount", detail: "" });
         return;
     }
 
     // START A GAME
 
     currentGame.ongoing = true;
+
     currentGame.order = currentGame.players.slice();
+    let orderUsernames = currentGame.order.map((player) => player.username);
+    io.in(lobbycode).emit("setOrder", orderUsernames);
+    io.in(currentGame.lobbycode).emit("setPlayerWithTurn", currentGame.order[0].username);
+
     currentGame.players[0].vorhand = true;
 
     currentGame.talon = createTalon();
@@ -298,11 +303,18 @@ function acceptPlayedCard(socket, player, currentGame, data) {
 
     currentGame.playedCards.push(data);
     io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
+
     currentGame.order.shift();
+    if (currentGame.order.length > 0)
+        io.in(currentGame.lobbycode).emit("setPlayerWithTurn", currentGame.order[0].username);
 }
 
 function endOpening(currentGame, winnerIndex) {
     console.log(currentGame.players[winnerIndex].username + " won");
+    io.in(currentGame.lobbycode).emit("setInfoType", {
+        type: "somebodyWon",
+        detail: currentGame.players[winnerIndex].username,
+    });
 
     if (currentGame.players[winnerIndex].vorhand == true && currentGame.opening == "AufDissle") {
         // Player lost
@@ -326,21 +338,28 @@ function endOpening(currentGame, winnerIndex) {
         currentGame.players.push(currentGame.players.shift());
     }
     currentGame.order = currentGame.players.slice();
+    let orderUsernames = currentGame.order.map((player) => player.username);
+    io.in(currentGame.lobbycode).emit("setOrder", orderUsernames);
+    io.in(currentGame.lobbycode).emit("setPlayerWithTurn", currentGame.order[0].username);
 
     currentGame.playedCards = [];
 
-    currentGame.players.forEach((player) => {
-        drawCard(currentGame.lobbycode, 1, player);
-        io.to(player.socket.id).emit("setYourCards", player.cards);
-    });
-    io.in(currentGame.lobbycode).emit("setTalon", currentGame.talon);
+    setTimeout(() => {
+        currentGame.players.forEach((player) => {
+            drawCard(currentGame.lobbycode, 1, player);
+            io.to(player.socket.id).emit("setYourCards", player.cards);
+        });
+        io.in(currentGame.lobbycode).emit("setTalon", currentGame.talon);
+
+        io.in(currentGame.lobbycode).emit("setInfoType", { type: "newCards", detail: "" });
+    }, 5500);
 }
 
 function processAndereAlteHat(socket, data, player, currentGame) {
     if (player === currentGame.players[0] && data.value !== "A") {
         // If vorhand plays not allowed card
         declinePlayedCard(socket, player, currentGame);
-        socket.emit("setWarningType", "noAceButAceOpening");
+        socket.emit("setWarningType", { type: "noAceButAceOpening", detail: "" });
     } else {
         // If allowed card is played
         acceptPlayedCard(socket, player, currentGame, data);
@@ -370,7 +389,7 @@ function processAndereAlteHat(socket, data, player, currentGame) {
 function processGeElfen(socket, data, player, currentGame) {
     if (player === currentGame.players[0] && data.value !== "A") {
         declinePlayedCard(socket, player, currentGame);
-        socket.emit("setWarningType", "noAceButAceOpening");
+        socket.emit("setWarningType", { type: "noAceButAceOpening", detail: "" });
     } else {
         acceptPlayedCard(socket, player, currentGame, data);
     }
@@ -385,7 +404,7 @@ function processHöherHat(socket, data, player, currentGame) {
         (data.value === "A" || data.type === currentGame.trumpCard.type)
     ) {
         declinePlayedCard(socket, player, currentGame);
-        socket.emit("setWarningType", "aceOrTrumpInHöherHat");
+        socket.emit("setWarningType", { type: "aceOrTrumpInHöherHat", detail: "" });
     } else {
         acceptPlayedCard(socket, player, currentGame, data);
     }
