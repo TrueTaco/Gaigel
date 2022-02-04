@@ -9,10 +9,11 @@ const useStyles = makeStyles({
 interface Props {
     snackbarType: string;
     type: string;
+    detail: string;
     reset: () => void;
 }
 
-const Popup: React.FC<Props> = ({ snackbarType, type, reset }) => {
+const Popup: React.FC<Props> = ({ snackbarType, type, detail, reset }) => {
     const classes = useStyles();
     let message = "";
 
@@ -43,7 +44,7 @@ const Popup: React.FC<Props> = ({ snackbarType, type, reset }) => {
         // -------- Infos --------
         // TODO: Das hier muss auch noch implementiert werden (Iwie muss der Spielername hier landen dann)
         case "somebodyWon":
-            message = "XY hat den Stich gewonnen.";
+            message = `${detail} hat den Stich gewonnen.`;
             break;
         case "newCards":
             message = "Es wurden neue Karten ausgeteilt.";
