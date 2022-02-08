@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import socketIOClient from "socket.io-client";
 
-import { Box } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
 import LandingPage from "./LandingPage";
@@ -10,6 +9,7 @@ import Talon from "./Talon";
 import TrumpCard from "./TrumpCard";
 import PlayedCards from "./PlayedCards";
 import YourCards from "./YourCards";
+import { Box, Button } from "@material-ui/core";
 import Opening from "./Opening";
 import LobbyPage from "./LobbyPage";
 import PlayerList from "./PlayerList";
@@ -46,6 +46,16 @@ const useStyles = makeStyles({
     talonAndTrump: {
         display: "flex",
         justifyContent: "center",
+    },
+    meldenButton: {
+        backgroundColor: "#575757",
+        border: "5px solid #303030",
+        borderRadius: 20,
+        display: "flex",
+        color: "white",
+        "&:hover": {
+            backgroundColor: "#474747",
+        },
     },
 });
 
@@ -92,6 +102,8 @@ const Gaigel: React.FC<Props> = () => {
 
     const [socket, setSocket] = useState(null);
 
+    const [announcing, setAnnouncing] = useState<boolean>(false);
+
     // The cards that can still be drawn from the talon
     const [talonCards, setTalonCards] = useState<CardProps[]>(
         new Array(0).fill({ type: "", value: "" })
@@ -102,6 +114,9 @@ const Gaigel: React.FC<Props> = () => {
 
     // The cards that are currently being played
     const [playedCards, setPlayedCards] = useState<CardProps[]>([]);
+
+    // Determines if the player can call (melden)
+    const [canCall, setCanCall] = useState<boolean>(true);
 
     // The cards that the user currently has
     const [yourCards, setYourCards] = useState<CardProps[]>(
@@ -159,7 +174,6 @@ const Gaigel: React.FC<Props> = () => {
             (card) => card.type !== "" && card.value !== ""
         );
 
-        // if (actualPlayedCards.length < playerCount) {
         let playedCardIndex: number = yourCards.findIndex((card) => {
             return card.type === type && card.value === value;
         });
@@ -198,6 +212,12 @@ const Gaigel: React.FC<Props> = () => {
     const AufDissle = () => {
         // @ts-ignore
         socket.emit("AufDissle", "");
+    };
+
+    const Melden = () => {
+        setAnnouncing(!announcing);
+        // @ts-ignore
+        socket.emit("Melden", announcing);
     };
 
     // MARK: useEffect
@@ -276,6 +296,10 @@ const Gaigel: React.FC<Props> = () => {
             setOpening(false);
         });
 
+        newSocket.on("canCall", (data: any) => {
+            setCanCall(data);
+        });
+
         newSocket.on("template", (data: string) => {
             // DO NOT use states (in most cases)
             // DO use "data"
@@ -285,7 +309,6 @@ const Gaigel: React.FC<Props> = () => {
     }, [setSocket]);
 
     // MARK: Return
-    // <Typography>|{response}|</Typography>
     // @ts-ignore
     return (
         <Box
@@ -325,6 +348,22 @@ const Gaigel: React.FC<Props> = () => {
                         />
                     </Box>
 
+                    {canCall && (
+                        <Button
+                            variant="outlined"
+                            //sx={{ boxShadow: 1 }}
+                            className={classes.meldenButton}
+                            style={{
+                                border:
+                                    announcing === false
+                                        ? "5px solid #303030"
+                                        : " 5px solid #ffe600",
+                            }}
+                            onClick={Melden}
+                        >
+                            Melden
+                        </Button>
+                    )}
                     {opening && (
                         <Opening
                             AndereAlteHat={AndereAlteHat}
