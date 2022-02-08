@@ -9,12 +9,12 @@ import Talon from "./Talon";
 import TrumpCard from "./TrumpCard";
 import PlayedCards from "./PlayedCards";
 import YourCards from "./YourCards";
-import { Box, Button, Snackbar } from "@material-ui/core";
+import { Box, Button } from "@material-ui/core";
 import Opening from "./Opening";
-import Alert from "@material-ui/lab/Alert";
 import LobbyPage from "./LobbyPage";
 import PlayerList from "./PlayerList";
 import GameInformation from "./GameInformation";
+import Popup from "./Popup";
 
 // MARK: Styles
 const useStyles = makeStyles({
@@ -66,9 +66,9 @@ interface CardProps {
     value: string;
 }
 
-interface PlayerProps {
-    username: string;
-    wins: number;
+interface warningInfoProps {
+    type: string;
+    detail: string;
 }
 
 const Gaigel: React.FC<Props> = () => {
@@ -83,6 +83,8 @@ const Gaigel: React.FC<Props> = () => {
 
     const [ownUsername, setOwnUsername] = useState<string>("");
 
+    const [score, setScore] = useState<number>(0);
+
     // All needed information about the joined lobby
     const [lobbyInformation, setLobbyInformation] = useState<any>({
         lobbycode: "",
@@ -90,9 +92,14 @@ const Gaigel: React.FC<Props> = () => {
         playerInformation: [],
     });
 
-    const [opening, setOpening] = useState(false);
+    const [order, setOrder] = useState<string[]>([]);
+    const [playerWithTurn, setPlayerWithTurn] = useState<string>("");
+
+    const [opening, setOpening] = useState<boolean>(false);
+
     // Latest response from server (For debugging purposes)
     const [response, setResponse] = useState("");
+
     const [socket, setSocket] = useState(null);
 
     const [announcing, setAnnouncing] = useState<boolean>(false);
@@ -101,8 +108,6 @@ const Gaigel: React.FC<Props> = () => {
     const [talonCards, setTalonCards] = useState<CardProps[]>(
         new Array(0).fill({ type: "", value: "" })
     );
-
-    const [noAceWarning, setNoAceWarning] = useState(false);
 
     // The trump card
     const [trumpCard, setTrumpCard] = useState<CardProps>({ type: "", value: "" });
@@ -118,11 +123,21 @@ const Gaigel: React.FC<Props> = () => {
         new Array(5).fill({ type: "", value: "" })
     );
 
-    const closeNoAceWarning = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    const [warningType, setWarningType] = useState<warningInfoProps>({ type: "", detail: "" });
+    const [infoType, setInfoType] = useState<warningInfoProps>({ type: "", detail: "" });
+
+    const resetWarning = (event?: React.SyntheticEvent | Event, reason?: string) => {
         if (reason === "clickaway") {
             return;
         }
-        setNoAceWarning(false);
+        setWarningType({ type: "", detail: "" });
+    };
+
+    const resetInfo = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === "clickaway") {
+            return;
+        }
+        setInfoType({ type: "", detail: "" });
     };
 
     const login = (username: string, lobbycode: string) => {
@@ -176,7 +191,7 @@ const Gaigel: React.FC<Props> = () => {
             // @ts-ignore
             socket.emit("AndereAlteHat", "");
         } else {
-            setNoAceWarning(true);
+            setWarningType({ type: "noAce", detail: "" });
         }
     };
 
@@ -185,7 +200,7 @@ const Gaigel: React.FC<Props> = () => {
             // @ts-ignore
             socket.emit("GeElfen", "");
         } else {
-            setNoAceWarning(true);
+            setWarningType({ type: "noAce", detail: "" });
         }
     };
 
@@ -224,6 +239,26 @@ const Gaigel: React.FC<Props> = () => {
 
         newSocket.on("lobbyInformation", (data: any) => {
             setLobbyInformation(data);
+        });
+
+        newSocket.on("setOrder", (data: any) => {
+            setOrder(data);
+        });
+
+        newSocket.on("setPlayerWithTurn", (data: any) => {
+            setPlayerWithTurn(data);
+        });
+
+        newSocket.on("setInfoType", (data: any) => {
+            setInfoType(data);
+        });
+
+        newSocket.on("setWarningType", (data: any) => {
+            setWarningType(data);
+        });
+
+        newSocket.on("setScore", (data: any) => {
+            setScore(data);
         });
 
         newSocket.on("startGame", (data: any) => {
@@ -298,12 +333,9 @@ const Gaigel: React.FC<Props> = () => {
                     <GameInformation
                         username={ownUsername}
                         lobbycode={lobbyInformation.lobbycode}
+                        score={score}
                     />
-                    <PlayerList
-                        playerlist={lobbyInformation.playerInformation.map(
-                            (element: any) => element.username
-                        )}
-                    />
+                    <PlayerList order={order} playerWithTurn={playerWithTurn} />
                     <Box className={classes.playingField}>
                         <Box className={classes.talonAndTrump}>
                             <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
@@ -315,16 +347,7 @@ const Gaigel: React.FC<Props> = () => {
                             playerCount={lobbyInformation.playerInformation.length}
                         />
                     </Box>
-                    <Snackbar
-                        open={noAceWarning}
-                        autoHideDuration={3000}
-                        onClose={closeNoAceWarning}
-                        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-                    >
-                        <Alert onClose={closeNoAceWarning} severity="warning">
-                            Sie haben kein Ass. Sie können dieses Opening nicht spielen.
-                        </Alert>
-                    </Snackbar>
+
                     {canCall && (
                         <Button
                             variant="outlined"
@@ -352,6 +375,19 @@ const Gaigel: React.FC<Props> = () => {
                     <YourCards userCards={yourCards} playCard={playCard} />
                 </>
             )}
+
+            <Popup
+                snackbarType="info"
+                type={infoType.type}
+                detail={infoType.detail}
+                reset={resetInfo}
+            />
+            <Popup
+                snackbarType="warning"
+                type={warningType.type}
+                detail={warningType.detail}
+                reset={resetWarning}
+            />
         </Box>
     );
 };

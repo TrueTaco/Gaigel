@@ -17,7 +17,10 @@ const useStyles = makeStyles({
         gap: "10px",
     },
     header: {
+        marginBottom: 10,
         textAlign: "center",
+        fontSize: 16,
+        fontWeight: "bold",
         color: "white",
     },
     buttongroup: {
