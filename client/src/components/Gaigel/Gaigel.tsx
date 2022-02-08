@@ -191,8 +191,16 @@ const Gaigel: React.FC<Props> = () => {
     };
 
     const HöherHat = () => {
-        // @ts-ignore
-        socket.emit("HöherHat", "");
+        let allowedCards = yourCards.filter(
+            (card) => trumpCard.type !== card.type && card.value !== "A"
+        );
+
+        if (allowedCards.length < 1) {
+            setWarningType({ type: "höherHatNotPossible", detail: "" });
+        } else {
+            // @ts-ignore
+            socket.emit("HöherHat", "");
+        }
     };
 
     const AufDissle = () => {

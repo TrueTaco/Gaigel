@@ -41,6 +41,10 @@ const Popup: React.FC<Props> = ({ snackbarType, type, detail, reset }) => {
             message =
                 "Sie haben eine Eröffnung gewählt, bei welcher kein Ass und kein Trumpf als erste Karte gespielt werden darf.";
             break;
+        case "höherHatNotPossible":
+            message =
+                "Sie können diese Eröffnung nicht spielen, da sie keine Karte haben, die weder Trumpf noch ein Ass ist.";
+            break;
         // -------- Infos --------
         // TODO: Das hier muss auch noch implementiert werden (Iwie muss der Spielername hier landen dann)
         case "somebodyWon":

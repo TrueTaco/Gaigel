@@ -479,7 +479,8 @@ function processHöherHat(socket, data, player, currentGame) {
 }
 
 function createTalon() {
-    let types = ["Eichel", "Blatt", "Herz", "Schellen"];
+    // let types = ["Eichel", "Blatt", "Herz", "Schellen"];
+    let types = ["Eichel", "Blatt"];
     // let types: string[] = ["Eichel"];
     let values = ["7", "U", "O", "K", "10", "A"];
     let newTalon = [];
