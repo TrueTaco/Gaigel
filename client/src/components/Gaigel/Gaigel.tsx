@@ -9,7 +9,7 @@ import Talon from "./Talon";
 import TrumpCard from "./TrumpCard";
 import PlayedCards from "./PlayedCards";
 import YourCards from "./YourCards";
-import { Box, Snackbar } from "@material-ui/core";
+import { Box, Button, Snackbar } from "@material-ui/core";
 import Opening from "./Opening";
 import Alert from "@material-ui/lab/Alert";
 import LobbyPage from "./LobbyPage";
@@ -46,6 +46,16 @@ const useStyles = makeStyles({
     talonAndTrump: {
         display: "flex",
         justifyContent: "center",
+    },
+    meldenButton: {
+        backgroundColor: "#575757",
+        border: "5px solid #303030",
+        borderRadius: 20,
+        display: "flex",
+        color: "white",
+        "&:hover": {
+            backgroundColor: "#474747",
+        },
     },
 });
 
@@ -85,6 +95,8 @@ const Gaigel: React.FC<Props> = () => {
     const [response, setResponse] = useState("");
     const [socket, setSocket] = useState(null);
 
+    const [announcing, setAnnouncing] = useState<boolean>(false);
+
     // The cards that can still be drawn from the talon
     const [talonCards, setTalonCards] = useState<CardProps[]>(
         new Array(0).fill({ type: "", value: "" })
@@ -97,6 +109,9 @@ const Gaigel: React.FC<Props> = () => {
 
     // The cards that are currently being played
     const [playedCards, setPlayedCards] = useState<CardProps[]>([]);
+
+    // Determines if the player can call (melden)
+    const [canCall, setCanCall] = useState<boolean>(true);
 
     // The cards that the user currently has
     const [yourCards, setYourCards] = useState<CardProps[]>(
@@ -144,12 +159,10 @@ const Gaigel: React.FC<Props> = () => {
             (card) => card.type !== "" && card.value !== ""
         );
 
-        // if (actualPlayedCards.length < playerCount) {
         let playedCardIndex: number = yourCards.findIndex((card) => {
             return card.type === type && card.value === value;
         });
         setYourCards(yourCards.filter((card, index) => index !== playedCardIndex));
-
 
         setPlayedCards(() => [...actualPlayedCards, { type: type, value: value }]);
 
@@ -184,6 +197,12 @@ const Gaigel: React.FC<Props> = () => {
     const AufDissle = () => {
         // @ts-ignore
         socket.emit("AufDissle", "");
+    };
+
+    const Melden = () => {
+        setAnnouncing(!announcing);
+        // @ts-ignore
+        socket.emit("Melden", announcing);
     };
 
     // MARK: useEffect
@@ -242,6 +261,10 @@ const Gaigel: React.FC<Props> = () => {
             setOpening(false);
         });
 
+        newSocket.on("canCall", (data: any) => {
+            setCanCall(data);
+        });
+
         newSocket.on("template", (data: string) => {
             // DO NOT use states (in most cases)
             // DO use "data"
@@ -251,7 +274,6 @@ const Gaigel: React.FC<Props> = () => {
     }, [setSocket]);
 
     // MARK: Return
-    // <Typography>|{response}|</Typography>
     // @ts-ignore
     return (
         <Box
@@ -298,12 +320,27 @@ const Gaigel: React.FC<Props> = () => {
                         autoHideDuration={3000}
                         onClose={closeNoAceWarning}
                         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-                        //message="Sie haben kein Ass sie können dieses Opening nicht spielen"
                     >
                         <Alert onClose={closeNoAceWarning} severity="warning">
                             Sie haben kein Ass. Sie können dieses Opening nicht spielen.
                         </Alert>
                     </Snackbar>
+                    {canCall && (
+                        <Button
+                            variant="outlined"
+                            //sx={{ boxShadow: 1 }}
+                            className={classes.meldenButton}
+                            style={{
+                                border:
+                                    announcing === false
+                                        ? "5px solid #303030"
+                                        : " 5px solid #ffe600",
+                            }}
+                            onClick={Melden}
+                        >
+                            Melden
+                        </Button>
+                    )}
                     {opening && (
                         <Opening
                             AndereAlteHat={AndereAlteHat}

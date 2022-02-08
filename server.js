@@ -4,7 +4,6 @@ const http = require("http");
 const socketIO = require("socket.io");
 
 const classes = require("./classes.js");
-const opening = require("./client/src/components/Gaigel/Opening");
 
 // MARK: Server Initialization
 const app = express();
@@ -87,27 +86,45 @@ io.on("connection", (socket) => {
                 case "HöherHat":
                     processHöherHat(socket, data, player, currentGame);
                     break;
-                case "AufDissle":
-                    break;
                 default:
                     // Normalround
                     if (
                         player.vorhand == true &&
-                        opening == "AufDissle" &&
-                        player.cards.filter((card) => card.value == player.cards[0].value)
-                            .length === 5
+                        currentGame.opening == "AufDissle" &&
+                        player.cards.filter((card) => card.value == "7").length === 5
                     ) {
-                        // Player won
+                        // closeGame()
                     }
-                    acceptPlayedCard(socket, player, currentGame, data);
+                    if (player.melden === true) {
+                        let types = ["Eichel", "Blatt", "Herz", "Schellen"];
+                        let playableCards = [];
+                        types.forEach(function (type) {
+                            let sameType = player.cards.filter((card) => card.type == type);
+                            if (
+                                sameType.length > 1 &&
+                                sameType.filter((card) => card.value == "O").length > 0 &&
+                                sameType.filter((card) => card.value == "K").length > 0
+                            ) {
+                                playableCards.push(sameType.filter((card) => card.value == "O"));
+                                playableCards.push(sameType.filter((card) => card.value == "K"));
+                            }
+                        });
+
+                        if (data in playableCards) {
+                            acceptPlayedCard(socket, player, currentGame, data);
+                        } else {
+                            declinePlayedCard(socket, player, currentGame, data);
+                        }
+                    } else {
+                        acceptPlayedCard(socket, player, currentGame, data);
+                    }
+
                     if (currentGame.order.length === 0) {
                         // If currrent round is over
-                        let playerWithHighestPoints = player;
+                        let playerWithHighestPoints = currentGame.players[0];
                         currentGame.players.forEach(function (player) {
                             if (
-                                (player.playedCard.type ===
-                                    playerWithHighestPoints.playedCard.type ||
-                                    player.playedCard.type === currentGame.trumpCard.type) &&
+                                player.playedCard.type === currentGame.trumpCard.type &&
                                 pointsMap.get(player.playedCard.value) >
                                     pointsMap.get(playerWithHighestPoints.playedCard.value)
                             ) {
@@ -118,6 +135,7 @@ io.on("connection", (socket) => {
                         let winnerIndex = currentGame.players.findIndex(
                             (player) => player === playerWithHighestPoints
                         );
+
                         endOpening(currentGame, winnerIndex);
                     }
                     break;
@@ -167,8 +185,9 @@ io.on("connection", (socket) => {
         // Set GameOpening
     });
 
-    socket.on("template", () => {
-        // Do something
+    socket.on("Melden", (data) => {
+        let player = players.find((element) => element.socket === socket);
+        player.melden = data;
     });
 
     socket.on("disconnect", () => {
@@ -176,7 +195,17 @@ io.on("connection", (socket) => {
         players = players.filter((player) => player.socket.id !== socket.id);
         console.log(`${players.length} | Client disconnected (${socket.id})`);
     });
+
+    socket.on("template", () => {
+        // Do something
+    });
 });
+
+function endGame() {
+    //    reset all the stuff and put pack player to lobby
+    //    put player back in to lobby
+    //    setGameStarted(false) mit timer
+}
 
 function tryToStartGame(lobbycode) {
     let currentGame = games.find((element) => element.lobbycode === lobbycode);
@@ -210,6 +239,7 @@ function tryToStartGame(lobbycode) {
     currentGame.players.forEach((player) => {
         drawCard(lobbycode, 5, player);
         io.to(player.socket.id).emit("setYourCards", player.cards);
+        checkCanCall(player);
     });
 
     io.in(lobbycode).emit("setTalon", currentGame.talon);
@@ -300,7 +330,7 @@ function acceptPlayedCard(socket, player, currentGame, data) {
 function endOpening(currentGame, winnerIndex) {
     console.log(currentGame.players[winnerIndex].username + " won");
 
-    if (currentGame.players[winnerIndex].vorhand == true && opening == "AufDissle") {
+    if (currentGame.players[winnerIndex].vorhand == true && currentGame.opening == "AufDissle") {
         // Player lost
     }
 
@@ -309,7 +339,9 @@ function endOpening(currentGame, winnerIndex) {
         // endGame();
     }
 
-    currentGame.opening = "";
+    if (currentGame.opening !== "AufDissle") {
+        currentGame.opening = "";
+    }
 
     // Create new-order
     let winner = currentGame.players[winnerIndex];
@@ -323,8 +355,25 @@ function endOpening(currentGame, winnerIndex) {
     currentGame.players.forEach((player) => {
         drawCard(currentGame.lobbycode, 1, player);
         io.to(player.socket.id).emit("setYourCards", player.cards);
+        checkCanCall(player);
     });
     io.in(currentGame.lobbycode).emit("setTalon", currentGame.talon);
+}
+
+function checkCanCall(player) {
+    let types = ["Eichel", "Blatt", "Herz", "Schellen"];
+    types.forEach(function (type) {
+        let sameType = player.cards.filter((card) => card.type == type);
+        if (
+            sameType.length > 1 &&
+            sameType.filter((card) => card.value == "O").length > 0 &&
+            sameType.filter((card) => card.value == "K").length > 0
+        ) {
+            io.to(player.socket.id).emit("canCall", true);
+        } else {
+            io.to(player.socket.id).emit("canCall", false);
+        }
+    });
 }
 
 function processAndereAlteHat(socket, data, player, currentGame) {
