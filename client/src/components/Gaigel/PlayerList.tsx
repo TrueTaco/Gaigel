@@ -38,6 +38,7 @@ const PlayerList: React.FC<Props> = ({ order, playerWithTurn }) => {
                     <Typography
                         className={classes.name}
                         style={{ border: turn ? "2px solid #ffe600" : "none" }}
+                        key={name}
                     >
                         {name}
                     </Typography>

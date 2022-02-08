@@ -205,8 +205,16 @@ const Gaigel: React.FC<Props> = () => {
     };
 
     const HöherHat = () => {
-        // @ts-ignore
-        socket.emit("HöherHat", "");
+        let allowedCards = yourCards.filter(
+            (card) => trumpCard.type !== card.type && card.value !== "A"
+        );
+
+        if (allowedCards.length < 1) {
+            setWarningType({ type: "höherHatNotPossible", detail: "" });
+        } else {
+            // @ts-ignore
+            socket.emit("HöherHat", "");
+        }
     };
 
     const AufDissle = () => {
@@ -261,8 +269,9 @@ const Gaigel: React.FC<Props> = () => {
             setScore(data);
         });
 
-        newSocket.on("startGame", (data: any) => {
-            setGameStarted(true);
+        newSocket.on("setGameStarted", (data: boolean) => {
+            setGameStarted(data);
+            console.log(`setGameStarted: ${data}`);
         });
 
         newSocket.on("setTalon", (data: any) => {

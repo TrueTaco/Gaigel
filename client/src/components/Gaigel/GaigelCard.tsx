@@ -28,13 +28,14 @@ interface Props {
     value: string;
     clickable: boolean;
     playCard?: (type: string, value: string) => void;
+    hidden?: boolean;
 }
 
 interface Hash {
     [details: string]: string;
 }
 
-const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard }) => {
+const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard, hidden = false }) => {
     const classes = useStyles();
     const symbolMap: Hash = {};
     const iconSize = 10;
@@ -54,16 +55,25 @@ const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard }) => {
                 className={classes.cardActionArea}
                 style={{ pointerEvents: clickable ? "auto" : "none" }}
             >
-                {value !== "" && (
-                    <Box>
-                        <img src={symbolMap[type]} width={iconSize} height={iconSize} alt="" />
-                        <img src={"/Blank.jpg"} width={"15"} height={iconSize} alt="" />
-                        <img src={symbolMap[type]} width={iconSize} height={iconSize} alt="" />
-                        <Typography align="center">{value}</Typography>
-                        <img src={symbolMap[type]} width={iconSize} height={iconSize} alt="" />
-                        <img src={"/Blank.jpg"} width={"15"} height={iconSize} alt="" />
-                        <img src={symbolMap[type]} width={iconSize} height={iconSize} alt="" />
-                    </Box>
+                {hidden ? (
+                    <img
+                        src={"/cardBacksite_noSpaceAround.png"}
+                        width={"40"}
+                        height={"60"}
+                        alt=""
+                    />
+                ) : (
+                    value !== "" && (
+                        <Box>
+                            <img src={symbolMap[type]} width={iconSize} height={iconSize} alt="" />
+                            <img src={"/Blank.jpg"} width={"15"} height={iconSize} alt="" />
+                            <img src={symbolMap[type]} width={iconSize} height={iconSize} alt="" />
+                            <Typography align="center">{value}</Typography>
+                            <img src={symbolMap[type]} width={iconSize} height={iconSize} alt="" />
+                            <img src={"/Blank.jpg"} width={"15"} height={iconSize} alt="" />
+                            <img src={symbolMap[type]} width={iconSize} height={iconSize} alt="" />
+                        </Box>
+                    )
                 )}
             </CardActionArea>
         </Paper>
