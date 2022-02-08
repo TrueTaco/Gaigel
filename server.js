@@ -172,11 +172,54 @@ io.on("connection", (socket) => {
     });
 
     socket.on("disconnect", () => {
+        console.log(`${players.length} | Client disconnected (${socket.id})`);
+        closeGame(socket);
         resetPlayer(socket);
         players = players.filter((player) => player.socket.id !== socket.id);
-        console.log(`${players.length} | Client disconnected (${socket.id})`);
     });
 });
+
+function closeGame(socket) {
+    let disconnectedPlayer = players.find((element) => element.socket == socket);
+    if (disconnectedPlayer.lobbycode === "") return;
+    let currentGame = games.find((element) => element.lobbycode === disconnectedPlayer.lobbycode);
+
+    // Tell other players that the game will be closed
+    io.in(disconnectedPlayer.lobbycode).emit("setInfoType", {
+        type: "playerLeft",
+        detail: disconnectedPlayer.username,
+    });
+
+    currentGame.players.forEach((player) => {
+        // Unready all players
+        player.ready = false;
+    });
+
+    setTimeout(() => {
+        resetGame(currentGame);
+    }, 15000);
+}
+
+function resetGame(currentGame) {
+    io.in(currentGame.lobbycode).emit("setGameStarted", false);
+
+    // Reset game
+    currentGame.ongoing = false;
+    currentGame.trumpCard = {};
+    currentGame.opening = "";
+    currentGame.talon = [];
+    currentGame.playedCards = [];
+
+    currentGame.players.forEach((player) => {
+        // Reset player information
+        player.score = 0;
+        player.vorhand = false;
+        player.playedCard = {};
+        player.cards = [];
+    });
+
+    shareLobbyInformation(currentGame.lobbycode);
+}
 
 function tryToStartGame(lobbycode) {
     let currentGame = games.find((element) => element.lobbycode === lobbycode);
@@ -225,13 +268,14 @@ function tryToStartGame(lobbycode) {
 
     io.to(currentGame.players[0].socket.id).emit("openOpening", "");
 
-    io.in(lobbycode).emit("startGame", "");
+    io.in(lobbycode).emit("setGameStarted", true);
     console.log(`Started a game for lobbycode ${lobbycode}`);
 }
 
 function shareLobbyInformation(lobbycode) {
     if (lobbycode === "") return;
     let currentGame = games.find((element) => element.lobbycode === lobbycode);
+    if (!currentGame) return;
 
     // Send new playerLists to all other players
     playerInformation = currentGame.players.map((player) => {
@@ -474,7 +518,7 @@ function drawCard(lobbycode, amount, player) {
     let currentGame = games.find((element) => element.lobbycode === lobbycode);
 
     if (player.cards.length < 5 && currentGame.talon.length > 0) {
-        // Gets last cards of the deprecatedTalon array and removes them
+        // Gets last cards of the talon array and removes them
         let drawnCards = currentGame.talon.slice(currentGame.talon.length - amount);
         currentGame.talon = currentGame.talon.slice(0, currentGame.talon.length - amount);
 

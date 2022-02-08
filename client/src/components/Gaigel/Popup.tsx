@@ -49,6 +49,9 @@ const Popup: React.FC<Props> = ({ snackbarType, type, detail, reset }) => {
         case "newCards":
             message = "Es wurden neue Karten ausgeteilt.";
             break;
+        case "playerLeft":
+            message = `${detail} hat das Spiel verlassen. Die Lobby wird in 15 Sekunden geschlossen.`;
+            break;
         default:
             break;
     }

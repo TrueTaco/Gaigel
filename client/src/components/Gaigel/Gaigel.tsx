@@ -241,8 +241,9 @@ const Gaigel: React.FC<Props> = () => {
             setScore(data);
         });
 
-        newSocket.on("startGame", (data: any) => {
-            setGameStarted(true);
+        newSocket.on("setGameStarted", (data: boolean) => {
+            setGameStarted(data);
+            console.log(`setGameStarted: ${data}`);
         });
 
         newSocket.on("setTalon", (data: any) => {
