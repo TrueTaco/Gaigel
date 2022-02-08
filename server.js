@@ -93,20 +93,40 @@ io.on("connection", (socket) => {
                     if (
                         player.vorhand == true &&
                         currentGame.opening == "AufDissle" &&
-                        player.cards.filter((card) => card.value == player.cards[0].value)
-                            .length === 5
+                        player.cards.filter((card) => card.value == "7").length === 5
                     ) {
-                        // Player won
+                        // closeGame()
                     }
-                    acceptPlayedCard(socket, player, currentGame, data);
+                    if (player.melden === true) {
+                        let types = ["Eichel", "Blatt", "Herz", "Schellen"];
+                        let playableCards = [];
+                        types.forEach(function (type) {
+                            let sameType = player.cards.filter((card) => card.type == type);
+                            if (
+                                sameType.length > 1 &&
+                                sameType.filter((card) => card.value == "O").length > 0 &&
+                                sameType.filter((card) => card.value == "K").length > 0
+                            ) {
+                                playableCards.push(sameType.filter((card) => card.value == "O"));
+                                playableCards.push(sameType.filter((card) => card.value == "K"));
+                            }
+                        });
+
+                        if (data in playableCards) {
+                            acceptPlayedCard(socket, player, currentGame, data);
+                        } else {
+                            declinePlayedCard(socket, player, currentGame, data);
+                        }
+                    } else {
+                        acceptPlayedCard(socket, player, currentGame, data);
+                    }
+
                     if (currentGame.order.length === 0) {
                         // If currrent round is over
-                        let playerWithHighestPoints = player;
+                        let playerWithHighestPoints = currentGame.players[0];
                         currentGame.players.forEach(function (player) {
                             if (
-                                (player.playedCard.type ===
-                                    playerWithHighestPoints.playedCard.type ||
-                                    player.playedCard.type === currentGame.trumpCard.type) &&
+                                player.playedCard.type === currentGame.trumpCard.type &&
                                 pointsMap.get(player.playedCard.value) >
                                     pointsMap.get(playerWithHighestPoints.playedCard.value)
                             ) {
@@ -117,6 +137,7 @@ io.on("connection", (socket) => {
                         let winnerIndex = currentGame.players.findIndex(
                             (player) => player === playerWithHighestPoints
                         );
+
                         endOpening(currentGame, winnerIndex);
                     }
                     break;
@@ -167,8 +188,9 @@ io.on("connection", (socket) => {
         // Set GameOpening
     });
 
-    socket.on("template", () => {
-        // Do something
+    socket.on("Melden", (data) => {
+        let player = players.find((element) => element.socket === socket);
+        player.melden = data;
     });
 
     socket.on("disconnect", () => {
@@ -176,6 +198,10 @@ io.on("connection", (socket) => {
         closeGame(socket);
         resetPlayer(socket);
         players = players.filter((player) => player.socket.id !== socket.id);
+    });
+
+    socket.on("template", () => {
+        // Do something
     });
 });
 
@@ -262,6 +288,7 @@ function tryToStartGame(lobbycode) {
     currentGame.players.forEach((player) => {
         drawCard(lobbycode, 5, player);
         io.to(player.socket.id).emit("setYourCards", player.cards);
+        checkCanCall(player);
     });
 
     io.in(lobbycode).emit("setTalon", currentGame.talon);
@@ -374,7 +401,9 @@ function endOpening(currentGame, winnerIndex) {
         player.socket.emit("setScore", player.score);
     });
 
-    currentGame.opening = "";
+    if (currentGame.opening !== "AufDissle") {
+        currentGame.opening = "";
+    }
 
     // Create new-order
     let winner = currentGame.players[winnerIndex];
@@ -392,11 +421,28 @@ function endOpening(currentGame, winnerIndex) {
         currentGame.players.forEach((player) => {
             drawCard(currentGame.lobbycode, 1, player);
             io.to(player.socket.id).emit("setYourCards", player.cards);
+            checkCanCall(player);
         });
         io.in(currentGame.lobbycode).emit("setTalon", currentGame.talon);
 
         io.in(currentGame.lobbycode).emit("setInfoType", { type: "newCards", detail: "" });
     }, 5500);
+}
+
+function checkCanCall(player) {
+    let types = ["Eichel", "Blatt", "Herz", "Schellen"];
+    types.forEach(function (type) {
+        let sameType = player.cards.filter((card) => card.type == type);
+        if (
+            sameType.length > 1 &&
+            sameType.filter((card) => card.value == "O").length > 0 &&
+            sameType.filter((card) => card.value == "K").length > 0
+        ) {
+            io.to(player.socket.id).emit("canCall", true);
+        } else {
+            io.to(player.socket.id).emit("canCall", false);
+        }
+    });
 }
 
 function processAndereAlteHat(socket, data, player, currentGame) {

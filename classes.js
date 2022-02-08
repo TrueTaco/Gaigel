@@ -16,6 +16,7 @@ class Player {
         this.playedCard = {};
         this.cards = [];
         this.socket = socket;
+        this.melden = false;
     }
 }
 
