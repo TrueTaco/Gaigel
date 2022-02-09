@@ -167,20 +167,6 @@ const Gaigel: React.FC<Props> = () => {
 
     // MARK: playCard
     const playCard = (type: string, value: string) => {
-        // The array of played cards is filled up with empty entries in PlayingField.tsx in order to make empty GaigelCards
-        // For some reason those also append to playedCards
-        // Therefore they need to be filtered out
-        let actualPlayedCards: CardProps[] = playedCards.filter(
-            (card) => card.type !== "" && card.value !== ""
-        );
-
-        let playedCardIndex: number = yourCards.findIndex((card) => {
-            return card.type === type && card.value === value;
-        });
-        setYourCards(yourCards.filter((card, index) => index !== playedCardIndex));
-
-        setPlayedCards(() => [...actualPlayedCards, { type: type, value: value }]);
-
         let playedCard: CardProps = { type: type, value: value };
         // @ts-ignore
         socket.emit("playCard", playedCard);

@@ -36,7 +36,7 @@ const PlayedCards: React.FC<Props> = ({ playedCards, playerCount }) => {
     );
 
     useEffect(() => {
-        let tempCards: CardProps[] = playedCards;
+        let tempCards: CardProps[] = playedCards.slice();
         for (let i = playedCards.length; i < playerCount; i++) {
             tempCards.push({ type: "", value: "" });
         }
