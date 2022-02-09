@@ -257,37 +257,29 @@ const Gaigel: React.FC<Props> = () => {
 
         newSocket.on("setGameStarted", (data: boolean) => {
             setGameStarted(data);
-            console.log(`setGameStarted: ${data}`);
         });
 
         newSocket.on("setTalon", (data: any) => {
-            console.log("Talon set");
             setTalonCards(data);
         });
 
         newSocket.on("setTrumpCard", (data: any) => {
-            console.log("Trumpcard set");
             setTrumpCard(data);
         });
 
         newSocket.on("setYourCards", (data: any) => {
-            console.log("Your cards set");
             setYourCards(data);
         });
 
         newSocket.on("setPlayedCards", (data: any) => {
-            console.log("Played cards set");
             setPlayedCards(data);
-            console.log(playedCards);
         });
 
         newSocket.on("openOpening", (data: any) => {
-            console.log("Open Opening");
             setOpening(true);
         });
 
         newSocket.on("closeOpening", (data: any) => {
-            console.log("Closed Opening");
             setOpening(false);
         });
 
