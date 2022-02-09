@@ -155,6 +155,7 @@ io.on("connection", (socket) => {
         currentGame.opening = "AndereAlteHat";
         console.log("AndereAlteHat");
         io.to(socket.id).emit("closeOpening", "");
+        io.to(currentGame.lobbycode).emit("setOpening", "AndereAlteHat");
         // Set GameOpening
     });
 
@@ -165,6 +166,7 @@ io.on("connection", (socket) => {
         currentGame.opening = "GeElfen";
         console.log("GeElfen");
         io.to(socket.id).emit("closeOpening", "");
+        io.to(currentGame.lobbycode).emit("setOpening", "GeElfen");
         // Set GameOpening
     });
 
@@ -175,6 +177,7 @@ io.on("connection", (socket) => {
         currentGame.opening = "HöherHat";
         console.log("HöherHat");
         io.to(socket.id).emit("closeOpening", "");
+        io.to(currentGame.lobbycode).emit("setOpening", "HöherHat");
         // Set GameOpening
     });
 
@@ -185,6 +188,7 @@ io.on("connection", (socket) => {
         currentGame.opening = "AufDissle";
         console.log("AufDissle");
         io.to(socket.id).emit("closeOpening", "");
+        io.to(currentGame.lobbycode).emit("setOpening", "AufDissle");
         // Set GameOpening
     });
 
@@ -406,6 +410,7 @@ function endOpening(currentGame, winnerIndex) {
 
     if (currentGame.opening !== "AufDissle") {
         currentGame.opening = "";
+        io.in(currentGame.lobbycode).emit("setOpening", "");
     }
 
     // Create new-order

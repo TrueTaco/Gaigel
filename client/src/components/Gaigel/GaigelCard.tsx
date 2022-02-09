@@ -55,7 +55,7 @@ const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard, hidden 
                 className={classes.cardActionArea}
                 style={{ pointerEvents: clickable ? "auto" : "none" }}
             >
-                {hidden ? (
+                {hidden && value !== "" ? (
                     <img
                         src={"/cardBacksite_noSpaceAround.png"}
                         width={"40"}

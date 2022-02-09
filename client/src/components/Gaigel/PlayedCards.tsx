@@ -20,6 +20,7 @@ const useStyles = makeStyles({
 interface Props {
     playedCards: CardProps[];
     playerCount: number;
+    opening: string;
 }
 
 interface CardProps {
@@ -27,9 +28,10 @@ interface CardProps {
     value: string;
 }
 
-const PlayedCards: React.FC<Props> = ({ playedCards, playerCount }) => {
+const PlayedCards: React.FC<Props> = ({ playedCards, playerCount, opening }) => {
     const classes = useStyles();
     let i: number = 0;
+    let hidden: boolean = opening === "AndereAlteHat" || opening === "HöherHat";
 
     const [cards, setCards] = useState<CardProps[]>(
         new Array(playerCount).fill({ type: "", value: "" })
@@ -52,7 +54,12 @@ const PlayedCards: React.FC<Props> = ({ playedCards, playerCount }) => {
                     i++;
                     return (
                         <Grid item key={i}>
-                            <GaigelCard type={card.type} value={card.value} clickable={false} />
+                            <GaigelCard
+                                type={card.type}
+                                value={card.value}
+                                clickable={false}
+                                hidden={hidden}
+                            />
                         </Grid>
                     );
                 })}
