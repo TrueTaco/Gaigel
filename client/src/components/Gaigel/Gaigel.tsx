@@ -97,6 +97,8 @@ const Gaigel: React.FC<Props> = () => {
 
     const [opening, setOpening] = useState<boolean>(false);
 
+    const [currentOpening, setCurrentOpening] = useState<string>("");
+
     // Latest response from server (For debugging purposes)
     const [response, setResponse] = useState("");
 
@@ -205,11 +207,9 @@ const Gaigel: React.FC<Props> = () => {
     };
 
     const HöherHat = () => {
-        let allowedCards = yourCards.filter(
-            (card) => trumpCard.type !== card.type && card.value !== "A"
-        );
+        let allowedCards = yourCards.filter((card) => trumpCard.type !== card.type);
 
-        if (allowedCards.length < 1) {
+        if (allowedCards.length == 5) {
             setWarningType({ type: "höherHatNotPossible", detail: "" });
         } else {
             // @ts-ignore
@@ -305,6 +305,10 @@ const Gaigel: React.FC<Props> = () => {
             setOpening(false);
         });
 
+        newSocket.on("setOpening", (data: any) => {
+            setCurrentOpening(data);
+        });
+
         newSocket.on("canCall", (data: any) => {
             setCanCall(data);
         });
@@ -354,6 +358,7 @@ const Gaigel: React.FC<Props> = () => {
                         <PlayedCards
                             playedCards={playedCards}
                             playerCount={lobbyInformation.playerInformation.length}
+                            opening={currentOpening}
                         />
                     </Box>
 
