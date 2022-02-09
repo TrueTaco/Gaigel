@@ -368,7 +368,10 @@ function declinePlayedCard(socket, player, currentGame) {
 
 function acceptPlayedCard(socket, player, currentGame, data) {
     player.playedCard = data;
-    let cardIndex = player.cards.findIndex((element) => element === data);
+    let cardIndex = player.cards.findIndex(
+        (element) => element.type === data.type && element.value === data.value
+    );
+
     player.cards.splice(cardIndex, 1);
     socket.emit("setYourCards", player.cards);
 
