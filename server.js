@@ -120,11 +120,15 @@ io.on("connection", (socket) => {
                         });
 
                         if (data in playableCards) {
+                            if (currentGame.players.length === currentGame.order.length)
+                                currentGame.playedCards = [];
                             acceptPlayedCard(socket, player, currentGame, data);
                         } else {
                             declinePlayedCard(socket, player, currentGame, data);
                         }
                     } else {
+                        if (currentGame.players.length === currentGame.order.length)
+                            currentGame.playedCards = [];
                         acceptPlayedCard(socket, player, currentGame, data);
                     }
 
@@ -145,7 +149,7 @@ io.on("connection", (socket) => {
                             (player) => player === playerWithHighestPoints
                         );
 
-                        endOpening(currentGame, winnerIndex);
+                        endRound(currentGame, winnerIndex);
                     }
                     break;
             }
@@ -362,7 +366,7 @@ function acceptPlayedCard(socket, player, currentGame, data) {
         io.in(currentGame.lobbycode).emit("setPlayerWithTurn", currentGame.order[0].username);
 }
 
-function endOpening(currentGame, winnerIndex) {
+function endRound(currentGame, winnerIndex) {
     console.log(currentGame.players[winnerIndex].username + " won");
     io.in(currentGame.lobbycode).emit("setInfoType", {
         type: "somebodyWon",
@@ -397,8 +401,6 @@ function endOpening(currentGame, winnerIndex) {
     let orderUsernames = currentGame.order.map((player) => player.username);
     io.in(currentGame.lobbycode).emit("setOrder", orderUsernames);
     io.in(currentGame.lobbycode).emit("setPlayerWithTurn", currentGame.order[0].username);
-
-    currentGame.playedCards = [];
 
     setTimeout(() => {
         currentGame.players.forEach((player) => {
@@ -455,7 +457,7 @@ function processAndereAlteHat(socket, data, player, currentGame) {
                         player.playedCard.value == currentGame.playedCards[0].value
                 );
         }
-        endOpening(currentGame, winnerIndex);
+        endRound(currentGame, winnerIndex);
     }
 }
 
@@ -467,7 +469,7 @@ function processGeElfen(socket, data, player, currentGame) {
         acceptPlayedCard(socket, player, currentGame, data);
     }
     if (currentGame.order.length === 0) {
-        endOpening(currentGame, 0);
+        endRound(currentGame, 0);
     }
 }
 
@@ -502,7 +504,7 @@ function processHöherHat(socket, data, player, currentGame) {
                 (player) => player === playerWithHighestPoints
             );
         }
-        endOpening(currentGame, winnerIndex);
+        endRound(currentGame, winnerIndex);
         currentGame.opening = "";
     }
 }
