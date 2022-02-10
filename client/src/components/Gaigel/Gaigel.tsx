@@ -173,6 +173,12 @@ const Gaigel: React.FC<Props> = () => {
             setWarningType({ type: "noOpeningChosen", detail: "" });
             return;
         }
+
+        if (yourCards.length < 5 && talonCards.length > 0) {
+            setWarningType({ type: "waitForCards", detail: "" });
+            return;
+        }
+
         let playedCard: CardProps = { type: type, value: value };
         // @ts-ignore
         socket.emit("playCard", playedCard);

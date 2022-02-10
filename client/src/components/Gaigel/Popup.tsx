@@ -26,7 +26,6 @@ const Popup: React.FC<Props> = ({ snackbarType, type, detail, reset }) => {
         case "notYourTurn":
             message = "Sie sind nicht an der Reihe und können daher jetzt keine Karte spielen.";
             break;
-        // TODO: Das hier muss noch implementiert werden (Karte muss dann geblockt werden)
         case "noOpeningChosen":
             message = "Sie müssen eine Eröffnung auswählen, bevor Sie eine Karte spielen können.";
             break;
@@ -45,8 +44,10 @@ const Popup: React.FC<Props> = ({ snackbarType, type, detail, reset }) => {
             message =
                 "Sie können diese Eröffnung nicht spielen, da sie keine Karte haben, die weder Trumpf noch ein Ass ist.";
             break;
+        case "waitForCards":
+            message = "Sie müssen warten, bis neue Karten ausgeteilt wurden.";
+            break;
         // -------- Infos --------
-        // TODO: Das hier muss auch noch implementiert werden (Iwie muss der Spielername hier landen dann)
         case "somebodyWon":
             message = `${detail} hat den Stich gewonnen.`;
             break;
