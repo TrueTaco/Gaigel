@@ -169,6 +169,10 @@ const Gaigel: React.FC<Props> = () => {
 
     // MARK: playCard
     const playCard = (type: string, value: string) => {
+        if (opening) {
+            setWarningType({ type: "noOpeningChosen", detail: "" });
+            return;
+        }
         let playedCard: CardProps = { type: type, value: value };
         // @ts-ignore
         socket.emit("playCard", playedCard);
