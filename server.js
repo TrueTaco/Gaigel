@@ -148,47 +148,14 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("AndereAlteHat", () => {
+    socket.on("chooseOpening", (data) => {
         let player = players.find((element) => element.socket == socket);
         let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
 
-        currentGame.opening = "AndereAlteHat";
-        console.log("AndereAlteHat");
+        currentGame.opening = data;
+        console.log(data);
         io.to(socket.id).emit("closeOpening", "");
-        io.to(currentGame.lobbycode).emit("setOpening", "AndereAlteHat");
-        // Set GameOpening
-    });
-
-    socket.on("GeElfen", () => {
-        let player = players.find((element) => element.socket == socket);
-        let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
-
-        currentGame.opening = "GeElfen";
-        console.log("GeElfen");
-        io.to(socket.id).emit("closeOpening", "");
-        io.to(currentGame.lobbycode).emit("setOpening", "GeElfen");
-        // Set GameOpening
-    });
-
-    socket.on("HöherHat", () => {
-        let player = players.find((element) => element.socket == socket);
-        let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
-
-        currentGame.opening = "HöherHat";
-        console.log("HöherHat");
-        io.to(socket.id).emit("closeOpening", "");
-        io.to(currentGame.lobbycode).emit("setOpening", "HöherHat");
-        // Set GameOpening
-    });
-
-    socket.on("AufDissle", () => {
-        let player = players.find((element) => element.socket == socket);
-        let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
-
-        currentGame.opening = "AufDissle";
-        console.log("AufDissle");
-        io.to(socket.id).emit("closeOpening", "");
-        io.to(currentGame.lobbycode).emit("setOpening", "AufDissle");
+        io.to(currentGame.lobbycode).emit("setOpening", data);
         // Set GameOpening
     });
 

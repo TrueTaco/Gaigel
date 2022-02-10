@@ -187,7 +187,7 @@ const Gaigel: React.FC<Props> = () => {
     const AndereAlteHat = () => {
         if (yourCards.filter((card) => card.value === "A").length > 0) {
             // @ts-ignore
-            socket.emit("AndereAlteHat", "");
+            socket.emit("chooseOpening", "AndereAlteHat");
         } else {
             setWarningType({ type: "noAce", detail: "" });
         }
@@ -196,7 +196,7 @@ const Gaigel: React.FC<Props> = () => {
     const GeElfen = () => {
         if (yourCards.filter((card) => card.value === "A").length > 0) {
             // @ts-ignore
-            socket.emit("GeElfen", "");
+            socket.emit("chooseOpening", "GeElfen");
         } else {
             setWarningType({ type: "noAce", detail: "" });
         }
@@ -211,13 +211,13 @@ const Gaigel: React.FC<Props> = () => {
             setWarningType({ type: "höherHatNotPossible", detail: "" });
         } else {
             // @ts-ignore
-            socket.emit("HöherHat", "");
+            socket.emit("chooseOpening", "HöherHat");
         }
     };
 
     const AufDissle = () => {
         // @ts-ignore
-        socket.emit("AufDissle", "");
+        socket.emit("chooseOpening", "AufDissle");
     };
 
     const Melden = () => {
