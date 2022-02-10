@@ -238,6 +238,7 @@ function tryToStartGame(lobbycode) {
         io.in(lobbycode).emit("setWarningType", { type: "falsePlayercount", detail: "" });
         return;
     }
+    if (currentGame.ongoing) return;
 
     // START A GAME
 
