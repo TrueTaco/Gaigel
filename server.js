@@ -42,19 +42,26 @@ io.on("connection", (socket) => {
     socket.emit("onConnect", message);
 
     socket.on("joinLobby", (data) => {
+        let gameToJoin = games.find((element) => element.lobbycode === data.lobbycode);
+
+        if (gameToJoin?.ongoing) {
+            socket.emit("setWarningType", { type: "gameOngoing", detail: "" });
+            return;
+        }
+
         let currentPlayer = players.find((element) => element.socket.id === socket.id);
         currentPlayer.username = data.username;
         currentPlayer.lobbycode = data.lobbycode;
 
-        if (!games.find((element) => element.lobbycode === data.lobbycode)) {
+        if (!gameToJoin) {
             console.log(`Creating game with lobbycode ${data.lobbycode}`);
             let newGame = new classes.Game([currentPlayer], data.lobbycode);
             games.push(newGame);
         } else {
             console.log(`Found game with lobby ${data.lobbycode}`);
-            let currentGame = games.find((element) => element.lobbycode === data.lobbycode);
-            currentGame.players.push(currentPlayer);
+            gameToJoin.players.push(currentPlayer);
         }
+        socket.emit("setLoggedIn", true);
         socket.join(data.lobbycode);
         shareLobbyInformation(currentPlayer.lobbycode);
     });

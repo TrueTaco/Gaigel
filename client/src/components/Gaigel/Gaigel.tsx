@@ -143,7 +143,6 @@ const Gaigel: React.FC<Props> = () => {
     };
 
     const login = (username: string, lobbycode: string) => {
-        setLoggedIn(true);
         setOwnUsername(username);
 
         // @ts-ignore
@@ -241,6 +240,10 @@ const Gaigel: React.FC<Props> = () => {
 
         newSocket.on("onConnect", (data: string) => {
             setResponse(data);
+        });
+
+        newSocket.on("setLoggedIn", (data: boolean) => {
+            setLoggedIn(data);
         });
 
         newSocket.on("lobbyInformation", (data: any) => {

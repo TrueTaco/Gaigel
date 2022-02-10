@@ -19,6 +19,10 @@ const Popup: React.FC<Props> = ({ snackbarType, type, detail, reset }) => {
 
     switch (type) {
         // -------- Warnings --------
+        case "gameOngoing":
+            message =
+                "Dieser Lobby kann nicht beigetreten werden, da das Spiel bereits im vollen Gange ist.";
+            break;
         case "falsePlayercount":
             message =
                 "Mit dieser Anzahl an Spielern lässt sich kein Spiel starten. Für ein Spiel werden 2, 3, 4 oder 6 Spieler benötigt.";
