@@ -42,19 +42,26 @@ io.on("connection", (socket) => {
     socket.emit("onConnect", message);
 
     socket.on("joinLobby", (data) => {
+        let gameToJoin = games.find((element) => element.lobbycode === data.lobbycode);
+
+        if (gameToJoin?.ongoing) {
+            socket.emit("setWarningType", { type: "gameOngoing", detail: "" });
+            return;
+        }
+
         let currentPlayer = players.find((element) => element.socket.id === socket.id);
         currentPlayer.username = data.username;
         currentPlayer.lobbycode = data.lobbycode;
 
-        if (!games.find((element) => element.lobbycode === data.lobbycode)) {
+        if (!gameToJoin) {
             console.log(`Creating game with lobbycode ${data.lobbycode}`);
             let newGame = new classes.Game([currentPlayer], data.lobbycode);
             games.push(newGame);
         } else {
             console.log(`Found game with lobby ${data.lobbycode}`);
-            let currentGame = games.find((element) => element.lobbycode === data.lobbycode);
-            currentGame.players.push(currentPlayer);
+            gameToJoin.players.push(currentPlayer);
         }
+        socket.emit("setLoggedIn", true);
         socket.join(data.lobbycode);
         shareLobbyInformation(currentPlayer.lobbycode);
     });
@@ -113,11 +120,15 @@ io.on("connection", (socket) => {
                         });
 
                         if (data in playableCards) {
+                            if (currentGame.players.length === currentGame.order.length)
+                                currentGame.playedCards = [];
                             acceptPlayedCard(socket, player, currentGame, data);
                         } else {
                             declinePlayedCard(socket, player, currentGame, data);
                         }
                     } else {
+                        if (currentGame.players.length === currentGame.order.length)
+                            currentGame.playedCards = [];
                         acceptPlayedCard(socket, player, currentGame, data);
                     }
 
@@ -138,7 +149,7 @@ io.on("connection", (socket) => {
                             (player) => player === playerWithHighestPoints
                         );
 
-                        endOpening(currentGame, winnerIndex);
+                        endRound(currentGame, winnerIndex);
                     }
                     break;
             }
@@ -148,47 +159,14 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("AndereAlteHat", () => {
+    socket.on("chooseOpening", (data) => {
         let player = players.find((element) => element.socket == socket);
         let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
 
-        currentGame.opening = "AndereAlteHat";
-        console.log("AndereAlteHat");
+        currentGame.opening = data;
+        console.log(data);
         io.to(socket.id).emit("closeOpening", "");
-        io.to(currentGame.lobbycode).emit("setOpening", "AndereAlteHat");
-        // Set GameOpening
-    });
-
-    socket.on("GeElfen", () => {
-        let player = players.find((element) => element.socket == socket);
-        let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
-
-        currentGame.opening = "GeElfen";
-        console.log("GeElfen");
-        io.to(socket.id).emit("closeOpening", "");
-        io.to(currentGame.lobbycode).emit("setOpening", "GeElfen");
-        // Set GameOpening
-    });
-
-    socket.on("HöherHat", () => {
-        let player = players.find((element) => element.socket == socket);
-        let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
-
-        currentGame.opening = "HöherHat";
-        console.log("HöherHat");
-        io.to(socket.id).emit("closeOpening", "");
-        io.to(currentGame.lobbycode).emit("setOpening", "HöherHat");
-        // Set GameOpening
-    });
-
-    socket.on("AufDissle", () => {
-        let player = players.find((element) => element.socket == socket);
-        let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
-
-        currentGame.opening = "AufDissle";
-        console.log("AufDissle");
-        io.to(socket.id).emit("closeOpening", "");
-        io.to(currentGame.lobbycode).emit("setOpening", "AufDissle");
+        io.to(currentGame.lobbycode).emit("setOpening", data);
         // Set GameOpening
     });
 
@@ -271,6 +249,7 @@ function tryToStartGame(lobbycode) {
         io.in(lobbycode).emit("setWarningType", { type: "falsePlayercount", detail: "" });
         return;
     }
+    if (currentGame.ongoing) return;
 
     // START A GAME
 
@@ -387,7 +366,7 @@ function acceptPlayedCard(socket, player, currentGame, data) {
         io.in(currentGame.lobbycode).emit("setPlayerWithTurn", currentGame.order[0].username);
 }
 
-function endOpening(currentGame, winnerIndex) {
+function endRound(currentGame, winnerIndex) {
     console.log(currentGame.players[winnerIndex].username + " won");
     io.in(currentGame.lobbycode).emit("setInfoType", {
         type: "somebodyWon",
@@ -422,8 +401,6 @@ function endOpening(currentGame, winnerIndex) {
     let orderUsernames = currentGame.order.map((player) => player.username);
     io.in(currentGame.lobbycode).emit("setOrder", orderUsernames);
     io.in(currentGame.lobbycode).emit("setPlayerWithTurn", currentGame.order[0].username);
-
-    currentGame.playedCards = [];
 
     setTimeout(() => {
         currentGame.players.forEach((player) => {
@@ -480,7 +457,7 @@ function processAndereAlteHat(socket, data, player, currentGame) {
                         player.playedCard.value == currentGame.playedCards[0].value
                 );
         }
-        endOpening(currentGame, winnerIndex);
+        endRound(currentGame, winnerIndex);
     }
 }
 
@@ -492,7 +469,7 @@ function processGeElfen(socket, data, player, currentGame) {
         acceptPlayedCard(socket, player, currentGame, data);
     }
     if (currentGame.order.length === 0) {
-        endOpening(currentGame, 0);
+        endRound(currentGame, 0);
     }
 }
 
@@ -527,7 +504,7 @@ function processHöherHat(socket, data, player, currentGame) {
                 (player) => player === playerWithHighestPoints
             );
         }
-        endOpening(currentGame, winnerIndex);
+        endRound(currentGame, winnerIndex);
         currentGame.opening = "";
     }
 }
@@ -535,7 +512,7 @@ function processHöherHat(socket, data, player, currentGame) {
 function createTalon() {
     // let types = ["Eichel", "Blatt", "Herz", "Schellen"];
     let types = ["Eichel", "Blatt"];
-    // let types: string[] = ["Eichel"];
+    // let types = ["Eichel"];
     let values = ["7", "U", "O", "K", "10", "A"];
     let newTalon = [];
 
