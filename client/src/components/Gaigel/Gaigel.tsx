@@ -197,9 +197,11 @@ const Gaigel: React.FC<Props> = () => {
     };
 
     const HöherHat = () => {
-        let allowedCards = yourCards.filter((card) => trumpCard.type !== card.type);
+        let allowedCards = yourCards.filter(
+            (card) => trumpCard.type !== card.type && card.value !== "A"
+        );
 
-        if (allowedCards.length == 5) {
+        if (allowedCards.length < 1) {
             setWarningType({ type: "höherHatNotPossible", detail: "" });
         } else {
             // @ts-ignore
