@@ -143,7 +143,6 @@ const Gaigel: React.FC<Props> = () => {
     };
 
     const login = (username: string, lobbycode: string) => {
-        setLoggedIn(true);
         setOwnUsername(username);
 
         // @ts-ignore
@@ -169,6 +168,16 @@ const Gaigel: React.FC<Props> = () => {
 
     // MARK: playCard
     const playCard = (type: string, value: string) => {
+        if (opening) {
+            setWarningType({ type: "noOpeningChosen", detail: "" });
+            return;
+        }
+
+        if (yourCards.length < 5 && talonCards.length > 0) {
+            setWarningType({ type: "waitForCards", detail: "" });
+            return;
+        }
+
         let playedCard: CardProps = { type: type, value: value };
         // @ts-ignore
         socket.emit("playCard", playedCard);
@@ -177,7 +186,7 @@ const Gaigel: React.FC<Props> = () => {
     const AndereAlteHat = () => {
         if (yourCards.filter((card) => card.value === "A").length > 0) {
             // @ts-ignore
-            socket.emit("AndereAlteHat", "");
+            socket.emit("chooseOpening", "AndereAlteHat");
         } else {
             setWarningType({ type: "noAce", detail: "" });
         }
@@ -186,7 +195,7 @@ const Gaigel: React.FC<Props> = () => {
     const GeElfen = () => {
         if (yourCards.filter((card) => card.value === "A").length > 0) {
             // @ts-ignore
-            socket.emit("GeElfen", "");
+            socket.emit("chooseOpening", "GeElfen");
         } else {
             setWarningType({ type: "noAce", detail: "" });
         }
@@ -201,13 +210,13 @@ const Gaigel: React.FC<Props> = () => {
             setWarningType({ type: "höherHatNotPossible", detail: "" });
         } else {
             // @ts-ignore
-            socket.emit("HöherHat", "");
+            socket.emit("chooseOpening", "HöherHat");
         }
     };
 
     const AufDissle = () => {
         // @ts-ignore
-        socket.emit("AufDissle", "");
+        socket.emit("chooseOpening", "AufDissle");
     };
 
     const Melden = () => {
@@ -231,6 +240,10 @@ const Gaigel: React.FC<Props> = () => {
 
         newSocket.on("onConnect", (data: string) => {
             setResponse(data);
+        });
+
+        newSocket.on("setLoggedIn", (data: boolean) => {
+            setLoggedIn(data);
         });
 
         newSocket.on("lobbyInformation", (data: any) => {
