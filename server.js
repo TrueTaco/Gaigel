@@ -107,6 +107,7 @@ io.on("connection", (socket) => {
                     if (player.melden === true) {
                         let types = ["Eichel", "Blatt", "Herz", "Schellen"];
                         let playableCards = [];
+                        let cardFound = false;
                         types.forEach(function (type) {
                             let sameType = player.cards.filter((card) => card.type == type);
                             if (
@@ -118,8 +119,13 @@ io.on("connection", (socket) => {
                                 playableCards.push(sameType.filter((card) => card.value == "K"));
                             }
                         });
+                        playableCards.forEach(function (card) {
+                            if (card[0].type === data.type && card[0].value === data.value) {
+                                cardFound = true;
+                            }
+                        });
 
-                        if (data in playableCards) {
+                        if (cardFound === true) {
                             if (currentGame.players.length === currentGame.order.length)
                                 currentGame.playedCards = [];
                             acceptPlayedCard(socket, player, currentGame, data);
@@ -173,6 +179,7 @@ io.on("connection", (socket) => {
     socket.on("Melden", (data) => {
         let player = players.find((element) => element.socket === socket);
         player.melden = data;
+        console.log("Melden:" + data);
     });
 
     socket.on("disconnect", () => {
@@ -373,12 +380,17 @@ function endRound(currentGame, winnerIndex) {
         detail: currentGame.players[winnerIndex].username,
     });
 
-    if (currentGame.players[winnerIndex].vorhand == true && currentGame.opening == "AufDissle") {
+    if (currentGame.players[winnerIndex].vorhand === true && currentGame.opening === "AufDissle") {
         // Player lost
     }
-
+    if (currentGame.players[winnerIndex].melden === true) {
+        currentGame.players[winnerIndex].score += 20;
+        if (currentGame.players[winnerIndex].playedCard.type === currentGame.trumpCard.type) {
+            currentGame.players[winnerIndex].score += 20;
+        }
+    }
     currentGame.players[winnerIndex].score += calculateScore(currentGame.playedCards);
-    if (currentGame.players[winnerIndex].score >= 101 || currentGame.talon.length == 0) {
+    if (currentGame.players[winnerIndex].score >= 101 || currentGame.talon.length === 0) {
         // endGame();
     }
 
@@ -411,11 +423,12 @@ function endRound(currentGame, winnerIndex) {
         io.in(currentGame.lobbycode).emit("setTalon", currentGame.talon);
 
         io.in(currentGame.lobbycode).emit("setInfoType", { type: "newCards", detail: "" });
-    }, 5500);
+    }, 1000);
 }
 
 function checkCanCall(player) {
     let types = ["Eichel", "Blatt", "Herz", "Schellen"];
+    let sendTrue = false;
     types.forEach(function (type) {
         let sameType = player.cards.filter((card) => card.type == type);
         if (
@@ -424,10 +437,12 @@ function checkCanCall(player) {
             sameType.filter((card) => card.value == "K").length > 0
         ) {
             io.to(player.socket.id).emit("canCall", true);
-        } else {
-            io.to(player.socket.id).emit("canCall", false);
+            sendTrue = true;
         }
     });
+    if (sendTrue === false) {
+        io.to(player.socket.id).emit("canCall", false);
+    }
 }
 
 function processAndereAlteHat(socket, data, player, currentGame) {

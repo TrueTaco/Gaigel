@@ -61,6 +61,9 @@ const Popup: React.FC<Props> = ({ snackbarType, type, detail, reset }) => {
         case "playerLeft":
             message = `${detail} hat das Spiel verlassen. Die Lobby wird in 15 Sekunden geschlossen.`;
             break;
+        case "meldenNotCurrentlyPlaying":
+            message = `Sie können nur melden wenn sie die Runde beginnen.`;
+            break;
         default:
             break;
     }
