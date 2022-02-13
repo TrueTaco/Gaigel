@@ -220,9 +220,13 @@ const Gaigel: React.FC<Props> = () => {
     };
 
     const Melden = () => {
-        setAnnouncing(!announcing);
-        // @ts-ignore
-        socket.emit("Melden", announcing);
+        if (ownUsername === playerWithTurn) {
+            // @ts-ignore
+            socket.emit("Melden", !announcing);
+            setAnnouncing(!announcing);
+        } else {
+            setWarningType({ type: "meldenNotCurrentlyPlaying", detail: "" });
+        }
     };
 
     // MARK: useEffect
