@@ -41,6 +41,7 @@ io.on("connection", (socket) => {
     let message = `Hello Client ${socket.id}`;
     socket.emit("onConnect", message);
 
+    // Logic for joining / creating a lobby
     socket.on("joinLobby", (data) => {
         let gameToJoin = games.find((element) => element.lobbycode === data.lobbycode);
 
@@ -66,10 +67,12 @@ io.on("connection", (socket) => {
         shareLobbyInformation(currentPlayer.lobbycode);
     });
 
+    // Is called when a player leaves a lobby by clicking the back button
     socket.on("backToLogin", () => {
         resetPlayer(socket);
     });
 
+    // Is called whenever a player presses the ready button
     socket.on("getReady", () => {
         let currentPlayer = players.find((element) => element.socket.id === socket.id);
         currentPlayer.ready = true;
@@ -77,6 +80,7 @@ io.on("connection", (socket) => {
         shareLobbyInformation(currentPlayer.lobbycode);
     });
 
+    // This function contains most of the game logic
     socket.on("playCard", (data) => {
         let player = players.find((element) => element.socket == socket);
         console.log(`${player.username} played this card: ${data.type} ${data.value}`);
@@ -96,7 +100,7 @@ io.on("connection", (socket) => {
                 case "AufDissle":
                     break;
                 default:
-                    // Normalround
+                    // Normal round
                     if (
                         player.vorhand == true &&
                         currentGame.opening == "AufDissle" &&
@@ -161,6 +165,7 @@ io.on("connection", (socket) => {
         }
     });
 
+    // This function holds the logic for choosing an opening
     socket.on("chooseOpening", (data) => {
         let player = players.find((element) => element.socket == socket);
         let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
@@ -178,6 +183,7 @@ io.on("connection", (socket) => {
         console.log("Melden:" + data);
     });
 
+    // This function contains the logic for when a player disconnects
     socket.on("disconnect", () => {
         console.log(`${players.length} | Client disconnected (${socket.id})`);
         closeGame(socket);
@@ -190,6 +196,7 @@ io.on("connection", (socket) => {
     });
 });
 
+// Function that determines the winner of a "Stich"
 function decideWinner(currentGame) {
     let playerWithHighestPoints = currentGame.players[0];
     let playerWithHighestPointsHasTrump =
@@ -213,6 +220,7 @@ function decideWinner(currentGame) {
     return winnerIndex;
 }
 
+// Function for closing a game in case a player disconnects
 function closeGame(socket) {
     let disconnectedPlayer = players.find((element) => element.socket == socket);
     if (disconnectedPlayer.lobbycode === "") return;
@@ -234,6 +242,7 @@ function closeGame(socket) {
     }, 15000);
 }
 
+// Function for resetting all variables when a game returns back to the lobby
 function resetGame(currentGame) {
     io.in(currentGame.lobbycode).emit("setGameStarted", false);
 
@@ -255,6 +264,7 @@ function resetGame(currentGame) {
     shareLobbyInformation(currentGame.lobbycode);
 }
 
+// Function that is called everytime a game could be started
 function tryToStartGame(lobbycode) {
     let currentGame = games.find((element) => element.lobbycode === lobbycode);
     let amountPlayers = 0;
@@ -308,6 +318,7 @@ function tryToStartGame(lobbycode) {
     console.log(`Started a game for lobbycode ${lobbycode}`);
 }
 
+// Function for sharing lobbycode, amount of ready players and information about the players between all players
 function shareLobbyInformation(lobbycode) {
     if (lobbycode === "") return;
     let currentGame = games.find((element) => element.lobbycode === lobbycode);
@@ -332,6 +343,7 @@ function shareLobbyInformation(lobbycode) {
     tryToStartGame(lobbycode);
 }
 
+// Function for completely resetting a player when disconnecting or leaving a lobby
 function resetPlayer(socket) {
     let currentPlayer = players.find((element) => element.socket === socket);
 
@@ -362,6 +374,7 @@ function resetPlayer(socket) {
     currentPlayer.cards = [];
 }
 
+// Function for calculating the score of a Stich
 function calculateScore(cards) {
     let points = 0;
     cards.forEach(function (card) {
@@ -370,11 +383,13 @@ function calculateScore(cards) {
     return points;
 }
 
+// Function that is called everytime a played card is declined
 function declinePlayedCard(socket, player, currentGame) {
     io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
     socket.emit("setYourCards", player.cards);
 }
 
+// Function that is called everytime a played card is accepted
 function acceptPlayedCard(socket, player, currentGame, data) {
     player.playedCard = data;
     let cardIndex = player.cards.findIndex(
@@ -392,6 +407,7 @@ function acceptPlayedCard(socket, player, currentGame, data) {
         io.in(currentGame.lobbycode).emit("setPlayerWithTurn", currentGame.order[0].username);
 }
 
+// Function that is called at the end of every round
 function endRound(currentGame, winnerIndex) {
     console.log(currentGame.players[winnerIndex].username + " won");
     io.in(currentGame.lobbycode).emit("setInfoType", {
@@ -440,6 +456,7 @@ function endRound(currentGame, winnerIndex) {
     }, 1000);
 }
 
+// Function that checks if a player can use the utility "Melden"
 function checkCanCall(player) {
     let types = ["Eichel", "Blatt", "Herz", "Schellen"];
     let sendTrue = false;
@@ -459,6 +476,7 @@ function checkCanCall(player) {
     }
 }
 
+// Function that holds the game logic for the opening "Andere Alte hat"
 function processAndereAlteHat(socket, data, player, currentGame) {
     if (player === currentGame.players[0] && data.value !== "A") {
         // If vorhand plays not allowed card
@@ -490,6 +508,7 @@ function processAndereAlteHat(socket, data, player, currentGame) {
     }
 }
 
+// Function that holds the game logic for the opening "Ge-Elfen"
 function processGeElfen(socket, data, player, currentGame) {
     if (player === currentGame.players[0] && data.value !== "A") {
         declinePlayedCard(socket, player, currentGame);
@@ -502,6 +521,7 @@ function processGeElfen(socket, data, player, currentGame) {
     }
 }
 
+// Function that holds the game logic for the opening "Höher hat"
 function processHöherHat(socket, data, player, currentGame) {
     if (
         player === currentGame.players[0] &&
@@ -538,6 +558,7 @@ function processHöherHat(socket, data, player, currentGame) {
     }
 }
 
+// Function that creates the Talon from scratch
 function createTalon() {
     // let types = ["Eichel", "Blatt", "Herz", "Schellen"];
     let types = ["Eichel", "Blatt"];
@@ -566,6 +587,7 @@ function fisherYatesShuffle(arr) {
     return arr;
 }
 
+// Function that chooses the trump card for the next game
 function chooseTrumpCard(lobbycode) {
     let currentGame = games.find((element) => element.lobbycode === lobbycode);
 
@@ -575,6 +597,7 @@ function chooseTrumpCard(lobbycode) {
     return newTrumpCard;
 }
 
+// Function for drawing a card, sorting the new cards and sending them to the corresponding player
 function drawCard(lobbycode, amount, player) {
     let currentGame = games.find((element) => element.lobbycode === lobbycode);
 
