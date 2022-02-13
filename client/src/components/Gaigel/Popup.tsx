@@ -52,8 +52,11 @@ const Popup: React.FC<Props> = ({ snackbarType, type, detail, reset }) => {
             message = "Sie müssen warten, bis neue Karten ausgeteilt wurden.";
             break;
         // -------- Infos --------
-        case "somebodyWon":
+        case "somebodyWonTheStich":
             message = `${detail} hat den Stich gewonnen.`;
+            break;
+        case "somebodyWonTheGame":
+            message = `${detail} hat das Spiel gewonnen.`;
             break;
         case "newCards":
             message = "Es wurden neue Karten ausgeteilt.";

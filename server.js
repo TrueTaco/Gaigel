@@ -102,11 +102,14 @@ io.on("connection", (socket) => {
                 default:
                     // Normal round
                     if (
-                        player.vorhand == true &&
+                        player.vorhand &&
                         currentGame.opening == "AufDissle" &&
                         player.cards.filter((card) => card.value == "7").length === 5
                     ) {
-                        // closeGame()
+                        let winnerIndex = currentGame.players.findIndex(
+                            (element) => element.socket.id === player.socket.id
+                        );
+                        endGame(currentGame, winnerIndex);
                     }
                     if (player.melden === true) {
                         let types = ["Eichel", "Blatt", "Herz", "Schellen"];
@@ -138,10 +141,19 @@ io.on("connection", (socket) => {
                                 type: "hatGemeldet",
                                 detail: player.username,
                             });
+
                             player.score += 20;
                             if (player.playedCard.type === currentGame.trumpCard.type) {
                                 player.score += 20;
                             }
+
+                            if (player.score >= 101) {
+                                let winnerIndex = currentGame.players.findIndex(
+                                    (element) => element.socket.id === player.socket.id
+                                );
+                                endGame(currentGame, winnerIndex);
+                            }
+
                             player.socket.emit("setScore", player.score);
                         } else {
                             declinePlayedCard(socket, player, currentGame, data);
@@ -186,7 +198,7 @@ io.on("connection", (socket) => {
     // This function contains the logic for when a player disconnects
     socket.on("disconnect", () => {
         console.log(`${players.length} | Client disconnected (${socket.id})`);
-        closeGame(socket);
+        shutGame(socket);
         resetPlayer(socket);
         players = players.filter((player) => player.socket.id !== socket.id);
     });
@@ -220,8 +232,21 @@ function decideWinner(currentGame) {
     return winnerIndex;
 }
 
+// Function for ending a game in case somebody won
+function endGame(currentGame, winnerIndex) {
+    let winnerName = currentGame.players[winnerIndex].username;
+    io.in(currentGame.lobbycode).emit("setInfoType", {
+        type: "somebodyWonTheGame",
+        detail: winnerName,
+    });
+
+    setTimeout(() => {
+        resetGame(currentGame);
+    }, 10000);
+}
+
 // Function for closing a game in case a player disconnects
-function closeGame(socket) {
+function shutGame(socket) {
     let disconnectedPlayer = players.find((element) => element.socket == socket);
     if (disconnectedPlayer.lobbycode === "") return;
     let currentGame = games.find((element) => element.lobbycode === disconnectedPlayer.lobbycode);
@@ -255,10 +280,12 @@ function resetGame(currentGame) {
 
     currentGame.players.forEach((player) => {
         // Reset player information
+        player.ready = false;
         player.score = 0;
         player.vorhand = false;
         player.playedCard = {};
         player.cards = [];
+        player.melden = false;
     });
 
     shareLobbyInformation(currentGame.lobbycode);
@@ -372,6 +399,7 @@ function resetPlayer(socket) {
     currentPlayer.vorhand = false;
     currentPlayer.playedCard = {};
     currentPlayer.cards = [];
+    currentPlayer.melden = false;
 }
 
 // Function for calculating the score of a Stich
@@ -409,30 +437,31 @@ function acceptPlayedCard(socket, player, currentGame, data) {
 
 // Function that is called at the end of every round
 function endRound(currentGame, winnerIndex) {
-    console.log(currentGame.players[winnerIndex].username + " won");
-    io.in(currentGame.lobbycode).emit("setInfoType", {
-        type: "somebodyWon",
-        detail: currentGame.players[winnerIndex].username,
-    });
-
     if (currentGame.players[winnerIndex].vorhand === true && currentGame.opening === "AufDissle") {
         // Player lost
     }
 
-    currentGame.players[winnerIndex].score += calculateScore(currentGame.playedCards);
-    if (currentGame.players[winnerIndex].score >= 101 || currentGame.talon.length === 0) {
-        // endGame();
-    }
-
     // Send scores to every player
+    currentGame.players[winnerIndex].score += calculateScore(currentGame.playedCards);
     currentGame.players.forEach((player) => {
         player.socket.emit("setScore", player.score);
     });
+
+    if (currentGame.players[winnerIndex].score >= 20) {
+        endGame(currentGame, winnerIndex);
+        return;
+    }
 
     if (currentGame.opening !== "AufDissle") {
         currentGame.opening = "";
         io.in(currentGame.lobbycode).emit("setOpening", "");
     }
+
+    console.log(currentGame.players[winnerIndex].username + " won");
+    io.in(currentGame.lobbycode).emit("setInfoType", {
+        type: "somebodyWonTheStich",
+        detail: currentGame.players[winnerIndex].username,
+    });
 
     // Create new-order
     let winner = currentGame.players[winnerIndex];
