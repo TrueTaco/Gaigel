@@ -129,6 +129,16 @@ io.on("connection", (socket) => {
                             if (currentGame.players.length === currentGame.order.length)
                                 currentGame.playedCards = [];
                             acceptPlayedCard(socket, player, currentGame, data);
+
+                            io.in(currentGame.lobbycode).emit("setInfoType", {
+                                type: "hatGemeldet",
+                                detail: player.username,
+                            });
+                            player.score += 20;
+                            if (player.playedCard.type === currentGame.trumpCard.type) {
+                                player.score += 20;
+                            }
+                            player.socket.emit("setScore", player.score);
                         } else {
                             declinePlayedCard(socket, player, currentGame, data);
                         }
@@ -140,21 +150,7 @@ io.on("connection", (socket) => {
 
                     if (currentGame.order.length === 0) {
                         // If currrent round is over
-                        let playerWithHighestPoints = currentGame.players[0];
-                        currentGame.players.forEach(function (player) {
-                            if (
-                                player.playedCard.type === currentGame.trumpCard.type &&
-                                pointsMap.get(player.playedCard.value) >
-                                    pointsMap.get(playerWithHighestPoints.playedCard.value)
-                            ) {
-                                playerWithHighestPoints = player;
-                            }
-                        });
-
-                        let winnerIndex = currentGame.players.findIndex(
-                            (player) => player === playerWithHighestPoints
-                        );
-
+                        let winnerIndex = decideWinner(currentGame);
                         endRound(currentGame, winnerIndex);
                     }
                     break;
@@ -193,6 +189,29 @@ io.on("connection", (socket) => {
         // Do something
     });
 });
+
+function decideWinner(currentGame) {
+    let playerWithHighestPoints = currentGame.players[0];
+    let playerWithHighestPointsHasTrump =
+        playerWithHighestPoints.playedCard.type === currentGame.trumpCard.type;
+    currentGame.players.forEach(function (player) {
+        let playerHasTrump = player.playedCard.type === currentGame.trumpCard.type;
+        let playerHasHigherCard =
+            pointsMap.get(player.playedCard.value) >
+            pointsMap.get(playerWithHighestPoints.playedCard.value);
+        if (
+            (playerHasTrump && !playerWithHighestPointsHasTrump) ||
+            (((playerHasTrump && playerWithHighestPointsHasTrump) ||
+                (!playerHasTrump && !playerWithHighestPointsHasTrump)) &&
+                playerHasHigherCard)
+        ) {
+            playerWithHighestPoints = player;
+        }
+    });
+
+    let winnerIndex = currentGame.players.findIndex((player) => player === playerWithHighestPoints);
+    return winnerIndex;
+}
 
 function closeGame(socket) {
     let disconnectedPlayer = players.find((element) => element.socket == socket);
@@ -382,13 +401,6 @@ function endRound(currentGame, winnerIndex) {
 
     if (currentGame.players[winnerIndex].vorhand === true && currentGame.opening === "AufDissle") {
         // Player lost
-    }
-
-    if (currentGame.players[winnerIndex].melden === true) {
-        currentGame.players[winnerIndex].score += 20;
-        if (currentGame.players[winnerIndex].playedCard.type === currentGame.trumpCard.type) {
-            currentGame.players[winnerIndex].score += 20;
-        }
     }
 
     currentGame.players[winnerIndex].score += calculateScore(currentGame.playedCards);

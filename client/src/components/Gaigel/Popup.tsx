@@ -64,6 +64,9 @@ const Popup: React.FC<Props> = ({ snackbarType, type, detail, reset }) => {
         case "meldenNotCurrentlyPlaying":
             message = `Sie können nur melden wenn sie die Runde beginnen.`;
             break;
+        case "hatGemeldet":
+            message = `${detail} hat melden.`;
+            break;
         default:
             break;
     }
