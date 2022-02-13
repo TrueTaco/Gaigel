@@ -383,12 +383,14 @@ function endRound(currentGame, winnerIndex) {
     if (currentGame.players[winnerIndex].vorhand === true && currentGame.opening === "AufDissle") {
         // Player lost
     }
+
     if (currentGame.players[winnerIndex].melden === true) {
         currentGame.players[winnerIndex].score += 20;
         if (currentGame.players[winnerIndex].playedCard.type === currentGame.trumpCard.type) {
             currentGame.players[winnerIndex].score += 20;
         }
     }
+
     currentGame.players[winnerIndex].score += calculateScore(currentGame.playedCards);
     if (currentGame.players[winnerIndex].score >= 101 || currentGame.talon.length === 0) {
         // endGame();
