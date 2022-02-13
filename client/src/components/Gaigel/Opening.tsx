@@ -19,8 +19,6 @@ const useStyles = makeStyles({
     header: {
         marginBottom: 10,
         textAlign: "center",
-        fontSize: 16,
-        fontWeight: "bold",
         color: "white",
     },
     buttongroup: {

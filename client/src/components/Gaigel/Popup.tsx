@@ -52,8 +52,11 @@ const Popup: React.FC<Props> = ({ snackbarType, type, detail, reset }) => {
             message = "Sie müssen warten, bis neue Karten ausgeteilt wurden.";
             break;
         // -------- Infos --------
-        case "somebodyWon":
+        case "somebodyWonTheStich":
             message = `${detail} hat den Stich gewonnen.`;
+            break;
+        case "somebodyWonTheGame":
+            message = `${detail} hat das Spiel gewonnen.`;
             break;
         case "newCards":
             message = "Es wurden neue Karten ausgeteilt.";
@@ -62,10 +65,10 @@ const Popup: React.FC<Props> = ({ snackbarType, type, detail, reset }) => {
             message = `${detail} hat das Spiel verlassen. Die Lobby wird in 15 Sekunden geschlossen.`;
             break;
         case "meldenNotCurrentlyPlaying":
-            message = `Sie können nur melden wenn sie die Runde beginnen.`;
+            message = `Sie können nur melden, wenn Sie die Runde beginnen.`;
             break;
         case "hatGemeldet":
-            message = `${detail} hat melden.`;
+            message = `${detail} hat gemeldet.`;
             break;
         default:
             break;
