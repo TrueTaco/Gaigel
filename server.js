@@ -134,7 +134,7 @@ io.on("connection", (socket) => {
     // This function contains the logic for when a player disconnects
     socket.on("disconnect", () => {
         console.log(`${players.length} | Client disconnected (${socket.id})`);
-        shutGame(socket);
+        handlePlayerDisconnect(socket);
         resetPlayer(socket);
         players = players.filter((player) => player.socket.id !== socket.id);
     });
@@ -193,11 +193,13 @@ function decideWinnerEndRound(currentGame) {
 
 // Function for ending a game in case somebody won
 function endGame(currentGame, winnerIndex) {
-    let winnerName = currentGame.players[winnerIndex].username;
+    let winner = currentGame.players[winnerIndex];
     io.in(currentGame.lobbycode).emit("setInfoType", {
         type: "somebodyWonTheGame",
-        detail: winnerName,
+        detail: winner.username,
     });
+
+    winner.wins++;
 
     setTimeout(() => {
         resetGame(currentGame);
@@ -205,7 +207,7 @@ function endGame(currentGame, winnerIndex) {
 }
 
 // Function for closing a game in case a player disconnects
-function shutGame(socket) {
+function handlePlayerDisconnect(socket) {
     let disconnectedPlayer = players.find((element) => element.socket == socket);
     if (disconnectedPlayer.lobbycode === "") return;
     let currentGame = games.find((element) => element.lobbycode === disconnectedPlayer.lobbycode);
@@ -651,8 +653,8 @@ function processMelden(socket, data, player, currentGame) {
 
 // Function that creates the Talon from scratch
 function createTalon() {
-    // let types = ["Eichel", "Blatt", "Herz", "Schellen"];
-    let types = ["Eichel", "Blatt"];
+    let types = ["Eichel", "Blatt", "Herz", "Schellen"];
+    // let types = ["Eichel", "Blatt"];
     // let types = ["Eichel"];
     let values = ["7", "U", "O", "K", "10", "A"];
     let newTalon = [];

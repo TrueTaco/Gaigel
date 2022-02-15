@@ -15,6 +15,7 @@ import LobbyPage from "./LobbyPage";
 import PlayerList from "./PlayerList";
 import GameInformation from "./GameInformation";
 import Popup from "./Popup";
+import EndPopup from "./EndPopup";
 
 // MARK: Styles
 const useStyles = makeStyles({
@@ -359,6 +360,8 @@ const Gaigel: React.FC<Props> = () => {
                             opening={currentOpening}
                         />
                     </Box>
+
+                    <EndPopup />
 
                     {canCall && (
                         <Button
