@@ -29,6 +29,10 @@ const GlobalStyle = createGlobalStyle`
       background-color: #313131;
       display: flex;
       justify-content: center;
+
+      background-image: url("/greenBackground.png");
+      background-size: cover;
+      background-position: center;
    }
 
    html {

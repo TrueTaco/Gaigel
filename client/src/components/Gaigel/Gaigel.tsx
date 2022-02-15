@@ -326,7 +326,7 @@ const Gaigel: React.FC<Props> = () => {
         <Box
             className={classes.root}
             style={{
-                backgroundColor: !loggedIn || !gameStarted ? "#313131" : "#7c5439",
+                backgroundColor: !loggedIn || !gameStarted ? "none" : "#7c5439",
                 border: !loggedIn || !gameStarted ? "none" : "10px solid #53362b",
             }}
         >
@@ -361,7 +361,7 @@ const Gaigel: React.FC<Props> = () => {
                         />
                     </Box>
 
-                    <EndPopup />
+                    {/* <EndPopup /> */}
 
                     {canCall && (
                         <Button

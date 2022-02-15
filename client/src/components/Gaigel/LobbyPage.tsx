@@ -13,6 +13,7 @@ const useStyles = makeStyles({
         flexDirection: "column",
         justifyContent: "center",
         gap: "20px",
+        boxShadow: "5px 5px 15px black",
     },
     control: {
         display: "flex",
