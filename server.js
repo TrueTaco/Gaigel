@@ -588,6 +588,10 @@ function processEndRound(socket, data, player, currentGame) {
             });
             if (playerHasColor && data.type !== currentGame.players[0].playedCard.type) {
                 declinePlayedCard(socket, player, currentGame, data);
+                socket.emit("setInfoType", {
+                    type: "hasToServe",
+                    detail: "",
+                });
             } else {
                 acceptPlayedCard(socket, player, currentGame, data);
             }
