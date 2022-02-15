@@ -100,74 +100,10 @@ io.on("connection", (socket) => {
                 case "AufDissle":
                     break;
                 default:
-                    // Normal round
-                    if (
-                        player.vorhand &&
-                        currentGame.opening == "AufDissle" &&
-                        player.cards.filter((card) => card.value == "7").length === 5
-                    ) {
-                        let winnerIndex = currentGame.players.findIndex(
-                            (element) => element.socket.id === player.socket.id
-                        );
-                        endGame(currentGame, winnerIndex);
-                    }
-                    if (player.melden === true) {
-                        let types = ["Eichel", "Blatt", "Herz", "Schellen"];
-                        let playableCards = [];
-                        let cardFound = false;
-                        types.forEach(function (type) {
-                            let sameType = player.cards.filter((card) => card.type == type);
-                            if (
-                                sameType.length > 1 &&
-                                sameType.filter((card) => card.value == "O").length > 0 &&
-                                sameType.filter((card) => card.value == "K").length > 0
-                            ) {
-                                playableCards.push(sameType.filter((card) => card.value == "O"));
-                                playableCards.push(sameType.filter((card) => card.value == "K"));
-                            }
-                        });
-                        playableCards.forEach(function (card) {
-                            if (card[0].type === data.type && card[0].value === data.value) {
-                                cardFound = true;
-                            }
-                        });
-
-                        if (cardFound === true) {
-                            if (currentGame.players.length === currentGame.order.length)
-                                currentGame.playedCards = [];
-                            acceptPlayedCard(socket, player, currentGame, data);
-
-                            io.in(currentGame.lobbycode).emit("setInfoType", {
-                                type: "hatGemeldet",
-                                detail: player.username,
-                            });
-
-                            player.score += 20;
-                            if (player.playedCard.type === currentGame.trumpCard.type) {
-                                player.score += 20;
-                            }
-
-                            if (player.score >= 101) {
-                                let winnerIndex = currentGame.players.findIndex(
-                                    (element) => element.socket.id === player.socket.id
-                                );
-                                endGame(currentGame, winnerIndex);
-                            }
-
-                            player.socket.emit("setScore", player.score);
-                        } else {
-                            declinePlayedCard(socket, player, currentGame, data);
-                        }
+                    if (currentGame.talon.length <= 0) {
+                        processEndRound(socket, data, player, currentGame);
                     } else {
-                        if (currentGame.players.length === currentGame.order.length)
-                            currentGame.playedCards = [];
-                        acceptPlayedCard(socket, player, currentGame, data);
-                    }
-
-                    if (currentGame.order.length === 0) {
-                        // If currrent round is over
-                        let winnerIndex = decideWinner(currentGame);
-                        endRound(currentGame, winnerIndex);
+                        processNormalRound(socket, data, player, currentGame);
                     }
                     break;
             }
@@ -222,6 +158,29 @@ function decideWinner(currentGame) {
             (playerHasTrump && !playerWithHighestPointsHasTrump) ||
             (((playerHasTrump && playerWithHighestPointsHasTrump) ||
                 (!playerHasTrump && !playerWithHighestPointsHasTrump)) &&
+                playerHasHigherCard)
+        ) {
+            playerWithHighestPoints = player;
+        }
+    });
+
+    let winnerIndex = currentGame.players.findIndex((player) => player === playerWithHighestPoints);
+    return winnerIndex;
+}
+
+function decideWinnerEndRound(currentGame) {
+    let playerWithHighestPoints = currentGame.players[0];
+    let playerWithHighestPointsHasTrump =
+        playerWithHighestPoints.playedCard.type === currentGame.trumpCard.type;
+    currentGame.players.forEach(function (player) {
+        let playerHasTrump = player.playedCard.type === currentGame.trumpCard.type;
+        let playerCanServe = player.playedCard.type === playerWithHighestPoints.playedCard.type;
+        let playerHasHigherCard =
+            pointsMap.get(player.playedCard.value) >
+            pointsMap.get(playerWithHighestPoints.playedCard.value);
+        if (
+            (playerHasTrump && !playerWithHighestPointsHasTrump) ||
+            (((playerHasTrump && playerWithHighestPointsHasTrump) || playerCanServe) &&
                 playerHasHigherCard)
         ) {
             playerWithHighestPoints = player;
@@ -447,7 +406,7 @@ function endRound(currentGame, winnerIndex) {
         player.socket.emit("setScore", player.score);
     });
 
-    if (currentGame.players[winnerIndex].score >= 20) {
+    if (currentGame.players[winnerIndex].score >= 101) {
         endGame(currentGame, winnerIndex);
         return;
     }
@@ -584,6 +543,109 @@ function processHöherHat(socket, data, player, currentGame) {
         }
         endRound(currentGame, winnerIndex);
         currentGame.opening = "";
+    }
+}
+
+function processNormalRound(socket, data, player, currentGame) {
+    // Normal round
+    if (
+        player.vorhand &&
+        currentGame.opening == "AufDissle" &&
+        player.cards.filter((card) => card.value == "7").length === 5
+    ) {
+        let winnerIndex = currentGame.players.findIndex(
+            (element) => element.socket.id === player.socket.id
+        );
+        endGame(currentGame, winnerIndex);
+    }
+    if (player.melden === true) {
+        processMelden(socket, data, player, currentGame);
+    } else {
+        if (currentGame.players.length === currentGame.order.length) currentGame.playedCards = [];
+        acceptPlayedCard(socket, player, currentGame, data);
+    }
+
+    if (currentGame.order.length === 0) {
+        // If currrent round is over
+        let winnerIndex = decideWinner(currentGame);
+        endRound(currentGame, winnerIndex);
+    }
+}
+
+function processEndRound(socket, data, player, currentGame) {
+    if (player.melden === true) {
+        processMelden(socket, data, player, currentGame);
+    } else {
+        if (currentGame.players.length === currentGame.order.length) currentGame.playedCards = [];
+        if (player === currentGame.players[0]) {
+            acceptPlayedCard(socket, player, currentGame, data);
+        } else {
+            let playerHasColor = false;
+            player.cards.forEach(function (card) {
+                if (card.type === currentGame.players[0].playedCard.type) {
+                    playerHasColor = true;
+                }
+            });
+            if (playerHasColor && data.type !== currentGame.players[0].playedCard.type) {
+                declinePlayedCard(socket, player, currentGame, data);
+            } else {
+                acceptPlayedCard(socket, player, currentGame, data);
+            }
+        }
+    }
+
+    if (currentGame.order.length === 0) {
+        // If currrent round is over
+        let winnerIndex = decideWinnerEndRound(currentGame);
+        endRound(currentGame, winnerIndex);
+    }
+}
+
+function processMelden(socket, data, player, currentGame) {
+    let types = ["Eichel", "Blatt", "Herz", "Schellen"];
+    let playableCards = [];
+    let cardFound = false;
+    types.forEach(function (type) {
+        let sameType = player.cards.filter((card) => card.type == type);
+        if (
+            sameType.length > 1 &&
+            sameType.filter((card) => card.value == "O").length > 0 &&
+            sameType.filter((card) => card.value == "K").length > 0
+        ) {
+            playableCards.push(sameType.filter((card) => card.value == "O"));
+            playableCards.push(sameType.filter((card) => card.value == "K"));
+        }
+    });
+    playableCards.forEach(function (card) {
+        if (card[0].type === data.type && card[0].value === data.value) {
+            cardFound = true;
+        }
+    });
+
+    if (cardFound === true) {
+        if (currentGame.players.length === currentGame.order.length) currentGame.playedCards = [];
+        acceptPlayedCard(socket, player, currentGame, data);
+
+        io.in(currentGame.lobbycode).emit("setInfoType", {
+            type: "hatGemeldet",
+            detail: player.username,
+        });
+
+        player.score += 20;
+        if (player.playedCard.type === currentGame.trumpCard.type) {
+            player.score += 20;
+        }
+
+        if (player.score >= 101) {
+            let winnerIndex = currentGame.players.findIndex(
+                (element) => element.socket.id === player.socket.id
+            );
+            endGame(currentGame, winnerIndex);
+        }
+
+        player.socket.emit("setScore", player.score);
+    } else {
+        declinePlayedCard(socket, player, currentGame, data);
     }
 }
 
