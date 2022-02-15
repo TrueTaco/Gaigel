@@ -15,6 +15,7 @@ import LobbyPage from "./LobbyPage";
 import PlayerList from "./PlayerList";
 import GameInformation from "./GameInformation";
 import Popup from "./Popup";
+import EndPopup from "./EndPopup";
 
 // MARK: Styles
 const useStyles = makeStyles({
@@ -325,7 +326,7 @@ const Gaigel: React.FC<Props> = () => {
         <Box
             className={classes.root}
             style={{
-                backgroundColor: !loggedIn || !gameStarted ? "#313131" : "#7c5439",
+                backgroundColor: !loggedIn || !gameStarted ? "none" : "#7c5439",
                 border: !loggedIn || !gameStarted ? "none" : "10px solid #53362b",
             }}
         >
@@ -359,6 +360,8 @@ const Gaigel: React.FC<Props> = () => {
                             opening={currentOpening}
                         />
                     </Box>
+
+                    {/* <EndPopup /> */}
 
                     {canCall && (
                         <Button

@@ -1,6 +1,7 @@
 import { makeStyles } from "@material-ui/core/styles";
 import { Box, Typography, Button, IconButton } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import Header from "./Header";
 
 const useStyles = makeStyles({
     root: {
@@ -12,6 +13,7 @@ const useStyles = makeStyles({
         flexDirection: "column",
         justifyContent: "center",
         gap: "20px",
+        boxShadow: "5px 5px 15px black",
     },
     control: {
         display: "flex",
@@ -20,7 +22,8 @@ const useStyles = makeStyles({
     },
     playerList: {
         marginBottom: 10,
-        padding: 15,
+        padding: 20,
+        paddingTop: 0,
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
@@ -30,9 +33,17 @@ const useStyles = makeStyles({
         display: "flex",
         justifyContent: "space-between",
     },
+    playerElement: {
+        fontWeight: "lighter",
+    },
     readyInformation: {
         display: "flex",
-        justifyContent: "center",
+        justifyContent: "space-between",
+        alignContent: "center",
+        alignItems: "center",
+    },
+    readyButton: {
+        width: "40%",
     },
 });
 
@@ -59,6 +70,9 @@ const LobbyPage: React.FC<Props> = ({
 
     return (
         <Box className={classes.root}>
+            <Header />
+            <hr />
+
             <Box className={classes.control}>
                 <IconButton onClick={backToLogin}>
                     <ArrowBackIcon />
@@ -67,6 +81,9 @@ const LobbyPage: React.FC<Props> = ({
             </Box>
 
             <Box className={classes.playerList}>
+                <Typography align="center" variant="h6" style={{ fontWeight: "lighter" }}>
+                    Spielerliste
+                </Typography>
                 {playerInformation.map((player) => {
                     let winString;
                     if (player.wins === 1) winString = "Sieg";
@@ -74,22 +91,28 @@ const LobbyPage: React.FC<Props> = ({
                     let key = Math.random();
                     return (
                         <Box className={classes.playerInformation} key={key}>
-                            <Typography>{player.username}</Typography>
-                            <Typography style={{ marginLeft: 10 }}>
+                            <Typography className={classes.playerElement}>
+                                {player.username}
+                            </Typography>
+                            <Typography
+                                className={classes.playerElement}
+                                style={{ marginLeft: 10 }}
+                            >
                                 {player.wins} {winString}
                             </Typography>
                         </Box>
                     );
                 })}
             </Box>
+
             <Box className={classes.readyInformation}>
                 <Typography>
-                    {amountReadyPlayers} / {playerInformation.length} sind bereit
+                    Bereit: {amountReadyPlayers} / {playerInformation.length}
                 </Typography>
+                <Button className={classes.readyButton} variant="contained" onClick={getReady}>
+                    Bereit
+                </Button>
             </Box>
-            <Button variant="contained" onClick={getReady}>
-                Bereit
-            </Button>
         </Box>
     );
 };
