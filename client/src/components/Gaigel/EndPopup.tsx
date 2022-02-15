@@ -1,7 +1,6 @@
 import { makeStyles } from "@material-ui/core/styles";
 import { Box, Typography, Card, Button } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import TrophyIcon from "@material-ui/icons/EmojiEventsOutlined";
 
 const useStyles = makeStyles({
     root: {
@@ -10,7 +9,7 @@ const useStyles = makeStyles({
         top: "50%",
         left: "50%",
         transform: "translate(-50%, -50%)",
-        padding: "20px",
+        padding: 20,
         display: "flex",
         flexDirection: "column",
         gap: "15px",
@@ -26,9 +25,6 @@ const useStyles = makeStyles({
     },
     logo: {
         width: "50px",
-    },
-    winner: {
-        textAlign: "center",
     },
     rankingHeader: {
         textAlign: "center",
@@ -84,7 +80,7 @@ const EndPopup: React.FC<Props> = () => {
         <Card className={classes.root}>
             <Box className={classes.header}>
                 <img src={"/crown.png"} className={classes.logo} />
-                <Typography className={classes.winner} variant="h4">
+                <Typography align="center" variant="h4">
                     {ranking[0].username} hat gewonnen!
                 </Typography>
             </Box>
@@ -113,7 +109,7 @@ const EndPopup: React.FC<Props> = () => {
                     Lobby
                 </Button>
                 <Typography align="right" noWrap={true}>
-                    Nächste Runde in <b>30</b> Sekunden.
+                    Nächste Runde in <b>30</b>
                 </Typography>
             </Box>
         </Card>

@@ -3,6 +3,8 @@ import { makeStyles } from "@material-ui/core/styles";
 
 import { Button, TextField, Box, Typography } from "@material-ui/core";
 
+import Header from "./Header";
+
 const useStyles = makeStyles({
     root: {
         minWidth: "300px",
@@ -14,9 +16,6 @@ const useStyles = makeStyles({
         flexDirection: "column",
         justifyContent: "center",
         gap: "20px",
-    },
-    info: {
-        textAlign: "center",
     },
     textField: {
         backgroundColor: "#ffffff",
@@ -61,14 +60,16 @@ const LandingPage: React.FC<Props> = ({ login }) => {
 
     return (
         <Box className={classes.root}>
-            <Typography className={classes.info}>
-                Tipp: Bei einem bisher nicht verwendeten Lobbycode wird automatisch eine neue Lobby
-                erstellt.
+            <Header />
+            <hr />
+
+            <Typography align="center" variant="h6" style={{ fontWeight: "lighter" }}>
+                Entscheide dich für einen Nutzernamen und tritt einer Lobby bei!
             </Typography>
+
             <TextField
                 className={classes.textField}
                 color="primary"
-                required
                 autoFocus
                 variant="outlined"
                 label="Nutzername"
@@ -78,12 +79,13 @@ const LandingPage: React.FC<Props> = ({ login }) => {
 
             <TextField
                 className={classes.textField}
-                required
                 autoFocus
                 variant="outlined"
                 label="Lobbycode"
                 onChange={handleLobbycodeChange}
                 inputProps={{ maxLength: 10 }}
+                helperText="Tipp: Bei einem bisher nicht verwendeten Lobbycode wird automatisch eine neue Lobby
+                erstellt."
             />
 
             <Button variant="contained" onClick={handleLogin}>
