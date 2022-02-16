@@ -7,17 +7,14 @@ import GaigelCard from "./GaigelCard";
 
 const useStyles = makeStyles({
     root: {
-        color: "white",
         width: 100,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        gap: "10px",
     },
     header: {
-        marginBottom: 10,
-    },
-    footer: {
-        marginTop: 10,
+        fontWeight: "lighter",
     },
 });
 
@@ -38,7 +35,7 @@ const TrumpCard: React.FC<Props> = ({ trumpCard }) => {
         <Grid className={classes.root}>
             <Typography className={classes.header}>Trumpf</Typography>
             <GaigelCard type={trumpCard.type} value={trumpCard.value} clickable={false} />
-            <Typography className={classes.footer}>{emptyChar}</Typography>
+            <Typography>{emptyChar}</Typography>
         </Grid>
     );
 };

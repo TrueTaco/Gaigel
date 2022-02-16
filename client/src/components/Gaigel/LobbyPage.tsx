@@ -3,9 +3,6 @@ import { Box, Typography, Button, IconButton } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import Header from "./Header";
 
-// TODO:
-// TODO:
-
 const useStyles = makeStyles({
     root: {
         maxWidth: "420px",
@@ -74,7 +71,6 @@ const LobbyPage: React.FC<Props> = ({
     return (
         <Box className={classes.root}>
             <Header />
-            <hr />
 
             <Box className={classes.control}>
                 <IconButton onClick={backToLogin}>

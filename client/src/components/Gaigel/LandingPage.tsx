@@ -61,7 +61,6 @@ const LandingPage: React.FC<Props> = ({ login }) => {
     return (
         <Box className={classes.root}>
             <Header />
-            <hr />
 
             <Typography align="center" variant="h6" style={{ fontWeight: "lighter" }}>
                 Entscheide dich für einen Nutzernamen und tritt einer Lobby bei!

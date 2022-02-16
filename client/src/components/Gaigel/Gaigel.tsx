@@ -16,15 +16,14 @@ import PlayerList from "./PlayerList";
 import GameInformation from "./GameInformation";
 import Popup from "./Popup";
 import EndPopup from "./EndPopup";
+import Header from "./Header";
 
 // MARK: Styles
 const useStyles = makeStyles({
     root: {
-        // color: "white",
         height: "100vh",
         paddingLeft: 20,
         paddingRight: 20,
-        // boxShadow: "0 0 0 5px #53362b",
         borderRadius: 20,
         display: "flex",
         flexDirection: "column",
@@ -33,12 +32,6 @@ const useStyles = makeStyles({
         alignItems: "center",
     },
     playingField: {
-        padding: 10,
-        paddingTop: 10,
-        paddingBottom: 20,
-        backgroundColor: "#1E7307",
-        border: "5px solid #185905",
-        // boxShadow: "0 0 0 5px #185905",
         borderRadius: 20,
         display: "flex",
         flexDirection: "column",
@@ -49,13 +42,10 @@ const useStyles = makeStyles({
         justifyContent: "center",
     },
     meldenButton: {
-        backgroundColor: "#575757",
-        border: "5px solid #303030",
         borderRadius: 20,
         display: "flex",
-        color: "white",
         "&:hover": {
-            backgroundColor: "#474747",
+            // backgroundColor: "#474747",
         },
     },
 });
@@ -326,8 +316,9 @@ const Gaigel: React.FC<Props> = () => {
         <Box
             className={classes.root}
             style={{
-                backgroundColor: !loggedIn || !gameStarted ? "none" : "#7c5439",
-                border: !loggedIn || !gameStarted ? "none" : "10px solid #53362b",
+                backgroundColor: !loggedIn || !gameStarted ? "none" : "#fff",
+                // border: !loggedIn || !gameStarted ? "none" : "10px solid #53362b",
+                boxShadow: !loggedIn || !gameStarted ? "none" : "5px 5px 15px black",
             }}
         >
             {!loggedIn ? (
@@ -342,37 +333,32 @@ const Gaigel: React.FC<Props> = () => {
                 />
             ) : (
                 <>
+                    <Header />
                     <GameInformation
                         username={ownUsername}
                         lobbycode={lobbyInformation.lobbycode}
                         score={score}
                     />
                     <PlayerList order={order} playerWithTurn={playerWithTurn} />
-                    <Box className={classes.playingField}>
-                        <Box className={classes.talonAndTrump}>
-                            <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
-                            <TrumpCard trumpCard={trumpCard} />
-                        </Box>
-
-                        <PlayedCards
-                            playedCards={playedCards}
-                            playerCount={lobbyInformation.playerInformation.length}
-                            opening={currentOpening}
-                        />
+                    <Box className={classes.talonAndTrump}>
+                        <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
+                        <TrumpCard trumpCard={trumpCard} />
                     </Box>
+
+                    <PlayedCards
+                        playedCards={playedCards}
+                        playerCount={lobbyInformation.playerInformation.length}
+                        opening={currentOpening}
+                    />
 
                     {/* <EndPopup /> */}
 
                     {canCall && (
                         <Button
                             variant="outlined"
-                            //sx={{ boxShadow: 1 }}
                             className={classes.meldenButton}
                             style={{
-                                border:
-                                    announcing === false
-                                        ? "5px solid #303030"
-                                        : " 5px solid #ffe600",
+                                border: announcing === false ? "none" : " 5px solid #ffe600",
                             }}
                             onClick={Melden}
                         >

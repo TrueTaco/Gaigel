@@ -4,9 +4,6 @@ import { Box, ButtonGroup, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles({
     root: {
-        padding: 10,
-        backgroundColor: "#575757",
-        border: "5px solid #303030",
         borderRadius: 20,
         display: "flex",
         flexDirection: "column",
@@ -17,9 +14,8 @@ const useStyles = makeStyles({
         gap: "10px",
     },
     header: {
-        marginBottom: 10,
         textAlign: "center",
-        color: "white",
+        fontWeight: "lighter",
     },
     buttongroup: {
         display: "flex",
