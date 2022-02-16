@@ -4,11 +4,11 @@ import { Grid, Paper, CardActionArea, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles({
     root: {
-        color: "white",
         width: 100,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        gap: "10px",
     },
     cardActionArea: {
         height: "100%",
@@ -23,10 +23,10 @@ const useStyles = makeStyles({
         alignItems: "center",
     },
     counter: {
-        marginTop: 10,
+        fontWeight: "lighter",
     },
     header: {
-        marginBottom: 10,
+        fontWeight: "lighter",
     },
 });
 

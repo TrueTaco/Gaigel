@@ -7,7 +7,6 @@ import Header from "./Header";
 
 const useStyles = makeStyles({
     root: {
-        minWidth: "300px",
         maxWidth: "420px",
         padding: 15,
         borderRadius: 10,
@@ -62,7 +61,6 @@ const LandingPage: React.FC<Props> = ({ login }) => {
     return (
         <Box className={classes.root}>
             <Header />
-            <hr />
 
             <Typography align="center" variant="h6" style={{ fontWeight: "lighter" }}>
                 Entscheide dich für einen Nutzernamen und tritt einer Lobby bei!

@@ -10,10 +10,10 @@ const useStyles = makeStyles({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        color: "white",
+        gap: "10px",
     },
     header: {
-        marginBottom: 10,
+        fontWeight: "lighter",
     },
 });
 
