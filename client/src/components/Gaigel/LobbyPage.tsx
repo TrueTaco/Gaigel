@@ -3,9 +3,12 @@ import { Box, Typography, Button, IconButton } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import Header from "./Header";
 
+// TODO:
+// TODO:
+
 const useStyles = makeStyles({
     root: {
-        minWidth: "300px",
+        maxWidth: "420px",
         padding: 15,
         borderRadius: 10,
         backgroundColor: "#ffffff",

@@ -3,6 +3,8 @@ import { Box, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles({
     root: {
+        marginLeft: 150,
+        marginRight: 150,
         display: "flex",
         justifyContent: "center",
         alignContent: "center",

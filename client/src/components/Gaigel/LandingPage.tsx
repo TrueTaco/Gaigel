@@ -7,7 +7,6 @@ import Header from "./Header";
 
 const useStyles = makeStyles({
     root: {
-        minWidth: "300px",
         maxWidth: "420px",
         padding: 15,
         borderRadius: 10,
