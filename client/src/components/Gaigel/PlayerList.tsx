@@ -3,6 +3,7 @@ import { Box, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles({
     root: {
+        maxWidth: "10%",
         borderRadius: 20,
         display: "flex",
         justifyContent: "space-between",
@@ -31,13 +32,16 @@ const PlayerList: React.FC<Props> = ({ order, playerWithTurn }) => {
             {order.map((name) => {
                 let turn = name === playerWithTurn;
                 return (
-                    <Typography
-                        className={classes.name}
-                        style={{ border: turn ? "2px solid #ffe600" : "none" }}
-                        key={name}
-                    >
-                        {name}
-                    </Typography>
+                    <>
+                        <Typography
+                            className={classes.name}
+                            style={{ border: turn ? "2px solid #ffe600" : "none" }}
+                            key={name}
+                        >
+                            {name}
+                        </Typography>
+                        <Typography>›</Typography>
+                    </>
                 );
             })}
         </Box>

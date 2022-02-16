@@ -22,6 +22,7 @@ import Header from "./Header";
 const useStyles = makeStyles({
     root: {
         height: "100vh",
+        padding: 10,
         paddingLeft: 20,
         paddingRight: 20,
         borderRadius: 20,
@@ -31,19 +32,11 @@ const useStyles = makeStyles({
         alignContent: "space-around",
         alignItems: "center",
     },
-    playingField: {
-        borderRadius: 20,
-        display: "flex",
-        flexDirection: "column",
-        gap: "10px",
-    },
     talonAndTrump: {
         display: "flex",
         justifyContent: "center",
     },
     meldenButton: {
-        borderRadius: 20,
-        display: "flex",
         "&:hover": {
             // backgroundColor: "#474747",
         },
@@ -340,6 +333,7 @@ const Gaigel: React.FC<Props> = () => {
                         score={score}
                     />
                     <PlayerList order={order} playerWithTurn={playerWithTurn} />
+                    <hr style={{ width: "100%" }} />
                     <Box className={classes.talonAndTrump}>
                         <Talon cardsLeft={talonCards.length} drawCard={drawCard} />
                         <TrumpCard trumpCard={trumpCard} />
@@ -350,6 +344,8 @@ const Gaigel: React.FC<Props> = () => {
                         playerCount={lobbyInformation.playerInformation.length}
                         opening={currentOpening}
                     />
+
+                    <hr style={{ width: "100%" }} />
 
                     {/* <EndPopup /> */}
 
