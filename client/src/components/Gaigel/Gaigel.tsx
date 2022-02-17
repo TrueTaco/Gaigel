@@ -17,6 +17,7 @@ import GameInformation from "./GameInformation";
 import Popup from "./Popup";
 import EndPopup from "./EndPopup";
 import Header from "./Header";
+import Actions from "./Actions";
 
 // MARK: Styles
 const useStyles = makeStyles({
@@ -35,11 +36,6 @@ const useStyles = makeStyles({
     talonAndTrump: {
         display: "flex",
         justifyContent: "center",
-    },
-    meldenButton: {
-        "&:hover": {
-            // backgroundColor: "#474747",
-        },
     },
 });
 
@@ -88,7 +84,13 @@ const Gaigel: React.FC<Props> = () => {
 
     const [socket, setSocket] = useState(null);
 
+    // Determines if the player can call (Melden)
+    const [canCall, setCanCall] = useState<boolean>(false);
+
     const [announcing, setAnnouncing] = useState<boolean>(false);
+
+    // Determines if the player can steal (Rauben)
+    const [canSteal, setCanSteal] = useState<boolean>(false);
 
     // The cards that can still be drawn from the talon
     const [talonCards, setTalonCards] = useState<CardProps[]>(
@@ -100,9 +102,6 @@ const Gaigel: React.FC<Props> = () => {
 
     // The cards that are currently being played
     const [playedCards, setPlayedCards] = useState<CardProps[]>([]);
-
-    // Determines if the player can call (melden)
-    const [canCall, setCanCall] = useState<boolean>(true);
 
     // The cards that the user currently has
     const [yourCards, setYourCards] = useState<CardProps[]>(
@@ -203,7 +202,7 @@ const Gaigel: React.FC<Props> = () => {
         socket.emit("chooseOpening", "AufDissle");
     };
 
-    const Melden = () => {
+    const melden = () => {
         if (ownUsername === playerWithTurn) {
             // @ts-ignore
             socket.emit("Melden", !announcing);
@@ -212,6 +211,8 @@ const Gaigel: React.FC<Props> = () => {
             setWarningType({ type: "meldenNotCurrentlyPlaying", detail: "" });
         }
     };
+
+    const rauben = () => {};
 
     // MARK: useEffect
     useEffect(() => {
@@ -349,18 +350,16 @@ const Gaigel: React.FC<Props> = () => {
 
                     {/* <EndPopup /> */}
 
-                    {canCall && (
-                        <Button
-                            variant="outlined"
-                            className={classes.meldenButton}
-                            style={{
-                                border: announcing === false ? "none" : " 5px solid #ffe600",
-                            }}
-                            onClick={Melden}
-                        >
-                            Melden
-                        </Button>
+                    {(canCall || canSteal) && (
+                        <Actions
+                            canCall={canCall}
+                            announcing={announcing}
+                            melden={melden}
+                            canSteal={canSteal}
+                            rauben={rauben}
+                        />
                     )}
+
                     {opening && (
                         <Opening
                             AndereAlteHat={AndereAlteHat}
@@ -369,6 +368,7 @@ const Gaigel: React.FC<Props> = () => {
                             AufDissle={AufDissle}
                         ></Opening>
                     )}
+
                     <YourCards userCards={yourCards} playCard={playCard} />
                 </>
             )}
