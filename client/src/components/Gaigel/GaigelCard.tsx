@@ -6,6 +6,7 @@ const useStyles = makeStyles({
     root: {
         width: 40,
         height: 60,
+        backgroundColor: "#f7f7f7",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -14,6 +15,22 @@ const useStyles = makeStyles({
         height: "100%",
         width: "100%",
         display: "flex",
+    },
+    card: {
+        height: "100%",
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-evenly",
+        alignContent: "center",
+        alignItems: "center",
+    },
+    symbolRow: {
+        width: "85%",
+        display: "flex",
+        justifyContent: "space-between",
+        alignContent: "center",
+        alignItems: "center",
     },
     cardIcons: {
         flex: 1,
@@ -64,14 +81,36 @@ const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard, hidden 
                     />
                 ) : (
                     value !== "" && (
-                        <Box>
-                            <img src={symbolMap[type]} width={iconSize} height={iconSize} alt="" />
-                            <img src={"/Blank.jpg"} width={"15"} height={iconSize} alt="" />
-                            <img src={symbolMap[type]} width={iconSize} height={iconSize} alt="" />
+                        <Box className={classes.card}>
+                            <Box className={classes.symbolRow}>
+                                <img
+                                    src={symbolMap[type]}
+                                    width={iconSize}
+                                    height={iconSize}
+                                    alt=""
+                                />
+                                <img
+                                    src={symbolMap[type]}
+                                    width={iconSize}
+                                    height={iconSize}
+                                    alt=""
+                                />
+                            </Box>
                             <Typography align="center">{value}</Typography>
-                            <img src={symbolMap[type]} width={iconSize} height={iconSize} alt="" />
-                            <img src={"/Blank.jpg"} width={"15"} height={iconSize} alt="" />
-                            <img src={symbolMap[type]} width={iconSize} height={iconSize} alt="" />
+                            <Box className={classes.symbolRow}>
+                                <img
+                                    src={symbolMap[type]}
+                                    width={iconSize}
+                                    height={iconSize}
+                                    alt=""
+                                />
+                                <img
+                                    src={symbolMap[type]}
+                                    width={iconSize}
+                                    height={iconSize}
+                                    alt=""
+                                />
+                            </Box>
                         </Box>
                     )
                 )}
