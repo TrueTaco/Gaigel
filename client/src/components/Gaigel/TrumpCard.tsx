@@ -11,7 +11,7 @@ const useStyles = makeStyles({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: "10px",
+        gap: "5px",
     },
     header: {
         fontWeight: "lighter",
@@ -35,7 +35,7 @@ const TrumpCard: React.FC<Props> = ({ trumpCard }) => {
         <Grid className={classes.root}>
             <Typography className={classes.header}>Trumpf</Typography>
             <GaigelCard type={trumpCard.type} value={trumpCard.value} clickable={false} />
-            <Typography>{emptyChar}</Typography>
+            <Typography variant="subtitle2">{emptyChar}</Typography>
         </Grid>
     );
 };

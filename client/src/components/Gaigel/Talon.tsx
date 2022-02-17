@@ -8,7 +8,7 @@ const useStyles = makeStyles({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: "10px",
+        gap: "5px",
     },
     cardActionArea: {
         height: "100%",
@@ -48,10 +48,17 @@ const Talon: React.FC<Props> = ({ cardsLeft, drawCard }) => {
                         drawCard(1);
                     }}
                 >
-                    <img src={"/cardBacksite_02.png"} width={"40"} height={"60"} alt="" />
+                    <img
+                        src={"/cardBacksite_noSpaceAround.png"}
+                        width={"40"}
+                        height={"60"}
+                        alt=""
+                    />
                 </CardActionArea>
             </Paper>
-            <Typography className={classes.counter}>Karten: {cardsLeft}</Typography>
+            <Typography variant="subtitle2" className={classes.counter}>
+                Karten: {cardsLeft}
+            </Typography>
         </Grid>
     );
 };

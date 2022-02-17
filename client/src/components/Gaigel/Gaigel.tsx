@@ -309,7 +309,7 @@ const Gaigel: React.FC<Props> = () => {
         <Box
             className={classes.root}
             style={{
-                backgroundColor: !loggedIn || !gameStarted ? "none" : "#fff",
+                backgroundColor: !loggedIn || !gameStarted ? "none" : "#ffffff",
                 // border: !loggedIn || !gameStarted ? "none" : "10px solid #53362b",
                 boxShadow: !loggedIn || !gameStarted ? "none" : "5px 5px 15px black",
             }}

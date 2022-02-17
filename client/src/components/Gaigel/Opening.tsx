@@ -11,7 +11,7 @@ const useStyles = makeStyles({
         alignContent: "center",
         alignItems: "center",
         flex: "flex-grow",
-        gap: "10px",
+        gap: "5px",
     },
     header: {
         textAlign: "center",
