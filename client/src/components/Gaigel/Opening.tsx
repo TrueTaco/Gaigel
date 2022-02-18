@@ -1,13 +1,14 @@
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import { Box, ButtonGroup, Typography } from "@material-ui/core";
+import { Box, IconButton, Typography } from "@material-ui/core";
+import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
 
 const useStyles = makeStyles({
     root: {
         borderRadius: 20,
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-around",
+        justifyContent: "space-evenly",
         alignContent: "center",
         alignItems: "center",
         flex: "flex-grow",
@@ -16,6 +17,16 @@ const useStyles = makeStyles({
     header: {
         textAlign: "center",
         fontWeight: "lighter",
+    },
+    headerBox: {
+        display: "flex",
+        justifyContent: "flex-start",
+        flexDirection: "row",
+        gap: "30px",
+        alignItems: "center",
+    },
+    instructions: {
+        position: "fixed",
     },
     buttonContainer: {
         display: "flex",
@@ -34,9 +45,18 @@ interface Props {
     AndereAlteHat: () => void;
     HöherHat: () => void;
     AufDissle: () => void;
+    handleClick: () => void;
+    hover: boolean;
 }
 
-const Opening: React.FC<Props> = ({ GeElfen, AndereAlteHat, HöherHat, AufDissle }) => {
+const Opening: React.FC<Props> = ({
+    GeElfen,
+    AndereAlteHat,
+    HöherHat,
+    AufDissle,
+    handleClick,
+    hover,
+}) => {
     const classes = useStyles();
 
     const handleAndereAlteHat = () => {
@@ -57,7 +77,14 @@ const Opening: React.FC<Props> = ({ GeElfen, AndereAlteHat, HöherHat, AufDissle
 
     return (
         <Box className={classes.root}>
-            <Typography className={classes.header}> Eröffnung</Typography>
+            <Box className={classes.headerBox}>
+                <HelpOutlineIcon style={{ opacity: "0", width: "50px" }} color="action" />
+                <Typography className={classes.header}> Eröffnung</Typography>
+                <IconButton>
+                    <HelpOutlineIcon onClick={handleClick} color="action" />
+                </IconButton>
+            </Box>
+
             <Box className={classes.buttonContainer}>
                 <Button
                     className={classes.button}

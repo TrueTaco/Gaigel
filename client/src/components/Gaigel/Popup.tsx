@@ -70,6 +70,9 @@ const Popup: React.FC<Props> = ({ snackbarType, type, detail, reset }) => {
         case "hatGemeldet":
             message = `${detail} hat gemeldet.`;
             break;
+        case "hasToServe":
+            message = `Sie müssen eine Karte in der selben Farbe spielen.`;
+            break;
         default:
             break;
     }

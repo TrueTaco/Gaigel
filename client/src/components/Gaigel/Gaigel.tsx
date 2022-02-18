@@ -9,7 +9,7 @@ import Talon from "./Talon";
 import TrumpCard from "./TrumpCard";
 import PlayedCards from "./PlayedCards";
 import YourCards from "./YourCards";
-import { Box, Button } from "@material-ui/core";
+import { Box, Button, Typography } from "@material-ui/core";
 import Opening from "./Opening";
 import LobbyPage from "./LobbyPage";
 import PlayerList from "./PlayerList";
@@ -18,6 +18,7 @@ import Popup from "./Popup";
 import EndPopup from "./EndPopup";
 import Header from "./Header";
 import Actions from "./Actions";
+import OpeningInstructions from "./OpeningInstructions";
 
 // MARK: Styles
 const useStyles = makeStyles({
@@ -33,6 +34,7 @@ const useStyles = makeStyles({
         alignContent: "space-around",
         alignItems: "center",
     },
+    openingInstructions: {},
     talonAndTrump: {
         display: "flex",
         justifyContent: "center",
@@ -110,6 +112,12 @@ const Gaigel: React.FC<Props> = () => {
 
     const [warningType, setWarningType] = useState<warningInfoProps>({ type: "", detail: "" });
     const [infoType, setInfoType] = useState<warningInfoProps>({ type: "", detail: "" });
+
+    const [clickedOpening, setClickedOpening] = useState<boolean>(false);
+
+    const onClickOpening = () => {
+        setClickedOpening(!clickedOpening);
+    };
 
     const resetWarning = (event?: React.SyntheticEvent | Event, reason?: string) => {
         if (reason === "clickaway") {
@@ -348,7 +356,7 @@ const Gaigel: React.FC<Props> = () => {
 
                     <hr style={{ width: "100%" }} />
 
-                    {/* <EndPopup /> */}
+                    {clickedOpening && <OpeningInstructions />}
 
                     {(canCall || canSteal) && (
                         <Actions
@@ -366,13 +374,14 @@ const Gaigel: React.FC<Props> = () => {
                             GeElfen={GeElfen}
                             HöherHat={HöherHat}
                             AufDissle={AufDissle}
+                            handleClick={onClickOpening}
+                            hover={clickedOpening}
                         ></Opening>
                     )}
 
                     <YourCards userCards={yourCards} playCard={playCard} />
                 </>
             )}
-
             <Popup
                 snackbarType="info"
                 type={infoType.type}
