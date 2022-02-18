@@ -6,8 +6,16 @@ const useStyles = makeStyles({
         width: "100%",
         display: "flex",
         justifyContent: "space-between",
+        alignContent: "center",
+        alignItems: "center",
         gap: "10px",
-        color: "white",
+    },
+    element: {
+        fontWeight: "lighter",
+        width: "50%",
+    },
+    score: {
+        fontWeight: "lighter",
     },
 });
 
@@ -22,9 +30,15 @@ const GameInformation: React.FC<Props> = ({ username, lobbycode, score }) => {
 
     return (
         <Box className={classes.root}>
-            <Typography>{username}</Typography>
-            <Typography>{score}</Typography>
-            <Typography>{lobbycode}</Typography>
+            <Typography variant="subtitle2" className={classes.element}>
+                {username}
+            </Typography>
+            <Typography variant="h6" className={classes.score}>
+                {/* {score} */} 40
+            </Typography>
+            <Typography variant="subtitle2" className={classes.element} align="right">
+                {lobbycode}
+            </Typography>
         </Box>
     );
 };

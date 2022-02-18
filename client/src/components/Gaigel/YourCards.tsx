@@ -6,17 +6,14 @@ import GaigelCard from "./GaigelCard";
 
 const useStyles = makeStyles({
     root: {
-        padding: 10,
-        backgroundColor: "#575757",
-        border: "5px solid #303030",
         borderRadius: 20,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        gap: "5px",
     },
     header: {
-        marginBottom: 10,
-        color: "white",
+        fontWeight: "lighter",
     },
 });
 

@@ -4,9 +4,6 @@ import { Box, ButtonGroup, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles({
     root: {
-        padding: 10,
-        backgroundColor: "#575757",
-        border: "5px solid #303030",
         borderRadius: 20,
         display: "flex",
         flexDirection: "column",
@@ -14,24 +11,21 @@ const useStyles = makeStyles({
         alignContent: "center",
         alignItems: "center",
         flex: "flex-grow",
-        gap: "10px",
+        gap: "5px",
     },
     header: {
-        marginBottom: 10,
         textAlign: "center",
-        color: "white",
+        fontWeight: "lighter",
     },
-    buttongroup: {
+    buttonContainer: {
         display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-around",
+        justifyContent: "center",
         alignContent: "center",
         alignItems: "center",
-        flex: "flex-grow",
+        gap: "5px",
     },
     button: {
-        paddingLeft: 15,
-        paddingRight: 15,
+        fontSize: 10,
     },
 });
 
@@ -64,33 +58,40 @@ const Opening: React.FC<Props> = ({ GeElfen, AndereAlteHat, HöherHat, AufDissle
     return (
         <Box className={classes.root}>
             <Typography className={classes.header}> Eröffnung</Typography>
-            <Box className={classes.buttongroup}>
-                <ButtonGroup orientation="vertical">
-                    <Button variant="contained" size="small" onClick={handleAndereAlteHat}>
-                        Andere Alte
-                    </Button>
-                    <Button variant="contained" size="small" onClick={handleGeElfen}>
-                        Ge-Elfen
-                    </Button>
-                </ButtonGroup>
-                <ButtonGroup orientation="vertical">
-                    <Button
-                        className={classes.button}
-                        variant="contained"
-                        size="small"
-                        onClick={handleHöherHat}
-                    >
-                        Höher hat
-                    </Button>
-                    <Button
-                        className={classes.button}
-                        variant="contained"
-                        size="small"
-                        onClick={handleAufDissle}
-                    >
-                        Auf Dissle
-                    </Button>
-                </ButtonGroup>
+            <Box className={classes.buttonContainer}>
+                <Button
+                    className={classes.button}
+                    variant="contained"
+                    size="small"
+                    onClick={handleAndereAlteHat}
+                >
+                    Andere Alte
+                </Button>
+                <Button
+                    className={classes.button}
+                    variant="contained"
+                    size="small"
+                    onClick={handleGeElfen}
+                >
+                    Ge-Elfen
+                </Button>
+
+                <Button
+                    className={classes.button}
+                    variant="contained"
+                    size="small"
+                    onClick={handleHöherHat}
+                >
+                    Höher hat
+                </Button>
+                <Button
+                    className={classes.button}
+                    variant="contained"
+                    size="small"
+                    onClick={handleAufDissle}
+                >
+                    Auf Dissle
+                </Button>
             </Box>
         </Box>
     );

@@ -4,11 +4,11 @@ import { Grid, Paper, CardActionArea, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles({
     root: {
-        color: "white",
         width: 100,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        gap: "5px",
     },
     cardActionArea: {
         height: "100%",
@@ -23,10 +23,10 @@ const useStyles = makeStyles({
         alignItems: "center",
     },
     counter: {
-        marginTop: 10,
+        fontWeight: "lighter",
     },
     header: {
-        marginBottom: 10,
+        fontWeight: "lighter",
     },
 });
 
@@ -48,10 +48,17 @@ const Talon: React.FC<Props> = ({ cardsLeft, drawCard }) => {
                         drawCard(1);
                     }}
                 >
-                    <img src={"/cardBacksite_02.png"} width={"40"} height={"60"} alt="" />
+                    <img
+                        src={"/cardBacksite_noSpaceAround.png"}
+                        width={"40"}
+                        height={"60"}
+                        alt=""
+                    />
                 </CardActionArea>
             </Paper>
-            <Typography className={classes.counter}>Karten: {cardsLeft}</Typography>
+            <Typography variant="subtitle2" className={classes.counter}>
+                Karten: {cardsLeft}
+            </Typography>
         </Grid>
     );
 };
