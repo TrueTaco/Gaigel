@@ -48,9 +48,25 @@ interface CardProps {
     value: string;
 }
 
-interface warningInfoProps {
+interface LobbyInformation {
+    lobbycode: string;
+    amountReadyPlayers: number;
+    playerInformation: [
+        {
+            username: string;
+            wins: number;
+        }
+    ];
+}
+
+interface WarningInfoProps {
     type: string;
     detail: string;
+}
+
+interface EndPlayerInformation {
+    username: string;
+    score: number;
 }
 
 const Gaigel: React.FC<Props> = () => {
@@ -68,10 +84,10 @@ const Gaigel: React.FC<Props> = () => {
     const [score, setScore] = useState<number>(0);
 
     // All needed information about the joined lobby
-    const [lobbyInformation, setLobbyInformation] = useState<any>({
+    const [lobbyInformation, setLobbyInformation] = useState<LobbyInformation>({
         lobbycode: "",
         amountReadyPlayers: 0,
-        playerInformation: [],
+        playerInformation: [{ username: "", wins: 0 }],
     });
 
     const [order, setOrder] = useState<string[]>([]);
@@ -94,6 +110,12 @@ const Gaigel: React.FC<Props> = () => {
     // Determines if the player can steal (Rauben)
     const [canSteal, setCanSteal] = useState<boolean>(false);
 
+    const [showEndPopup, setShowEndPopup] = useState<boolean>(false);
+
+    const [endInformation, setEndInformation] = useState<EndPlayerInformation[]>([
+        { username: "", score: 0 },
+    ]);
+
     // The cards that can still be drawn from the talon
     const [talonCards, setTalonCards] = useState<CardProps[]>(
         new Array(0).fill({ type: "", value: "" })
@@ -110,8 +132,8 @@ const Gaigel: React.FC<Props> = () => {
         new Array(5).fill({ type: "", value: "" })
     );
 
-    const [warningType, setWarningType] = useState<warningInfoProps>({ type: "", detail: "" });
-    const [infoType, setInfoType] = useState<warningInfoProps>({ type: "", detail: "" });
+    const [warningType, setWarningType] = useState<WarningInfoProps>({ type: "", detail: "" });
+    const [infoType, setInfoType] = useState<WarningInfoProps>({ type: "", detail: "" });
 
     const [clickedOpening, setClickedOpening] = useState<boolean>(false);
 
@@ -243,27 +265,27 @@ const Gaigel: React.FC<Props> = () => {
             setLoggedIn(data);
         });
 
-        newSocket.on("lobbyInformation", (data: any) => {
+        newSocket.on("lobbyInformation", (data: LobbyInformation) => {
             setLobbyInformation(data);
         });
 
-        newSocket.on("setOrder", (data: any) => {
+        newSocket.on("setOrder", (data: string[]) => {
             setOrder(data);
         });
 
-        newSocket.on("setPlayerWithTurn", (data: any) => {
+        newSocket.on("setPlayerWithTurn", (data: string) => {
             setPlayerWithTurn(data);
         });
 
-        newSocket.on("setInfoType", (data: any) => {
+        newSocket.on("setInfoType", (data: WarningInfoProps) => {
             setInfoType(data);
         });
 
-        newSocket.on("setWarningType", (data: any) => {
+        newSocket.on("setWarningType", (data: WarningInfoProps) => {
             setWarningType(data);
         });
 
-        newSocket.on("setScore", (data: any) => {
+        newSocket.on("setScore", (data: number) => {
             setScore(data);
         });
 
@@ -272,41 +294,40 @@ const Gaigel: React.FC<Props> = () => {
             console.log("Game state: " + data);
         });
 
-        newSocket.on("setTalon", (data: any) => {
+        newSocket.on("setTalon", (data: CardProps[]) => {
             setTalonCards(data);
         });
 
-        newSocket.on("setTrumpCard", (data: any) => {
+        newSocket.on("setTrumpCard", (data: CardProps) => {
             setTrumpCard(data);
         });
 
-        newSocket.on("setYourCards", (data: any) => {
+        newSocket.on("setYourCards", (data: CardProps[]) => {
             setYourCards(data);
         });
 
-        newSocket.on("setPlayedCards", (data: any) => {
+        newSocket.on("setPlayedCards", (data: CardProps[]) => {
             setPlayedCards(data);
         });
 
-        newSocket.on("openOpening", (data: any) => {
-            setOpening(true);
+        newSocket.on("setOpening", (data: boolean) => {
+            setOpening(data);
         });
 
-        newSocket.on("closeOpening", (data: any) => {
-            setOpening(false);
-        });
-
-        newSocket.on("setOpening", (data: any) => {
+        newSocket.on("setCurrentOpening", (data: string) => {
             setCurrentOpening(data);
         });
 
-        newSocket.on("canCall", (data: any) => {
+        newSocket.on("canCall", (data: boolean) => {
             setCanCall(data);
         });
 
-        newSocket.on("template", (data: string) => {
-            // DO NOT use states (in most cases)
-            // DO use "data"
+        newSocket.on("setShowEndPopup", (data: boolean) => {
+            setShowEndPopup(data);
+        });
+
+        newSocket.on("setEndInformation", (data: EndPlayerInformation[]) => {
+            setEndInformation(data);
         });
 
         return () => newSocket.close();
@@ -358,6 +379,8 @@ const Gaigel: React.FC<Props> = () => {
 
                     {clickedOpening && <OpeningInstructions />}
 
+                    {showEndPopup && <EndPopup endInformation={endInformation} />}
+
                     {(canCall || canSteal) && (
                         <Actions
                             canCall={canCall}
@@ -376,7 +399,7 @@ const Gaigel: React.FC<Props> = () => {
                             AufDissle={AufDissle}
                             handleClick={onClickOpening}
                             hover={clickedOpening}
-                        ></Opening>
+                        />
                     )}
 
                     <YourCards userCards={yourCards} playCard={playCard} />
