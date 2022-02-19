@@ -120,8 +120,8 @@ io.on("connection", (socket) => {
 
         currentGame.opening = data;
         console.log(data);
-        io.to(socket.id).emit("closeOpening", "");
-        io.to(currentGame.lobbycode).emit("setOpening", data);
+        io.to(socket.id).emit("setOpening", false);
+        io.to(currentGame.lobbycode).emit("setCurrentOpening", data);
         // Set GameOpening
     });
 
@@ -194,10 +194,12 @@ function decideWinnerEndRound(currentGame) {
 // Function for ending a game in case somebody won
 function endGame(currentGame, winnerIndex) {
     let winner = currentGame.players[winnerIndex];
-    io.in(currentGame.lobbycode).emit("setInfoType", {
-        type: "somebodyWonTheGame",
-        detail: winner.username,
-    });
+    // io.in(currentGame.lobbycode).emit("setInfoType", {
+    //     type: "somebodyWonTheGame",
+    //     detail: winner.username,
+    // });
+
+    io.in(currentGame.lobbycode).emit("setShowEndPopup", true);
 
     winner.wins++;
 
@@ -300,7 +302,7 @@ function tryToStartGame(lobbycode) {
 
     io.in(lobbycode).emit("setTalon", currentGame.talon);
 
-    io.to(currentGame.players[0].socket.id).emit("openOpening", "");
+    io.to(currentGame.players[0].socket.id).emit("setOpening", true);
 
     io.in(lobbycode).emit("setGameStarted", true);
     console.log(`Started a game for lobbycode ${lobbycode}`);
@@ -408,14 +410,14 @@ function endRound(currentGame, winnerIndex) {
         player.socket.emit("setScore", player.score);
     });
 
-    if (currentGame.players[winnerIndex].score >= 101) {
+    if (currentGame.players[winnerIndex].score >= 21) {
         endGame(currentGame, winnerIndex);
         return;
     }
 
     if (currentGame.opening !== "AufDissle") {
         currentGame.opening = "";
-        io.in(currentGame.lobbycode).emit("setOpening", "");
+        io.in(currentGame.lobbycode).emit("setCurrentOpening", "");
     }
 
     console.log(currentGame.players[winnerIndex].username + " won");
@@ -642,7 +644,7 @@ function processMelden(socket, data, player, currentGame) {
             player.score += 20;
         }
 
-        if (player.score >= 101) {
+        if (player.score >= 21) {
             let winnerIndex = currentGame.players.findIndex(
                 (element) => element.socket.id === player.socket.id
             );
