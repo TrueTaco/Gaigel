@@ -194,18 +194,27 @@ function decideWinnerEndRound(currentGame) {
 // Function for ending a game in case somebody won
 function endGame(currentGame, winnerIndex) {
     let winner = currentGame.players[winnerIndex];
-    // io.in(currentGame.lobbycode).emit("setInfoType", {
-    //     type: "somebodyWonTheGame",
-    //     detail: winner.username,
-    // });
-
-    io.in(currentGame.lobbycode).emit("setShowEndPopup", true);
-
     winner.wins++;
 
+    let endInformation = currentGame.players
+        .map((player) => {
+            return { username: player.username, score: player.score };
+        })
+        .sort((player1, player2) => {
+            if (player1.score < player2.score) return 1;
+            if (player1.score > player2.score) return -1;
+            return 0;
+        });
+
+    console.log(endInformation);
+
+    io.in(currentGame.lobbycode).emit("setEndInformation", endInformation);
+    io.in(currentGame.lobbycode).emit("setShowEndPopup", true);
+
     setTimeout(() => {
-        resetGame(currentGame);
-    }, 10000);
+        // TODO: Dont reset game, but restart it
+        if (currentGame.players.length > 0) resetGame(currentGame);
+    }, 20000);
 }
 
 // Function for closing a game in case a player disconnects

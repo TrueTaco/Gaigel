@@ -64,10 +64,9 @@ interface WarningInfoProps {
     detail: string;
 }
 
-// TODO: Game nochmal testen wegen der ganzen Refactors
-// TODO: Das hier zu Ende machen
-interface EndInformation {
-    winnerUsername: string;
+interface EndPlayerInformation {
+    username: string;
+    score: number;
 }
 
 const Gaigel: React.FC<Props> = () => {
@@ -113,7 +112,9 @@ const Gaigel: React.FC<Props> = () => {
 
     const [showEndPopup, setShowEndPopup] = useState<boolean>(false);
 
-    const [endInformation, setEndInformation] = useState<any>();
+    const [endInformation, setEndInformation] = useState<EndPlayerInformation[]>([
+        { username: "", score: 0 },
+    ]);
 
     // The cards that can still be drawn from the talon
     const [talonCards, setTalonCards] = useState<CardProps[]>(
@@ -325,6 +326,10 @@ const Gaigel: React.FC<Props> = () => {
             setShowEndPopup(data);
         });
 
+        newSocket.on("setEndInformation", (data: EndPlayerInformation[]) => {
+            setEndInformation(data);
+        });
+
         return () => newSocket.close();
     }, [setSocket]);
 
@@ -374,7 +379,7 @@ const Gaigel: React.FC<Props> = () => {
 
                     {clickedOpening && <OpeningInstructions />}
 
-                    {showEndPopup && <EndPopup />}
+                    {showEndPopup && <EndPopup endInformation={endInformation} />}
 
                     {(canCall || canSteal) && (
                         <Actions
