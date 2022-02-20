@@ -709,17 +709,17 @@ function createTalon() {
 
     // TODO: Remove this manual instantiation
     newTalon = [
-        // {
-        //     type: "Eichel",
-        //     value: "A",
-        // },
-        // {
-        //     type: "Herz",
-        //     value: "10",
-        // },
         {
             type: "Herz",
-            value: "7",
+            value: "K",
+        },
+        {
+            type: "Eichel",
+            value: "A",
+        },
+        {
+            type: "Herz",
+            value: "A",
         },
         {
             type: "Herz",
@@ -729,10 +729,10 @@ function createTalon() {
             type: "Herz",
             value: "O",
         },
-        // {
-        //     type: "Herz",
-        //     value: "10",
-        // },
+        {
+            type: "Herz",
+            value: "U",
+        },
     ];
 
     return newTalon;
@@ -752,7 +752,7 @@ function fisherYatesShuffle(arr) {
 function chooseTrumpCard(lobbycode) {
     let currentGame = games.find((element) => element.lobbycode === lobbycode);
 
-    let newTrumpCard = currentGame.talon.splice(0, 1)[0];
+    let newTrumpCard = currentGame.talon.slice(0)[0];
 
     return newTrumpCard;
 }
