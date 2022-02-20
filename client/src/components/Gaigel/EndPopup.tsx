@@ -60,9 +60,10 @@ interface EndPlayerInformation {
 
 interface Props {
     endInformation: EndPlayerInformation[];
+    backToLobby: () => void;
 }
 
-const EndPopup: React.FC<Props> = ({ endInformation }) => {
+const EndPopup: React.FC<Props> = ({ endInformation, backToLobby }) => {
     const classes = useStyles();
 
     const [counter, setCounter] = useState<number>(20);
@@ -111,7 +112,7 @@ const EndPopup: React.FC<Props> = ({ endInformation }) => {
             </Box>
 
             <Box className={classes.footer}>
-                <Button startIcon={<ArrowBackIcon />} variant="contained">
+                <Button startIcon={<ArrowBackIcon />} variant="contained" onClick={backToLobby}>
                     Lobby
                 </Button>
                 <Typography align="right" noWrap={true}>
