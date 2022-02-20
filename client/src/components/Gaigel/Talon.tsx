@@ -49,7 +49,7 @@ const Talon: React.FC<Props> = ({ cardsLeft, drawCard }) => {
                     }}
                 >
                     <img
-                        src={"/cardBacksite_noSpaceAround.png"}
+                        src={"/cardBacksite_noSpaceAround_n1.png"}
                         width={"40"}
                         height={"60"}
                         alt=""
