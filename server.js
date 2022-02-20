@@ -454,18 +454,25 @@ function acceptPlayedCard(socket, player, currentGame, data) {
 
 // Function that is called at the end of every round
 function endRound(currentGame, winnerIndex) {
-    if (currentGame.players[winnerIndex].vorhand === true && currentGame.opening === "AufDissle") {
+    let winningPlayer = currentGame.players[winnerIndex];
+    if (winningPlayer.vorhand === true && currentGame.opening === "AufDissle") {
         // Player lost
     }
 
     // Send scores to every player
-    currentGame.players[winnerIndex].score += calculateScore(currentGame.playedCards);
-    currentGame.players[winnerIndex].stiche++;
+    winningPlayer.score += calculateScore(currentGame.playedCards);
+    winningPlayer.stiche++;
+    if (winningPlayer.cards.length === 0) {
+        winningPlayer.score += 10;
+    }
     currentGame.players.forEach((player) => {
         player.socket.emit("setScore", player.score);
     });
 
-    if (currentGame.players[winnerIndex].score >= 21) {
+    if (winningPlayer.score >= 200) {
+        endGame(currentGame, winnerIndex);
+        return;
+    } else if (winningPlayer.cards.length === 0 && currentGame.talon.length === 0) {
         endGame(currentGame, winnerIndex);
         return;
     }
@@ -475,14 +482,14 @@ function endRound(currentGame, winnerIndex) {
         io.in(currentGame.lobbycode).emit("setCurrentOpening", "");
     }
 
-    console.log(currentGame.players[winnerIndex].username + " won");
+    console.log(winningPlayer.username + " won");
     io.in(currentGame.lobbycode).emit("setInfoType", {
         type: "somebodyWonTheStich",
-        detail: currentGame.players[winnerIndex].username,
+        detail: winningPlayer.username,
     });
 
     // Create new-order
-    let winner = currentGame.players[winnerIndex];
+    let winner = winningPlayer;
     while (winner != currentGame.players[0]) {
         currentGame.players.push(currentGame.players.shift());
     }
@@ -707,7 +714,7 @@ function processMelden(socket, data, player, currentGame) {
             player.score += 20;
         }
 
-        if (player.score >= 21) {
+        if (player.score >= 200) {
             let winnerIndex = currentGame.players.findIndex(
                 (element) => element.socket.id === player.socket.id
             );
@@ -722,9 +729,9 @@ function processMelden(socket, data, player, currentGame) {
 
 // Function that creates the Talon from scratch
 function createTalon() {
-    let types = ["Eichel", "Blatt", "Herz", "Schellen"];
+    //let types = ["Eichel", "Blatt", "Herz", "Schellen"];
     // let types = ["Eichel", "Blatt"];
-    // let types = ["Eichel"];
+    let types = ["Eichel"];
     let values = ["7", "U", "O", "K", "10", "A"];
     let newTalon = [];
 
