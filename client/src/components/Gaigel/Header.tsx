@@ -33,11 +33,11 @@ const Header: React.FC<Props> = () => {
     return (
         <>
             <Box className={classes.root}>
-                <img src={"/symbols.png"} className={classes.logo} />
+                <img src={"/Header_symbols.png"} className={classes.logo} />
                 <Typography align="center" variant="h4">
                     Gaigel
                 </Typography>
-                <img src={"/symbols.png"} className={classes.logo} />
+                <img src={"/Header_symbols_mirror.png"} className={classes.logo} />
             </Box>
 
             <hr style={{ width: "100%" }} />
