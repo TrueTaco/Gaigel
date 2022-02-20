@@ -255,7 +255,10 @@ const Gaigel: React.FC<Props> = () => {
         }
     };
 
-    const rauben = () => {};
+    const rauben = () => {
+        // @ts-ignore
+        socket.emit("Rauben");
+    };
 
     // MARK: useEffect
     useEffect(() => {
@@ -333,6 +336,10 @@ const Gaigel: React.FC<Props> = () => {
 
         newSocket.on("canCall", (data: boolean) => {
             setCanCall(data);
+        });
+
+        newSocket.on("canSteal", (data: boolean) => {
+            setCanSteal(data);
         });
 
         newSocket.on("setShowEndPopup", (data: boolean) => {

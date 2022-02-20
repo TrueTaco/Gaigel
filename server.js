@@ -141,6 +141,29 @@ io.on("connection", (socket) => {
         console.log("Melden:" + data);
     });
 
+    socket.on("Rauben", (data) => {
+        let player = players.find((element) => element.socket === socket);
+        // tauschen
+        let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
+        let tempCard = currentGame.trumpCard;
+
+        currentGame.trumpCard = player.cards.find(
+            (card) => card.type === currentGame.trumpCard.type && card.value === "7"
+        );
+        player.cards.splice(
+            player.cards.findIndex((card) => card.type === tempCard.type && card.value === "7"),
+            1
+        );
+
+        player.cards.push(tempCard);
+
+        // trump senden
+        io.in(currentGame.lobbycode).emit("setTrumpCard", currentGame.trumpCard);
+        // spielerkarten senden
+        socket.emit("setYourCards", player.cards);
+        socket.emit("canSteal", false);
+    });
+
     // This function contains the logic for when a player disconnects
     socket.on("disconnect", () => {
         console.log(`${players.length} | Client disconnected (${socket.id})`);
@@ -346,6 +369,7 @@ function startGame(currentGame) {
         drawCard(lobbycode, 5, player);
         io.to(player.socket.id).emit("setYourCards", player.cards);
         checkCanCall(player);
+        checkCanSteal(player, currentGame);
     });
 
     io.in(lobbycode).emit("setTalon", currentGame.talon);
@@ -509,11 +533,26 @@ function endRound(currentGame, winnerIndex) {
             drawCard(currentGame.lobbycode, 1, player);
             io.to(player.socket.id).emit("setYourCards", player.cards);
             checkCanCall(player);
+            checkCanSteal(player, currentGame);
         });
         io.in(currentGame.lobbycode).emit("setTalon", currentGame.talon);
 
         io.in(currentGame.lobbycode).emit("setInfoType", { type: "newCards", detail: "" });
     }, 1000);
+}
+
+function checkCanSteal(player, currentGame) {
+    if (
+        player.cards.filter(
+            (card) => card.type === currentGame.trumpCard.type && card.value === "7"
+        ).length > 0 &&
+        currentGame.players[0] === player &&
+        player.stiche > 0
+    ) {
+        io.to(player.socket.id).emit("canSteal", true);
+    } else {
+        io.to(player.socket.id).emit("canSteal", false);
+    }
 }
 
 // Function that checks if a player can use the utility "Melden"
