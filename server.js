@@ -157,7 +157,7 @@ function decideWinner(currentGame) {
         if (
             (playerHasTrump && !playerWithHighestPointsHasTrump) ||
             (((playerHasTrump && playerWithHighestPointsHasTrump) ||
-                (!playerHasTrump && !playerWithHighestPointsHasTrump)) &&
+                player.playedCard.type === playerWithHighestPoints.playedCard.type) &&
                 playerHasHigherCard)
         ) {
             playerWithHighestPoints = player;
@@ -457,8 +457,10 @@ function checkCanCall(player) {
             sameType.filter((card) => card.value == "O").length > 0 &&
             sameType.filter((card) => card.value == "K").length > 0
         ) {
-            io.to(player.socket.id).emit("canCall", true);
-            sendTrue = true;
+            if (player.score > 0) {
+                io.to(player.socket.id).emit("canCall", true);
+                sendTrue = true;
+            }
         }
     });
     if (sendTrue === false) {
