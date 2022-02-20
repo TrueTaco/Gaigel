@@ -57,10 +57,12 @@ io.on("connection", (socket) => {
         if (!gameToJoin) {
             console.log(`Creating game with lobbycode ${data.lobbycode}`);
             let newGame = new classes.Game([currentPlayer], data.lobbycode);
+            newGame.vorhandOrder.push(currentPlayer);
             games.push(newGame);
         } else {
             console.log(`Found game with lobby ${data.lobbycode}`);
             gameToJoin.players.push(currentPlayer);
+            gameToJoin.vorhandOrder.push(currentPlayer);
         }
         socket.emit("setLoggedIn", true);
         socket.join(data.lobbycode);
@@ -147,9 +149,9 @@ io.on("connection", (socket) => {
 // Function that determines the winner of a "Stich"
 function decideWinner(currentGame) {
     let playerWithHighestPoints = currentGame.players[0];
-    let playerWithHighestPointsHasTrump =
-        playerWithHighestPoints.playedCard.type === currentGame.trumpCard.type;
     currentGame.players.forEach(function (player) {
+        let playerWithHighestPointsHasTrump =
+            playerWithHighestPoints.playedCard.type === currentGame.trumpCard.type;
         let playerHasTrump = player.playedCard.type === currentGame.trumpCard.type;
         let playerHasHigherCard =
             pointsMap.get(player.playedCard.value) >
@@ -157,7 +159,7 @@ function decideWinner(currentGame) {
         if (
             (playerHasTrump && !playerWithHighestPointsHasTrump) ||
             (((playerHasTrump && playerWithHighestPointsHasTrump) ||
-                (!playerHasTrump && !playerWithHighestPointsHasTrump)) &&
+                player.playedCard.type === playerWithHighestPoints.playedCard.type) &&
                 playerHasHigherCard)
         ) {
             playerWithHighestPoints = player;
@@ -254,6 +256,7 @@ function resetGame(currentGame) {
         // Reset player information
         player.ready = false;
         player.score = 0;
+        player.stiche = 0;
         player.vorhand = false;
         player.playedCard = {};
         player.cards = [];
@@ -287,7 +290,8 @@ function tryToStartGame(lobbycode) {
     if (currentGame.ongoing) return;
 
     // START A GAME
-
+    currentGame.vorhandOrder.push(currentGame.vorhandOrder.shift());
+    currentGame.players = currentGame.vorhandOrder.slice();
     currentGame.ongoing = true;
 
     currentGame.order = currentGame.players.slice();
@@ -374,6 +378,7 @@ function resetPlayer(socket) {
     currentPlayer.ready = false;
     currentPlayer.wins = 0;
     currentPlayer.score = 0;
+    currentPlayer.stiche = 0;
     currentPlayer.vorhand = false;
     currentPlayer.playedCard = {};
     currentPlayer.cards = [];
@@ -426,6 +431,7 @@ function endRound(currentGame, winnerIndex) {
 
     // Send scores to every player
     currentGame.players[winnerIndex].score += calculateScore(currentGame.playedCards);
+    currentGame.players[winnerIndex].stiche++;
     currentGame.players.forEach((player) => {
         player.socket.emit("setScore", player.score);
     });
@@ -485,8 +491,10 @@ function checkCanCall(player) {
             sameType.filter((card) => card.value == "O").length > 0 &&
             sameType.filter((card) => card.value == "K").length > 0
         ) {
-            io.to(player.socket.id).emit("canCall", true);
-            sendTrue = true;
+            if (player.stiche > 0) {
+                io.to(player.socket.id).emit("canCall", true);
+                sendTrue = true;
+            }
         }
     });
     if (sendTrue === false) {

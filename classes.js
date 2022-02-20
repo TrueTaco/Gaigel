@@ -12,6 +12,7 @@ class Player {
         this.ready = false;
         this.wins = 0;
         this.score = 0;
+        this.stiche = 0;
         this.vorhand = false;
         this.playedCard = {};
         this.cards = [];
@@ -30,6 +31,7 @@ class Game {
         this.playedCards = [];
         this.players = players;
         this.order = [];
+        this.vorhandOrder = players.slice();
     }
 }
 
