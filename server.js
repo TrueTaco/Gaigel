@@ -254,6 +254,7 @@ function resetGame(currentGame) {
         // Reset player information
         player.ready = false;
         player.score = 0;
+        player.stiche = 0;
         player.vorhand = false;
         player.playedCard = {};
         player.cards = [];
@@ -368,6 +369,7 @@ function resetPlayer(socket) {
     currentPlayer.ready = false;
     currentPlayer.wins = 0;
     currentPlayer.score = 0;
+    currentPlayer.stiche = 0;
     currentPlayer.vorhand = false;
     currentPlayer.playedCard = {};
     currentPlayer.cards = [];
@@ -415,6 +417,7 @@ function endRound(currentGame, winnerIndex) {
 
     // Send scores to every player
     currentGame.players[winnerIndex].score += calculateScore(currentGame.playedCards);
+    currentGame.players[winnerIndex].stiche++;
     currentGame.players.forEach((player) => {
         player.socket.emit("setScore", player.score);
     });
@@ -468,7 +471,7 @@ function checkCanCall(player) {
             sameType.filter((card) => card.value == "O").length > 0 &&
             sameType.filter((card) => card.value == "K").length > 0
         ) {
-            if (player.score > 0) {
+            if (player.stiche > 0) {
                 io.to(player.socket.id).emit("canCall", true);
                 sendTrue = true;
             }
