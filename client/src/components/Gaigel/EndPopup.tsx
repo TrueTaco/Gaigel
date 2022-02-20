@@ -1,6 +1,7 @@
 import { makeStyles } from "@material-ui/core/styles";
 import { Box, Typography, Card, Button } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import { useEffect, useState } from "react";
 
 const useStyles = makeStyles({
     root: {
@@ -52,36 +53,41 @@ const useStyles = makeStyles({
     },
 });
 
-interface Props {}
+interface EndPlayerInformation {
+    username: string;
+    score: number;
+}
 
-const EndPopup: React.FC<Props> = () => {
+interface Props {
+    endInformation: EndPlayerInformation[];
+}
+
+const EndPopup: React.FC<Props> = ({ endInformation }) => {
     const classes = useStyles();
 
-    const ranking = [
-        {
-            username: "Michel",
-            score: 115,
-        },
-        {
-            username: "Till",
-            score: 90,
-        },
-        {
-            username: "Alex",
-            score: 56,
-        },
-        {
-            username: "Marko",
-            score: 21,
-        },
-    ];
+    const [counter, setCounter] = useState<number>(20);
+
+    const decreaseCounter = (newCounter: number) => {
+        setCounter(newCounter);
+
+        if (newCounter > 0) {
+            setTimeout(() => {
+                decreaseCounter(newCounter - 1);
+            }, 1000);
+        }
+    };
+
+    useEffect(() => {
+        setCounter(20);
+        decreaseCounter(20);
+    }, [endInformation]);
 
     return (
         <Card className={classes.root}>
             <Box className={classes.header}>
                 <img src={"/crown.png"} className={classes.logo} />
                 <Typography align="center" variant="h4">
-                    {ranking[0].username} hat gewonnen!
+                    {endInformation[0].username} hat gewonnen!
                 </Typography>
             </Box>
 
@@ -92,7 +98,7 @@ const EndPopup: React.FC<Props> = () => {
             </Typography>
 
             <Box className={classes.rankingContainer}>
-                {ranking.map((rank, index) => (
+                {endInformation.map((rank, index) => (
                     <Box className={classes.rankingElement}>
                         <Typography className={classes.rankingElementText}>
                             {index + 1}. {rank.username}
@@ -109,7 +115,7 @@ const EndPopup: React.FC<Props> = () => {
                     Lobby
                 </Button>
                 <Typography align="right" noWrap={true}>
-                    Nächste Runde in <b>30</b>
+                    Nächste Runde in <b>{counter}</b>
                 </Typography>
             </Box>
         </Card>

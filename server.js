@@ -120,8 +120,8 @@ io.on("connection", (socket) => {
 
         currentGame.opening = data;
         console.log(data);
-        io.to(socket.id).emit("closeOpening", "");
-        io.to(currentGame.lobbycode).emit("setOpening", data);
+        io.to(socket.id).emit("setOpening", false);
+        io.to(currentGame.lobbycode).emit("setCurrentOpening", data);
         // Set GameOpening
     });
 
@@ -194,16 +194,27 @@ function decideWinnerEndRound(currentGame) {
 // Function for ending a game in case somebody won
 function endGame(currentGame, winnerIndex) {
     let winner = currentGame.players[winnerIndex];
-    io.in(currentGame.lobbycode).emit("setInfoType", {
-        type: "somebodyWonTheGame",
-        detail: winner.username,
-    });
-
     winner.wins++;
 
+    let endInformation = currentGame.players
+        .map((player) => {
+            return { username: player.username, score: player.score };
+        })
+        .sort((player1, player2) => {
+            if (player1.score < player2.score) return 1;
+            if (player1.score > player2.score) return -1;
+            return 0;
+        });
+
+    console.log(endInformation);
+
+    io.in(currentGame.lobbycode).emit("setEndInformation", endInformation);
+    io.in(currentGame.lobbycode).emit("setShowEndPopup", true);
+
     setTimeout(() => {
-        resetGame(currentGame);
-    }, 10000);
+        // TODO: Dont reset game, but restart it
+        if (currentGame.players.length > 0) resetGame(currentGame);
+    }, 20000);
 }
 
 // Function for closing a game in case a player disconnects
@@ -300,7 +311,7 @@ function tryToStartGame(lobbycode) {
 
     io.in(lobbycode).emit("setTalon", currentGame.talon);
 
-    io.to(currentGame.players[0].socket.id).emit("openOpening", "");
+    io.to(currentGame.players[0].socket.id).emit("setOpening", true);
 
     io.in(lobbycode).emit("setGameStarted", true);
     console.log(`Started a game for lobbycode ${lobbycode}`);
@@ -408,14 +419,14 @@ function endRound(currentGame, winnerIndex) {
         player.socket.emit("setScore", player.score);
     });
 
-    if (currentGame.players[winnerIndex].score >= 101) {
+    if (currentGame.players[winnerIndex].score >= 21) {
         endGame(currentGame, winnerIndex);
         return;
     }
 
     if (currentGame.opening !== "AufDissle") {
         currentGame.opening = "";
-        io.in(currentGame.lobbycode).emit("setOpening", "");
+        io.in(currentGame.lobbycode).emit("setCurrentOpening", "");
     }
 
     console.log(currentGame.players[winnerIndex].username + " won");
@@ -644,7 +655,7 @@ function processMelden(socket, data, player, currentGame) {
             player.score += 20;
         }
 
-        if (player.score >= 101) {
+        if (player.score >= 21) {
             let winnerIndex = currentGame.players.findIndex(
                 (element) => element.socket.id === player.socket.id
             );
