@@ -48,6 +48,11 @@ interface CardProps {
     value: string;
 }
 
+interface PlayerProps {
+    username: string;
+    socketId: string;
+}
+
 interface LobbyInformation {
     lobbycode: string;
     amountReadyPlayers: number;
@@ -90,8 +95,11 @@ const Gaigel: React.FC<Props> = () => {
         playerInformation: [{ username: "", wins: 0 }],
     });
 
-    const [order, setOrder] = useState<string[]>([]);
-    const [playerWithTurn, setPlayerWithTurn] = useState<string>("");
+    const [order, setOrder] = useState<PlayerProps[]>([]);
+    const [playerWithTurn, setPlayerWithTurn] = useState<PlayerProps>({
+        username: "",
+        socketId: "",
+    });
 
     const [opening, setOpening] = useState<boolean>(false);
 
@@ -233,7 +241,7 @@ const Gaigel: React.FC<Props> = () => {
     };
 
     const melden = () => {
-        if (ownUsername === playerWithTurn) {
+        if (ownUsername === playerWithTurn.username) {
             // @ts-ignore
             socket.emit("Melden", !announcing);
             setAnnouncing(!announcing);
@@ -269,11 +277,11 @@ const Gaigel: React.FC<Props> = () => {
             setLobbyInformation(data);
         });
 
-        newSocket.on("setOrder", (data: string[]) => {
+        newSocket.on("setOrder", (data: PlayerProps[]) => {
             setOrder(data);
         });
 
-        newSocket.on("setPlayerWithTurn", (data: string) => {
+        newSocket.on("setPlayerWithTurn", (data: PlayerProps) => {
             setPlayerWithTurn(data);
         });
 
@@ -340,7 +348,6 @@ const Gaigel: React.FC<Props> = () => {
             className={classes.root}
             style={{
                 backgroundColor: !loggedIn || !gameStarted ? "none" : "#ffffff",
-                // border: !loggedIn || !gameStarted ? "none" : "10px solid #53362b",
                 boxShadow: !loggedIn || !gameStarted ? "none" : "5px 5px 15px black",
             }}
         >

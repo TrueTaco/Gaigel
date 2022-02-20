@@ -22,29 +22,36 @@ const useStyles = makeStyles({
     },
 });
 
+interface PlayerProps {
+    username: string;
+    socketId: string;
+}
 interface Props {
-    order: string[];
-    playerWithTurn: string;
+    order: PlayerProps[];
+    playerWithTurn: PlayerProps;
 }
 
 const PlayerList: React.FC<Props> = ({ order, playerWithTurn }) => {
     const classes = useStyles();
 
+    console.log(order);
+    console.log(playerWithTurn);
+
     return (
         <Box className={classes.root}>
-            {order.map((name, index) => {
-                let turn = name === playerWithTurn;
+            {order.map((player, index) => {
+                let turn = player.socketId === playerWithTurn.socketId;
+                console.log(player);
                 return (
                     <>
                         <Typography
                             variant="body2"
                             className={classes.name}
                             style={{ border: turn ? "2px solid #ffe600" : "none" }}
-                            key={name}
+                            key={player.socketId}
                         >
-                            {index + 1}. {name}
+                            {index + 1}. {player.username}
                         </Typography>
-                        {/* <Typography>›</Typography> */}
                     </>
                 );
             })}
