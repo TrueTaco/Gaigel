@@ -57,10 +57,12 @@ io.on("connection", (socket) => {
         if (!gameToJoin) {
             console.log(`Creating game with lobbycode ${data.lobbycode}`);
             let newGame = new classes.Game([currentPlayer], data.lobbycode);
+            newGame.vorhandOrder.push(currentPlayer);
             games.push(newGame);
         } else {
             console.log(`Found game with lobby ${data.lobbycode}`);
             gameToJoin.players.push(currentPlayer);
+            gameToJoin.vorhandOrder.push(currentPlayer);
         }
         socket.emit("setLoggedIn", true);
         socket.join(data.lobbycode);
@@ -147,9 +149,9 @@ io.on("connection", (socket) => {
 // Function that determines the winner of a "Stich"
 function decideWinner(currentGame) {
     let playerWithHighestPoints = currentGame.players[0];
-    let playerWithHighestPointsHasTrump =
-        playerWithHighestPoints.playedCard.type === currentGame.trumpCard.type;
     currentGame.players.forEach(function (player) {
+        let playerWithHighestPointsHasTrump =
+            playerWithHighestPoints.playedCard.type === currentGame.trumpCard.type;
         let playerHasTrump = player.playedCard.type === currentGame.trumpCard.type;
         let playerHasHigherCard =
             pointsMap.get(player.playedCard.value) >
@@ -236,7 +238,7 @@ function handlePlayerDisconnect(socket) {
 
     setTimeout(() => {
         resetGame(currentGame);
-    }, 15000);
+    }, 5000);
 }
 
 // Function for resetting all variables when a game returns back to the lobby
@@ -288,7 +290,8 @@ function tryToStartGame(lobbycode) {
     if (currentGame.ongoing) return;
 
     // START A GAME
-
+    currentGame.vorhandOrder.push(currentGame.vorhandOrder.shift());
+    currentGame.players = currentGame.vorhandOrder.slice();
     currentGame.ongoing = true;
 
     currentGame.order = currentGame.players.slice();

@@ -31,6 +31,7 @@ class Game {
         this.playedCards = [];
         this.players = players;
         this.order = [];
+        this.vorhandOrder = players.slice();
     }
 }
 
