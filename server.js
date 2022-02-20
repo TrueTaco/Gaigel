@@ -236,7 +236,7 @@ function handlePlayerDisconnect(socket) {
 
     setTimeout(() => {
         resetGame(currentGame);
-    }, 15000);
+    }, 5000);
 }
 
 // Function for resetting all variables when a game returns back to the lobby
@@ -291,9 +291,15 @@ function tryToStartGame(lobbycode) {
     currentGame.ongoing = true;
 
     currentGame.order = currentGame.players.slice();
-    let orderUsernames = currentGame.order.map((player) => player.username);
-    io.in(lobbycode).emit("setOrder", orderUsernames);
-    io.in(currentGame.lobbycode).emit("setPlayerWithTurn", currentGame.order[0].username);
+    let orderInfo = currentGame.order.map((player) => {
+        return { username: player.username, socketId: player.socket.id };
+    });
+    io.in(lobbycode).emit("setOrder", orderInfo);
+    let playerWithTurn = {
+        username: currentGame.order[0].username,
+        socketId: currentGame.order[0].socket.id,
+    };
+    io.in(currentGame.lobbycode).emit("setPlayerWithTurn", playerWithTurn);
 
     currentGame.players[0].vorhand = true;
 
@@ -403,8 +409,13 @@ function acceptPlayedCard(socket, player, currentGame, data) {
     io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
 
     currentGame.order.shift();
-    if (currentGame.order.length > 0)
-        io.in(currentGame.lobbycode).emit("setPlayerWithTurn", currentGame.order[0].username);
+    if (currentGame.order.length > 0) {
+        let playerWithTurn = {
+            username: currentGame.order[0].username,
+            socketId: currentGame.order[0].socket.id,
+        };
+        io.in(currentGame.lobbycode).emit("setPlayerWithTurn", playerWithTurn);
+    }
 }
 
 // Function that is called at the end of every round
@@ -441,9 +452,15 @@ function endRound(currentGame, winnerIndex) {
         currentGame.players.push(currentGame.players.shift());
     }
     currentGame.order = currentGame.players.slice();
-    let orderUsernames = currentGame.order.map((player) => player.username);
-    io.in(currentGame.lobbycode).emit("setOrder", orderUsernames);
-    io.in(currentGame.lobbycode).emit("setPlayerWithTurn", currentGame.order[0].username);
+    let orderInfo = currentGame.order.map((player) => {
+        return { username: player.username, socketId: player.socket.id };
+    });
+    io.in(currentGame.lobbycode).emit("setOrder", orderInfo);
+    let playerWithTurn = {
+        username: currentGame.order[0].username,
+        socketId: currentGame.order[0].socket.id,
+    };
+    io.in(currentGame.lobbycode).emit("setPlayerWithTurn", playerWithTurn);
 
     setTimeout(() => {
         currentGame.players.forEach((player) => {
