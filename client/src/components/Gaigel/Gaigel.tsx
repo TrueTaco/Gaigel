@@ -72,6 +72,7 @@ interface WarningInfoProps {
 interface EndPlayerInformation {
     username: string;
     score: number;
+    wins: number;
 }
 
 const Gaigel: React.FC<Props> = () => {
@@ -121,7 +122,7 @@ const Gaigel: React.FC<Props> = () => {
     const [showEndPopup, setShowEndPopup] = useState<boolean>(false);
 
     const [endInformation, setEndInformation] = useState<EndPlayerInformation[]>([
-        { username: "", score: 0 },
+        { username: "", score: 0, wins: 0 },
     ]);
 
     // The cards that can still be drawn from the talon
@@ -179,6 +180,7 @@ const Gaigel: React.FC<Props> = () => {
     };
 
     const backToLobby = () => {
+        setGameStarted(false);
         // @ts-ignore
         socket.emit("backToLobby", "");
     };
@@ -352,7 +354,7 @@ const Gaigel: React.FC<Props> = () => {
         <Box
             className={classes.root}
             style={{
-                backgroundColor: loggedIn === false || gameStarted === false ? "none" : "#ffffff",
+                backgroundColor: loggedIn && gameStarted ? "#ffffff" : "none",
                 boxShadow: !loggedIn || !gameStarted ? "none" : "5px 5px 15px black",
             }}
         >

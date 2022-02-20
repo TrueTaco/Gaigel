@@ -83,13 +83,15 @@ const OpeningInstructions: React.FC<Props> = () => {
                 <IconButton>
                     <ArrowBackIosIcon onClick={pageDown} />
                 </IconButton>
-                <Typography variant={"body1"}>{instructionTitles[currentPage]}</Typography>
+                <Typography variant="h6" style={{ fontWeight: "lighter" }}>
+                    {instructionTitles[currentPage]}
+                </Typography>
                 <IconButton>
                     <ArrowForwardIosIcon onClick={pageUp} />
                 </IconButton>
             </Box>
 
-            <Typography variant={"caption"}>{instructions[currentPage]}</Typography>
+            <Typography variant="caption">{instructions[currentPage]}</Typography>
         </Box>
     );
 };
