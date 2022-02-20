@@ -34,14 +34,10 @@ interface Props {
 const PlayerList: React.FC<Props> = ({ order, playerWithTurn }) => {
     const classes = useStyles();
 
-    console.log(order);
-    console.log(playerWithTurn);
-
     return (
         <Box className={classes.root}>
             {order.map((player, index) => {
                 let turn = player.socketId === playerWithTurn.socketId;
-                console.log(player);
                 return (
                     <>
                         <Typography
