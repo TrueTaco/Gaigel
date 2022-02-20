@@ -74,6 +74,14 @@ io.on("connection", (socket) => {
         resetPlayer(socket);
     });
 
+    // Is called when a playes wants to return to the lobby after the end of a game
+    socket.on("backToLobby", () => {
+        let player = players.find((element) => element.socket == socket);
+        let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
+
+        resetGame(currentGame);
+    });
+
     // Is called whenever a player presses the ready button
     socket.on("getReady", () => {
         let currentPlayer = players.find((element) => element.socket.id === socket.id);
@@ -212,10 +220,14 @@ function endGame(currentGame, winnerIndex) {
 
     io.in(currentGame.lobbycode).emit("setEndInformation", endInformation);
     io.in(currentGame.lobbycode).emit("setShowEndPopup", true);
+    currentGame.waitingForNextRound = true;
 
     setTimeout(() => {
-        // TODO: Dont reset game, but restart it
-        if (currentGame.players.length > 0) resetGame(currentGame);
+        if (currentGame.waitingForNextRound) {
+            startGame(currentGame);
+            io.in(currentGame.lobbycode).emit("setShowEndPopup", false);
+            currentGame.waitingForNextRound = false;
+        }
     }, 20000);
 }
 
@@ -244,6 +256,7 @@ function handlePlayerDisconnect(socket) {
 // Function for resetting all variables when a game returns back to the lobby
 function resetGame(currentGame) {
     io.in(currentGame.lobbycode).emit("setGameStarted", false);
+    io.in(currentGame.lobbycode).emit("setShowEndPopup", false);
 
     // Reset game
     currentGame.ongoing = false;
@@ -251,6 +264,7 @@ function resetGame(currentGame) {
     currentGame.opening = "";
     currentGame.talon = [];
     currentGame.playedCards = [];
+    currentGame.waitingForNextRound = false;
 
     currentGame.players.forEach((player) => {
         // Reset player information
@@ -261,6 +275,7 @@ function resetGame(currentGame) {
         player.playedCard = {};
         player.cards = [];
         player.melden = false;
+        player.socket.emit("setScore", player.score);
     });
 
     shareLobbyInformation(currentGame.lobbycode);
@@ -289,7 +304,12 @@ function tryToStartGame(lobbycode) {
     }
     if (currentGame.ongoing) return;
 
-    // START A GAME
+    startGame(currentGame);
+}
+
+function startGame(currentGame) {
+    let lobbycode = currentGame.lobbycode;
+
     currentGame.vorhandOrder.push(currentGame.vorhandOrder.shift());
     currentGame.players = currentGame.vorhandOrder.slice();
     currentGame.ongoing = true;
@@ -313,7 +333,16 @@ function tryToStartGame(lobbycode) {
     currentGame.trumpCard = chooseTrumpCard(lobbycode);
     io.in(lobbycode).emit("setTrumpCard", currentGame.trumpCard);
 
+    currentGame.playedCards = [];
+    io.in(currentGame.lobbycode).emit("setPlayedCards", currentGame.playedCards);
+
     currentGame.players.forEach((player) => {
+        player.score = 0;
+        player.stiche = 0;
+        player.playedCard = {};
+        player.cards = [];
+        player.melden = false;
+        player.socket.emit("setScore", player.score);
         drawCard(lobbycode, 5, player);
         io.to(player.socket.id).emit("setYourCards", player.cards);
         checkCanCall(player);
@@ -728,8 +757,7 @@ function fisherYatesShuffle(arr) {
 function chooseTrumpCard(lobbycode) {
     let currentGame = games.find((element) => element.lobbycode === lobbycode);
 
-    let newTrumpCard = currentGame.talon[currentGame.talon.length - 1];
-    currentGame.talon.slice(0, currentGame.talon.length - 1);
+    let newTrumpCard = currentGame.talon.slice(0)[0];
 
     return newTrumpCard;
 }

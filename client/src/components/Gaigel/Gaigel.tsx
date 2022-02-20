@@ -178,6 +178,11 @@ const Gaigel: React.FC<Props> = () => {
         socket.emit("backToLogin", "");
     };
 
+    const backToLobby = () => {
+        // @ts-ignore
+        socket.emit("backToLobby", "");
+    };
+
     const getReady = () => {
         // @ts-ignore
         socket.emit("getReady", "");
@@ -347,7 +352,7 @@ const Gaigel: React.FC<Props> = () => {
         <Box
             className={classes.root}
             style={{
-                backgroundColor: !loggedIn || !gameStarted ? "none" : "#ffffff",
+                backgroundColor: loggedIn === false || gameStarted === false ? "none" : "#ffffff",
                 boxShadow: !loggedIn || !gameStarted ? "none" : "5px 5px 15px black",
             }}
         >
@@ -386,7 +391,9 @@ const Gaigel: React.FC<Props> = () => {
 
                     {clickedOpening && <OpeningInstructions />}
 
-                    {showEndPopup && <EndPopup endInformation={endInformation} />}
+                    {showEndPopup && (
+                        <EndPopup endInformation={endInformation} backToLobby={backToLobby} />
+                    )}
 
                     {(canCall || canSteal) && (
                         <Actions
