@@ -1,52 +1,56 @@
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, Theme, useTheme, createStyles } from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { Box, Typography, Button, IconButton } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import Header from "./Header";
 
-const useStyles = makeStyles({
-    root: {
-        maxWidth: "420px",
-        padding: 15,
-        borderRadius: 10,
-        backgroundColor: "#ffffff",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        gap: "20px",
-        boxShadow: "5px 5px 15px black",
-    },
-    control: {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
-    playerList: {
-        marginBottom: 10,
-        padding: 20,
-        paddingTop: 0,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        gap: "10px",
-    },
-    playerInformation: {
-        display: "flex",
-        justifyContent: "space-between",
-    },
-    playerElement: {
-        fontWeight: "lighter",
-    },
-    readyInformation: {
-        display: "flex",
-        justifyContent: "space-between",
-        alignContent: "center",
-        alignItems: "center",
-    },
-    readyButton: {
-        width: "40%",
-    },
-});
-
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        root: {
+            maxWidth: "420px",
+            padding: 25,
+            borderRadius: 10,
+            backgroundColor: "#ffffff",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: "20px",
+            boxShadow: "5px 5px 15px black",
+        },
+        control: {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+        },
+        playerList: {
+            marginTop: 10,
+            marginBottom: 10,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: "10px",
+            [theme.breakpoints.up("md")]: {
+                gap: "15px",
+            },
+        },
+        playerInformation: {
+            display: "flex",
+            justifyContent: "space-between",
+        },
+        lighterFontWeight: {
+            fontWeight: "lighter",
+        },
+        readyInformation: {
+            display: "flex",
+            justifyContent: "space-between",
+            alignContent: "center",
+            alignItems: "center",
+        },
+        readyButton: {
+            width: "40%",
+        },
+    })
+);
 interface PlayerProps {
     username: string;
     wins: number;
@@ -67,6 +71,8 @@ const LobbyPage: React.FC<Props> = ({
     getReady,
 }) => {
     const classes = useStyles();
+    const theme = useTheme();
+    const matches = useMediaQuery(theme.breakpoints.up("md"));
 
     return (
         <Box className={classes.root}>
@@ -74,13 +80,22 @@ const LobbyPage: React.FC<Props> = ({
 
             <Box className={classes.control}>
                 <IconButton onClick={backToLogin}>
-                    <ArrowBackIcon />
+                    <ArrowBackIcon fontSize={matches ? "large" : "medium"} />
                 </IconButton>
-                <Typography>Lobbycode: {lobbycode}</Typography>
+                <Typography
+                    variant={matches ? "h6" : "body1"}
+                    className={classes.lighterFontWeight}
+                >
+                    Lobbycode: {lobbycode}
+                </Typography>
             </Box>
 
             <Box className={classes.playerList}>
-                <Typography align="center" variant="h6" style={{ fontWeight: "lighter" }}>
+                <Typography
+                    align="center"
+                    variant={matches ? "h4" : "h6"}
+                    style={{ fontWeight: "lighter" }}
+                >
                     Spielerliste
                 </Typography>
                 {playerInformation.map((player) => {
@@ -90,11 +105,15 @@ const LobbyPage: React.FC<Props> = ({
                     let key = Math.random();
                     return (
                         <Box className={classes.playerInformation} key={key}>
-                            <Typography className={classes.playerElement}>
+                            <Typography
+                                variant={matches ? "h6" : "body1"}
+                                className={classes.lighterFontWeight}
+                            >
                                 {player.username}
                             </Typography>
                             <Typography
-                                className={classes.playerElement}
+                                variant={matches ? "h6" : "body1"}
+                                className={classes.lighterFontWeight}
                                 style={{ marginLeft: 10 }}
                             >
                                 {player.wins} {winString}
@@ -105,7 +124,10 @@ const LobbyPage: React.FC<Props> = ({
             </Box>
 
             <Box className={classes.readyInformation}>
-                <Typography>
+                <Typography
+                    variant={matches ? "h6" : "body1"}
+                    className={classes.lighterFontWeight}
+                >
                     Bereit: {amountReadyPlayers} / {playerInformation.length}
                 </Typography>
                 <Button className={classes.readyButton} variant="contained" onClick={getReady}>
