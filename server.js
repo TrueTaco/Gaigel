@@ -143,13 +143,15 @@ io.on("connection", (socket) => {
 
     socket.on("Rauben", (data) => {
         let player = players.find((element) => element.socket === socket);
-        // tauschen
         let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
         let tempCard = currentGame.trumpCard;
 
-        currentGame.trumpCard = player.cards.find(
+        currentGame.talon[0] = player.cards.find(
             (card) => card.type === currentGame.trumpCard.type && card.value === "7"
         );
+
+        currentGame.trumpCard = currentGame.talon[0];
+
         player.cards.splice(
             player.cards.findIndex((card) => card.type === tempCard.type && card.value === "7"),
             1
@@ -157,9 +159,7 @@ io.on("connection", (socket) => {
 
         player.cards.push(tempCard);
 
-        // trump senden
         io.in(currentGame.lobbycode).emit("setTrumpCard", currentGame.trumpCard);
-        // spielerkarten senden
         socket.emit("setYourCards", player.cards);
         socket.emit("canSteal", false);
     });
@@ -547,7 +547,8 @@ function checkCanSteal(player, currentGame) {
             (card) => card.type === currentGame.trumpCard.type && card.value === "7"
         ).length > 0 &&
         currentGame.players[0] === player &&
-        player.stiche > 0
+        player.stiche > 0 &&
+        currentGame.talon.length > 0
     ) {
         io.to(player.socket.id).emit("canSteal", true);
     } else {

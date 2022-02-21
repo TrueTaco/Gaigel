@@ -61,9 +61,10 @@ interface EndPlayerInformation {
 interface Props {
     endInformation: EndPlayerInformation[];
     backToLobby: () => void;
+    aufDissle: boolean;
 }
 
-const EndPopup: React.FC<Props> = ({ endInformation, backToLobby }) => {
+const EndPopup: React.FC<Props> = ({ endInformation, backToLobby, aufDissle }) => {
     const classes = useStyles();
 
     const [counter, setCounter] = useState<number>(20);

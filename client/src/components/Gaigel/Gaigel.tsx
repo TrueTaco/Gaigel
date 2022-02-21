@@ -145,6 +145,8 @@ const Gaigel: React.FC<Props> = () => {
 
     const [clickedOpening, setClickedOpening] = useState<boolean>(false);
 
+    const [lostAufDissle, setLostAufDissle] = useState<boolean>(false);
+
     const onClickOpening = () => {
         setClickedOpening(!clickedOpening);
     };
@@ -399,7 +401,11 @@ const Gaigel: React.FC<Props> = () => {
                     {clickedOpening && <OpeningInstructions />}
 
                     {showEndPopup && (
-                        <EndPopup endInformation={endInformation} backToLobby={backToLobby} />
+                        <EndPopup
+                            aufDissle={lostAufDissle}
+                            endInformation={endInformation}
+                            backToLobby={backToLobby}
+                        />
                     )}
 
                     {(canCall || canSteal) && (
