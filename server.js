@@ -229,15 +229,9 @@ function endGame(currentGame, winnerIndex) {
     let winner = currentGame.players[winnerIndex];
     winner.wins++;
 
-    let endInformation = currentGame.players
-        .map((player) => {
-            return { username: player.username, score: player.score };
-        })
-        .sort((player1, player2) => {
-            if (player1.score < player2.score) return 1;
-            if (player1.score > player2.score) return -1;
-            return 0;
-        });
+    let endInformation = currentGame.players.map((player) => {
+        return { username: player.username, score: player.score, wins: player.wins };
+    });
 
     console.log(endInformation);
 

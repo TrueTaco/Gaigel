@@ -1,7 +1,10 @@
 import { makeStyles } from "@material-ui/core/styles";
-import { Box, Typography, Card, Button } from "@material-ui/core";
+import { Box, Typography, Card, Button, IconButton } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import { useEffect, useState } from "react";
+
+import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
+import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 
 const useStyles = makeStyles({
     root: {
@@ -26,6 +29,12 @@ const useStyles = makeStyles({
     },
     logo: {
         width: "50px",
+    },
+    rankingHeaderContainer: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignContent: "center",
+        alignItems: "center",
     },
     rankingHeader: {
         textAlign: "center",
@@ -56,6 +65,7 @@ const useStyles = makeStyles({
 interface EndPlayerInformation {
     username: string;
     score: number;
+    wins: number;
 }
 
 interface Props {
@@ -67,7 +77,28 @@ interface Props {
 const EndPopup: React.FC<Props> = ({ endInformation, backToLobby, aufDissle }) => {
     const classes = useStyles();
 
+    const [showRanking, setShowRanking] = useState<boolean>(false);
     const [counter, setCounter] = useState<number>(20);
+    const [finalSorting, setFinalSorting] = useState<EndPlayerInformation[]>([
+        { username: "", score: 0, wins: 0 },
+    ]);
+
+    let sortedByScore: EndPlayerInformation[] = endInformation.slice().sort((player1, player2) => {
+        if (player1.score < player2.score) return 1;
+        if (player1.score > player2.score) return -1;
+        return 0;
+    });
+
+    let sortedByWins: EndPlayerInformation[] = endInformation.slice().sort((player1, player2) => {
+        if (player1.wins < player2.wins) return 1;
+        if (player1.wins > player2.wins) return -1;
+        return 0;
+    });
+
+    const toggleShowRanking = () => {
+        let newToggle: boolean = !showRanking;
+        setShowRanking(newToggle);
+    };
 
     const decreaseCounter = (newCounter: number) => {
         setCounter(newCounter);
@@ -78,6 +109,11 @@ const EndPopup: React.FC<Props> = ({ endInformation, backToLobby, aufDissle }) =
             }, 1000);
         }
     };
+
+    useEffect(() => {
+        if (showRanking) setFinalSorting(sortedByWins);
+        else setFinalSorting(sortedByScore);
+    }, [showRanking]);
 
     useEffect(() => {
         setCounter(20);
@@ -95,18 +131,33 @@ const EndPopup: React.FC<Props> = ({ endInformation, backToLobby, aufDissle }) =
 
             <hr />
 
-            <Typography className={classes.rankingHeader} variant="h6">
-                Platzierungen
-            </Typography>
+            <Box className={classes.rankingHeaderContainer}>
+                <IconButton onClick={toggleShowRanking}>
+                    <ArrowBackIosIcon />
+                </IconButton>
+                <Typography className={classes.rankingHeader} variant="h6">
+                    {showRanking ? "Ranking" : "Platzierungen"}
+                </Typography>
+                <IconButton onClick={toggleShowRanking}>
+                    <ArrowForwardIosIcon />
+                </IconButton>
+            </Box>
 
             <Box className={classes.rankingContainer}>
-                {endInformation.map((rank, index) => (
+                {finalSorting.map((player, index) => (
                     <Box className={classes.rankingElement}>
                         <Typography className={classes.rankingElementText}>
-                            {index + 1}. {rank.username}
+                            {index + 1}. {player.username}
                         </Typography>
                         <Typography className={classes.rankingElementText}>
-                            {rank.score} Punkte
+                            {showRanking ? player.wins : player.score}{" "}
+                            {showRanking
+                                ? player.wins === 1
+                                    ? "Sieg"
+                                    : "Siege"
+                                : player.score === 1
+                                ? "Punkt"
+                                : "Punkte"}
                         </Typography>
                     </Box>
                 ))}
