@@ -38,7 +38,7 @@ const GameInformation: React.FC<Props> = ({ username, lobbycode, score }) => {
                 {username}
             </Typography>
             <Typography variant={matches ? "h5" : "h6"} className={classes.score}>
-                14{score}
+                {score}
             </Typography>
             <Typography
                 variant={matches ? "h6" : "subtitle2"}

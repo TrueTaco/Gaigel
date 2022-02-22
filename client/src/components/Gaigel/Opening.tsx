@@ -22,9 +22,9 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         headerBox: {
             display: "flex",
-            justifyContent: "flex-start",
+            justifyContent: "center",
             flexDirection: "row",
-            gap: "30px",
+            gap: "10px",
             alignItems: "center",
         },
         instructions: {
@@ -45,6 +45,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
     })
 );
+
 interface Props {
     GeElfen: () => void;
     AndereAlteHat: () => void;

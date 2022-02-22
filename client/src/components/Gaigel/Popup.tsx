@@ -1,10 +1,22 @@
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, Theme, useTheme, createStyles } from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { Snackbar } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 
-const useStyles = makeStyles({
-    root: {},
-});
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        root: {},
+        alert: {
+            display: "flex",
+            justifyContent: "center",
+            alignContent: "center",
+            alignItems: "center",
+            [theme.breakpoints.up("md")]: {
+                fontSize: "16px",
+            },
+        },
+    })
+);
 
 interface Props {
     snackbarType: string;
@@ -83,7 +95,7 @@ const Popup: React.FC<Props> = ({ snackbarType, type, detail, reset }) => {
     return (
         <Snackbar
             open={type !== ""}
-            autoHideDuration={5000}
+            autoHideDuration={50000}
             onClose={reset}
             anchorOrigin={{
                 vertical: snackbarType === "warning" ? "bottom" : "top",
@@ -91,7 +103,11 @@ const Popup: React.FC<Props> = ({ snackbarType, type, detail, reset }) => {
             }}
             transitionDuration={0}
         >
-            <Alert onClose={reset} severity={snackbarType === "warning" ? "warning" : "info"}>
+            <Alert
+                onClose={reset}
+                severity={snackbarType === "warning" ? "warning" : "info"}
+                className={classes.alert}
+            >
                 {message}
             </Alert>
         </Snackbar>
