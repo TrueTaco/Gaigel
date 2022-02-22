@@ -425,12 +425,12 @@ const Gaigel: React.FC<Props> = () => {
                         />
                     )}
 
-                    {(!canCall || canSteal) && (
+                    {(canCall || canSteal) && (
                         <Actions
-                            canCall={!canCall}
+                            canCall={canCall}
                             announcing={announcing}
                             melden={melden}
-                            canSteal={!canSteal}
+                            canSteal={canSteal}
                             rauben={rauben}
                         />
                     )}
