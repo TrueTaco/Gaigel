@@ -71,9 +71,11 @@ interface EndPlayerInformation {
 interface Props {
     endInformation: EndPlayerInformation[];
     backToLobby: () => void;
+    aufDissle: boolean;
+    losingPlayer?: string;
 }
 
-const EndPopup: React.FC<Props> = ({ endInformation, backToLobby }) => {
+const EndPopup: React.FC<Props> = ({ endInformation, backToLobby, aufDissle, losingPlayer }) => {
     const classes = useStyles();
 
     const [showRanking, setShowRanking] = useState<boolean>(false);
@@ -124,7 +126,9 @@ const EndPopup: React.FC<Props> = ({ endInformation, backToLobby }) => {
             <Box className={classes.header}>
                 <img src={"/crown.png"} className={classes.logo} />
                 <Typography align="center" variant="h4">
-                    {endInformation[0].username} hat gewonnen!
+                    {aufDissle
+                        ? "Ein " + losingPlayer + " hat auf Dissle verloren!"
+                        : endInformation[0].username + " hat gewonnen!"}
                 </Typography>
             </Box>
 
@@ -149,7 +153,7 @@ const EndPopup: React.FC<Props> = ({ endInformation, backToLobby }) => {
                             {index + 1}. {player.username}
                         </Typography>
                         <Typography className={classes.rankingElementText}>
-                            {showRanking ? player.wins : player.score}{" "}
+                            {showRanking ? player.wins : Math.floor(player.score)}{" "}
                             {showRanking
                                 ? player.wins === 1
                                     ? "Sieg"

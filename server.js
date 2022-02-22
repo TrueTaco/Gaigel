@@ -107,8 +107,6 @@ io.on("connection", (socket) => {
                 case "HöherHat":
                     processHöherHat(socket, data, player, currentGame);
                     break;
-                case "AufDissle":
-                    break;
                 default:
                     if (currentGame.talon.length <= 0) {
                         processEndRound(socket, data, player, currentGame);
@@ -139,6 +137,29 @@ io.on("connection", (socket) => {
         let player = players.find((element) => element.socket === socket);
         player.melden = data;
         console.log("Melden:" + data);
+    });
+
+    socket.on("Rauben", (data) => {
+        let player = players.find((element) => element.socket === socket);
+        let currentGame = games.find((element) => element.lobbycode === player.lobbycode);
+        let tempCard = currentGame.trumpCard;
+
+        currentGame.talon[0] = player.cards.find(
+            (card) => card.type === currentGame.trumpCard.type && card.value === "7"
+        );
+
+        currentGame.trumpCard = currentGame.talon[0];
+
+        player.cards.splice(
+            player.cards.findIndex((card) => card.type === tempCard.type && card.value === "7"),
+            1
+        );
+
+        player.cards.push(tempCard);
+
+        io.in(currentGame.lobbycode).emit("setTrumpCard", currentGame.trumpCard);
+        socket.emit("setYourCards", player.cards);
+        socket.emit("canSteal", false);
     });
 
     // This function contains the logic for when a player disconnects
@@ -340,6 +361,7 @@ function startGame(currentGame) {
         drawCard(lobbycode, 5, player);
         io.to(player.socket.id).emit("setYourCards", player.cards);
         checkCanCall(player);
+        checkCanSteal(player, currentGame);
     });
 
     io.in(lobbycode).emit("setTalon", currentGame.talon);
@@ -450,7 +472,29 @@ function acceptPlayedCard(socket, player, currentGame, data) {
 function endRound(currentGame, winnerIndex) {
     let winningPlayer = currentGame.players[winnerIndex];
     if (winningPlayer.vorhand === true && currentGame.opening === "AufDissle") {
-        // Player lost
+        io.in(currentGame.lobbycode).emit("lostAufDissle", winningPlayer.username);
+        let winner = currentGame.players[0];
+        currentGame.players.forEach(function (player) {
+            if (player.score > winner.score) {
+                winner = player;
+            }
+        });
+
+        if (winningPlayer.vorhand === true && winningPlayer.score === 0) {
+            currentGame.players.forEach(function (player) {
+                if (player !== winningPlayer) {
+                    player.score = 0.0001;
+                }
+            });
+
+            currentGame.players.forEach(function (player) {
+                if (player.score > winner.score) {
+                    winner = player;
+                }
+            });
+        }
+        let winnerIndex = currentGame.players.findIndex((player) => player === winner);
+        endGame(currentGame, winnerIndex);
     }
 
     // Send scores to every player
@@ -503,11 +547,27 @@ function endRound(currentGame, winnerIndex) {
             drawCard(currentGame.lobbycode, 1, player);
             io.to(player.socket.id).emit("setYourCards", player.cards);
             checkCanCall(player);
+            checkCanSteal(player, currentGame);
         });
         io.in(currentGame.lobbycode).emit("setTalon", currentGame.talon);
 
         io.in(currentGame.lobbycode).emit("setInfoType", { type: "newCards", detail: "" });
     }, 1000);
+}
+
+function checkCanSteal(player, currentGame) {
+    if (
+        player.cards.filter(
+            (card) => card.type === currentGame.trumpCard.type && card.value === "7"
+        ).length > 0 &&
+        currentGame.players[0] === player &&
+        player.stiche > 0 &&
+        currentGame.talon.length > 0
+    ) {
+        io.to(player.socket.id).emit("canSteal", true);
+    } else {
+        io.to(player.socket.id).emit("canSteal", false);
+    }
 }
 
 // Function that checks if a player can use the utility "Melden"

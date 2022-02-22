@@ -146,6 +146,10 @@ const Gaigel: React.FC<Props> = () => {
 
     const [clickedOpening, setClickedOpening] = useState<boolean>(false);
 
+    const [lostAufDissle, setLostAufDissle] = useState<boolean>(false);
+
+    const [losingPlayer, setLosingPlayer] = useState<string>("");
+
     const onClickOpening = () => {
         setClickedOpening(!clickedOpening);
     };
@@ -257,7 +261,10 @@ const Gaigel: React.FC<Props> = () => {
         }
     };
 
-    const rauben = () => {};
+    const rauben = () => {
+        // @ts-ignore
+        socket.emit("Rauben");
+    };
 
     // MARK: useEffect
     useEffect(() => {
@@ -337,12 +344,21 @@ const Gaigel: React.FC<Props> = () => {
             setCanCall(data);
         });
 
+        newSocket.on("canSteal", (data: boolean) => {
+            setCanSteal(data);
+        });
+
         newSocket.on("setShowEndPopup", (data: boolean) => {
             setShowEndPopup(data);
         });
 
         newSocket.on("setEndInformation", (data: EndPlayerInformation[]) => {
             setEndInformation(data);
+        });
+
+        newSocket.on("lostAufDissle", (data: string) => {
+            setLostAufDissle(true);
+            setLosingPlayer(data);
         });
 
         return () => newSocket.close();
@@ -394,7 +410,12 @@ const Gaigel: React.FC<Props> = () => {
                     {clickedOpening && <OpeningInstructions />}
 
                     {showEndPopup && (
-                        <EndPopup endInformation={endInformation} backToLobby={backToLobby} />
+                        <EndPopup
+                            aufDissle={lostAufDissle}
+                            endInformation={endInformation}
+                            backToLobby={backToLobby}
+                            losingPlayer={losingPlayer}
+                        />
                     )}
 
                     {(canCall || canSteal) && (
