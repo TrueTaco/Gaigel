@@ -61,6 +61,12 @@ io.on("connection", (socket) => {
             games.push(newGame);
         } else {
             console.log(`Found game with lobby ${data.lobbycode}`);
+
+            if (gameToJoin.vorhandOrder.length >= 6) {
+                socket.emit("setWarningType", { type: "lobbyFull", detail: "" });
+                return;
+            }
+
             gameToJoin.players.push(currentPlayer);
             gameToJoin.vorhandOrder.push(currentPlayer);
         }

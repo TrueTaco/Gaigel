@@ -51,6 +51,9 @@ const Popup: React.FC<Props> = ({ snackbarType, type, detail, reset }) => {
         case "waitForCards":
             message = "Sie müssen warten, bis neue Karten ausgeteilt wurden.";
             break;
+        case "lobbyFull":
+            message = "Diese Lobby hat bereits die maximale Spieleranzahl von 6 Spielern erreicht.";
+            break;
         // -------- Infos --------
         case "somebodyWonTheStich":
             message = `${detail} hat den Stich gewonnen.`;
