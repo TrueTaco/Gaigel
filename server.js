@@ -230,6 +230,7 @@ function handlePlayerDisconnect(socket) {
     let disconnectedPlayer = players.find((element) => element.socket == socket);
     if (disconnectedPlayer.lobbycode === "") return;
     let currentGame = games.find((element) => element.lobbycode === disconnectedPlayer.lobbycode);
+    if (!currentGame.ongoing) return;
 
     // Tell other players that the game will be closed
     io.in(disconnectedPlayer.lobbycode).emit("setInfoType", {
@@ -307,11 +308,11 @@ function startGame(currentGame) {
     currentGame.vorhandOrder.push(currentGame.vorhandOrder.shift());
     currentGame.players = currentGame.vorhandOrder.slice();
     currentGame.ongoing = true;
-
     currentGame.order = currentGame.players.slice();
     let orderInfo = currentGame.order.map((player) => {
         return { username: player.username, socketId: player.socket.id };
     });
+    console.log(`This lobby has ${orderInfo.length} players`);
     io.in(lobbycode).emit("setOrder", orderInfo);
     let playerWithTurn = {
         username: currentGame.order[0].username,
@@ -383,10 +384,14 @@ function resetPlayer(socket) {
     if (currentPlayer.lobbycode !== "") {
         let currentGame = games.find((element) => element.lobbycode === currentPlayer.lobbycode);
 
+        // Remove player from all lists of the game
         currentGame.players = currentGame.players.filter(
             (player) => player.socket.id !== socket.id
         );
         currentGame.order = currentGame.order.filter((player) => player.socket.id !== socket.id);
+        currentGame.vorhandOrder = currentGame.vorhandOrder.filter(
+            (player) => player.socket.id !== socket.id
+        );
 
         shareLobbyInformation(currentGame.lobbycode);
 
