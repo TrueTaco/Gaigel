@@ -6,11 +6,13 @@ const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             [theme.breakpoints.up("sm")]: {
-                marginLeft: 100,
-                marginRight: 100,
+                marginLeft: 120,
+                marginRight: 120,
+            },
+            [theme.breakpoints.up("md")]: {
+                gap: "30px",
             },
 
-            transition: "0.5s",
             display: "flex",
             justifyContent: "center",
             alignContent: "center",
@@ -20,7 +22,7 @@ const useStyles = makeStyles((theme: Theme) =>
         logo: {
             width: "50px",
             [theme.breakpoints.up("md")]: {
-                width: "70px",
+                width: "60px",
             },
         },
     })
@@ -39,7 +41,7 @@ const Header: React.FC<Props> = () => {
                 <img src={"/Header_symbols.png"} className={classes.logo} />
                 <Typography
                     align="center"
-                    variant={matches ? "h2" : "h3"}
+                    variant={matches ? "h3" : "h4"}
                     style={{ fontWeight: "lighter" }}
                 >
                     Gaigel

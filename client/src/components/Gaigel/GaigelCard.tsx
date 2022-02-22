@@ -1,45 +1,47 @@
-import { makeStyles } from "@material-ui/core/styles";
-
+import { makeStyles, Theme, useTheme, createStyles } from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { Paper, Box, Typography, CardActionArea } from "@material-ui/core";
 
-const useStyles = makeStyles({
-    root: {
-        width: 40,
-        height: 60,
-        border: "1px solid #ddd",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    cardActionArea: {
-        height: "100%",
-        width: "100%",
-        display: "flex",
-    },
-    card: {
-        height: "100%",
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-evenly",
-        alignContent: "center",
-        alignItems: "center",
-    },
-    symbolRow: {
-        width: "85%",
-        display: "flex",
-        justifyContent: "space-between",
-        alignContent: "center",
-        alignItems: "center",
-    },
-    cardIcons: {
-        flex: 1,
-        width: 40,
-        height: 40,
-        resizeMode: "contain",
-    },
-});
-
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        root: {
+            width: 40,
+            height: 60,
+            [theme.breakpoints.up("md")]: {
+                width: 50,
+                height: 75,
+            },
+            border: "1px solid #ddd",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+        },
+        cardActionArea: {
+            height: "100%",
+            width: "100%",
+            display: "flex",
+        },
+        card: {
+            height: "100%",
+            [theme.breakpoints.up("md")]: {
+                height: "95%",
+            },
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-evenly",
+            alignContent: "center",
+            alignItems: "center",
+        },
+        symbolRow: {
+            width: "85%",
+            display: "flex",
+            justifyContent: "space-between",
+            alignContent: "center",
+            alignItems: "center",
+        },
+    })
+);
 interface Props {
     type: string;
     value: string;
@@ -54,8 +56,11 @@ interface Hash {
 
 const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard, hidden = false }) => {
     const classes = useStyles();
+    const theme = useTheme();
+    const matches = useMediaQuery(theme.breakpoints.up("md"));
+
     const symbolMap: Hash = {};
-    const iconSize = 10;
+    const iconSize = matches ? 13 : 10;
     symbolMap["Eichel"] = "/Eichel.png";
     symbolMap["Blatt"] = "/Blatt.png";
     symbolMap["Herz"] = "/Herz.png";
@@ -75,8 +80,8 @@ const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard, hidden 
                 {hidden && value !== "" ? (
                     <img
                         src={"/cardBacksite_noSpaceAround_n1.png"}
-                        width={"40"}
-                        height={"60"}
+                        width={matches ? "50" : "40"}
+                        height={matches ? "75" : "60"}
                         alt=""
                     />
                 ) : (
@@ -96,7 +101,13 @@ const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard, hidden 
                                     alt=""
                                 />
                             </Box>
-                            <Typography align="center">{value}</Typography>
+                            <Typography
+                                variant={matches ? "h6" : "body1"}
+                                align="center"
+                                style={{ fontWeight: "lighter" }}
+                            >
+                                {value}
+                            </Typography>
                             <Box className={classes.symbolRow}>
                                 <img
                                     src={symbolMap[type]}

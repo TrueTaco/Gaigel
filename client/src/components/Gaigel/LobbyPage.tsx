@@ -93,7 +93,7 @@ const LobbyPage: React.FC<Props> = ({
             <Box className={classes.playerList}>
                 <Typography
                     align="center"
-                    variant={matches ? "h4" : "h6"}
+                    variant={matches ? "h5" : "h6"}
                     style={{ fontWeight: "lighter" }}
                 >
                     Spielerliste

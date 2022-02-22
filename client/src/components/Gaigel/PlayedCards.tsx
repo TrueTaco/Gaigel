@@ -1,21 +1,23 @@
 import { useEffect, useState } from "react";
-
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, Theme, useTheme, createStyles } from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { Grid, Box, Typography } from "@material-ui/core";
 
 import GaigelCard from "./GaigelCard";
 
-const useStyles = makeStyles({
-    root: {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: "5px",
-    },
-    header: {
-        fontWeight: "lighter",
-    },
-});
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        root: {
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "5px",
+        },
+        header: {
+            fontWeight: "lighter",
+        },
+    })
+);
 
 interface Props {
     playedCards: CardProps[];
@@ -30,6 +32,9 @@ interface CardProps {
 
 const PlayedCards: React.FC<Props> = ({ playedCards, playerCount, opening }) => {
     const classes = useStyles();
+    const theme = useTheme();
+    const matches = useMediaQuery(theme.breakpoints.up("md"));
+
     let i: number = 0;
     let hidden: boolean = opening === "AndereAlteHat" || opening === "HöherHat";
 
@@ -47,7 +52,9 @@ const PlayedCards: React.FC<Props> = ({ playedCards, playerCount, opening }) => 
 
     return (
         <Box className={classes.root}>
-            <Typography className={classes.header}>Gespielte Karten</Typography>
+            <Typography variant={matches ? "h6" : "body1"} className={classes.header}>
+                Gespielte Karten
+            </Typography>
 
             <Grid container spacing={1} justifyContent="center">
                 {cards.map((card) => {

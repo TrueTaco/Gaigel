@@ -318,7 +318,6 @@ function startGame(currentGame) {
     let orderInfo = currentGame.order.map((player) => {
         return { username: player.username, socketId: player.socket.id };
     });
-    console.log(`This lobby has ${orderInfo.length} players`);
     io.in(lobbycode).emit("setOrder", orderInfo);
     let playerWithTurn = {
         username: currentGame.order[0].username,

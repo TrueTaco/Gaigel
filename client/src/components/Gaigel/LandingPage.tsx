@@ -96,7 +96,6 @@ const LandingPage: React.FC<Props> = ({ login }) => {
 
             <TextField
                 className={classes.textField}
-                autoFocus
                 variant="outlined"
                 label="Lobbycode"
                 onChange={handleLobbycodeChange}
