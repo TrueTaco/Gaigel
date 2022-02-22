@@ -107,8 +107,6 @@ io.on("connection", (socket) => {
                 case "HöherHat":
                     processHöherHat(socket, data, player, currentGame);
                     break;
-                case "AufDissle":
-                    break;
                 default:
                     if (currentGame.talon.length <= 0) {
                         processEndRound(socket, data, player, currentGame);
@@ -474,7 +472,29 @@ function acceptPlayedCard(socket, player, currentGame, data) {
 function endRound(currentGame, winnerIndex) {
     let winningPlayer = currentGame.players[winnerIndex];
     if (winningPlayer.vorhand === true && currentGame.opening === "AufDissle") {
-        // Player lost
+        io.in(currentGame.lobbycode).emit("lostAufDissle", winningPlayer.username);
+        let winner = currentGame.players[0];
+        currentGame.players.forEach(function (player) {
+            if (player.score > winner.score) {
+                winner = player;
+            }
+        });
+
+        if (winningPlayer.vorhand === true && winningPlayer.score === 0) {
+            currentGame.players.forEach(function (player) {
+                if (player !== winningPlayer) {
+                    player.score = 0.0001;
+                }
+            });
+
+            currentGame.players.forEach(function (player) {
+                if (player.score > winner.score) {
+                    winner = player;
+                }
+            });
+        }
+        let winnerIndex = currentGame.players.findIndex((player) => player === winner);
+        endGame(currentGame, winnerIndex);
     }
 
     // Send scores to every player

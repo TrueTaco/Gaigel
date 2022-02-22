@@ -148,6 +148,8 @@ const Gaigel: React.FC<Props> = () => {
 
     const [lostAufDissle, setLostAufDissle] = useState<boolean>(false);
 
+    const [losingPlayer, setLosingPlayer] = useState<string>("");
+
     const onClickOpening = () => {
         setClickedOpening(!clickedOpening);
     };
@@ -354,6 +356,11 @@ const Gaigel: React.FC<Props> = () => {
             setEndInformation(data);
         });
 
+        newSocket.on("lostAufDissle", (data: string) => {
+            setLostAufDissle(true);
+            setLosingPlayer(data);
+        });
+
         return () => newSocket.close();
     }, [setSocket]);
 
@@ -407,6 +414,7 @@ const Gaigel: React.FC<Props> = () => {
                             aufDissle={lostAufDissle}
                             endInformation={endInformation}
                             backToLobby={backToLobby}
+                            losingPlayer={losingPlayer}
                         />
                     )}
 
