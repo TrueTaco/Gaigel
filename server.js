@@ -61,6 +61,12 @@ io.on("connection", (socket) => {
             games.push(newGame);
         } else {
             console.log(`Found game with lobby ${data.lobbycode}`);
+
+            if (gameToJoin.vorhandOrder.length >= 6) {
+                socket.emit("setWarningType", { type: "lobbyFull", detail: "" });
+                return;
+            }
+
             gameToJoin.players.push(currentPlayer);
             gameToJoin.vorhandOrder.push(currentPlayer);
         }
@@ -251,6 +257,7 @@ function handlePlayerDisconnect(socket) {
     let disconnectedPlayer = players.find((element) => element.socket == socket);
     if (disconnectedPlayer.lobbycode === "") return;
     let currentGame = games.find((element) => element.lobbycode === disconnectedPlayer.lobbycode);
+    if (!currentGame.ongoing) return;
 
     // Tell other players that the game will be closed
     io.in(disconnectedPlayer.lobbycode).emit("setInfoType", {
@@ -328,7 +335,6 @@ function startGame(currentGame) {
     currentGame.vorhandOrder.push(currentGame.vorhandOrder.shift());
     currentGame.players = currentGame.vorhandOrder.slice();
     currentGame.ongoing = true;
-
     currentGame.order = currentGame.players.slice();
     let orderInfo = currentGame.order.map((player) => {
         return { username: player.username, socketId: player.socket.id };
@@ -405,10 +411,14 @@ function resetPlayer(socket) {
     if (currentPlayer.lobbycode !== "") {
         let currentGame = games.find((element) => element.lobbycode === currentPlayer.lobbycode);
 
+        // Remove player from all lists of the game
         currentGame.players = currentGame.players.filter(
             (player) => player.socket.id !== socket.id
         );
         currentGame.order = currentGame.order.filter((player) => player.socket.id !== socket.id);
+        currentGame.vorhandOrder = currentGame.vorhandOrder.filter(
+            (player) => player.socket.id !== socket.id
+        );
 
         shareLobbyInformation(currentGame.lobbycode);
 
@@ -507,7 +517,7 @@ function endRound(currentGame, winnerIndex) {
         player.socket.emit("setScore", player.score);
     });
 
-    if (winningPlayer.score >= 200) {
+    if (winningPlayer.score >= 21) {
         endGame(currentGame, winnerIndex);
         return;
     } else if (winningPlayer.cards.length === 0 && currentGame.talon.length === 0) {
@@ -768,7 +778,7 @@ function processMelden(socket, data, player, currentGame) {
             player.score += 20;
         }
 
-        if (player.score >= 200) {
+        if (player.score >= 21) {
             let winnerIndex = currentGame.players.findIndex(
                 (element) => element.socket.id === player.socket.id
             );
@@ -783,9 +793,9 @@ function processMelden(socket, data, player, currentGame) {
 
 // Function that creates the Talon from scratch
 function createTalon() {
-    //let types = ["Eichel", "Blatt", "Herz", "Schellen"];
+    let types = ["Eichel", "Blatt", "Herz", "Schellen"];
     // let types = ["Eichel", "Blatt"];
-    let types = ["Eichel"];
+    // let types = ["Eichel"];
     let values = ["7", "U", "O", "K", "10", "A"];
     let newTalon = [];
 
