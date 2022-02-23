@@ -1,7 +1,7 @@
 import { makeStyles, Theme, useTheme, createStyles } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { Box, IconButton, Typography, Card, MobileStepper } from "@material-ui/core";
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 

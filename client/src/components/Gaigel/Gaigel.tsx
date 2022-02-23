@@ -10,7 +10,7 @@ import Talon from "./Talon";
 import TrumpCard from "./TrumpCard";
 import PlayedCards from "./PlayedCards";
 import YourCards from "./YourCards";
-import { Box, Button, Typography } from "@material-ui/core";
+import { Box, Fab } from "@material-ui/core";
 import Opening from "./Opening";
 import LobbyPage from "./LobbyPage";
 import PlayerList from "./PlayerList";
@@ -20,6 +20,8 @@ import EndPopup from "./EndPopup";
 import Header from "./Header";
 import Actions from "./Actions";
 import OpeningInstructions from "./OpeningInstructions";
+
+import QuestionMarkIcon from "@material-ui/icons/QuestionMark";
 
 // MARK: Styles
 const useStyles = makeStyles((theme: Theme) =>
@@ -112,9 +114,6 @@ const Gaigel: React.FC<Props> = () => {
     const [opening, setOpening] = useState<boolean>(false);
 
     const [currentOpening, setCurrentOpening] = useState<string>("");
-
-    // Latest response from server (For debugging purposes)
-    const [response, setResponse] = useState("");
 
     const [socket, setSocket] = useState(null);
 
@@ -285,10 +284,6 @@ const Gaigel: React.FC<Props> = () => {
         const newSocket = socketIOClient("http://127.0.0.1:5000");
         // @ts-ignore
         setSocket(newSocket);
-
-        newSocket.on("onConnect", (data: string) => {
-            setResponse(data);
-        });
 
         newSocket.on("setLoggedIn", (data: boolean) => {
             setLoggedIn(data);
@@ -462,6 +457,9 @@ const Gaigel: React.FC<Props> = () => {
                 detail={warningType.detail}
                 reset={resetWarning}
             />
+            <Fab style={{ zIndex: 60, position: "fixed", top: "90%", left: "95%" }}>
+                <QuestionMarkIcon />
+            </Fab>
         </Box>
     );
 };
