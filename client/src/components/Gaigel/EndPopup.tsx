@@ -136,7 +136,7 @@ const EndPopup: React.FC<Props> = ({ endInformation, backToLobby, aufDissle, los
                 <img src={"/crown.png"} className={classes.logo} alt="" />
                 <Typography align="center" variant={matches ? "h4" : "h5"}>
                     {true
-                        ? `Ein ${losingPlayer} hat auf Dissle verloren!`
+                        ? `${losingPlayer} hat auf Dissle verloren!`
                         : `${endInformation[0].username} hat gewonnen!`}
                 </Typography>
             </Box>

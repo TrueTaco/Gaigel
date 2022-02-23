@@ -20,9 +20,7 @@ import EndPopup from "./EndPopup";
 import Header from "./Header";
 import Actions from "./Actions";
 import OpeningInstructions from "./OpeningInstructions";
-
-// This is the old import for the icons
-import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
+import Instructions from "./Instructions";
 
 // MARK: Styles
 const useStyles = makeStyles((theme: Theme) =>
@@ -95,6 +93,8 @@ const Gaigel: React.FC<Props> = () => {
     // Boolean for deciding on whether to show the lobby page or the game
     const [gameStarted, setGameStarted] = useState<boolean>(false);
 
+    const [showInstructions, setShowInstructions] = useState<boolean>(true);
+
     const [ownUsername, setOwnUsername] = useState<string>("");
 
     const [score, setScore] = useState<number>(0);
@@ -156,6 +156,11 @@ const Gaigel: React.FC<Props> = () => {
     const [lostAufDissle, setLostAufDissle] = useState<boolean>(false);
 
     const [losingPlayer, setLosingPlayer] = useState<string>("");
+
+    const toggleShowInstructions = () => {
+        let newValue: boolean = !showInstructions;
+        setShowInstructions(newValue);
+    };
 
     const onClickOpening = () => {
         setClickedOpening(!clickedOpening);
@@ -443,7 +448,11 @@ const Gaigel: React.FC<Props> = () => {
                         />
                     )}
 
-                    <YourCards userCards={yourCards} playCard={playCard} />
+                    <YourCards
+                        userCards={yourCards}
+                        playCard={playCard}
+                        toggleShowInstructions={toggleShowInstructions}
+                    />
                 </>
             )}
             <Popup
@@ -458,9 +467,7 @@ const Gaigel: React.FC<Props> = () => {
                 detail={warningType.detail}
                 reset={resetWarning}
             />
-            <Fab style={{ zIndex: 60, position: "fixed", top: "90%", left: "95%" }}>
-                <QuestionMarkIcon />
-            </Fab>
+            {showInstructions && <Instructions />}
         </Box>
     );
 };
