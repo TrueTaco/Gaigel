@@ -21,7 +21,8 @@ import Header from "./Header";
 import Actions from "./Actions";
 import OpeningInstructions from "./OpeningInstructions";
 
-import QuestionMarkIcon from "@material-ui/icons/QuestionMark";
+// This is the old import for the icons
+import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 
 // MARK: Styles
 const useStyles = makeStyles((theme: Theme) =>
