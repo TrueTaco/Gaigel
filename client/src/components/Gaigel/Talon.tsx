@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme: Theme) =>
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            border: "none",
+            border: "1px solid #ddd",
             // boxShadow: "none",
         },
         counter: {
@@ -60,7 +60,7 @@ const Talon: React.FC<Props> = ({ cardsLeft, drawCard }) => {
                     }}
                 >
                     <img
-                        src={"/cardBacksite_noSpaceAround_n1.png"}
+                        src={"/cardBacksite_noSpaceAround_n1_n1.png"}
                         width={matches ? "50" : "40"}
                         height={matches ? "75" : "60"}
                         alt=""
