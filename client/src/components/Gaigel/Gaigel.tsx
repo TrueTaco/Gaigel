@@ -376,10 +376,11 @@ const Gaigel: React.FC<Props> = () => {
     return (
         <Box
             className={classes.root}
-            style={{
-                backgroundColor: loggedIn && gameStarted ? "#ffffff" : "none",
-                boxShadow: !loggedIn || !gameStarted ? "none" : "5px 5px 15px black",
-            }}
+            style={
+                loggedIn && gameStarted
+                    ? { backgroundColor: "#fff", boxShadow: "5px 5px 15px black" }
+                    : {}
+            }
         >
             {!loggedIn ? (
                 <LandingPage login={login} />
