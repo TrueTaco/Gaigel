@@ -1,18 +1,18 @@
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
+import { makeStyles, Theme, useTheme, createStyles } from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { Box, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
-            transition: "0.5s",
-            [theme.breakpoints.down("xs")]: {
-                marginLeft: 35,
-                marginRight: 35,
-            },
             [theme.breakpoints.up("sm")]: {
-                marginLeft: 150,
-                marginRight: 150,
+                marginLeft: 120,
+                marginRight: 120,
             },
+            [theme.breakpoints.up("md")]: {
+                gap: "30px",
+            },
+
             display: "flex",
             justifyContent: "center",
             alignContent: "center",
@@ -21,6 +21,9 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         logo: {
             width: "50px",
+            [theme.breakpoints.up("md")]: {
+                width: "60px",
+            },
         },
     })
 );
@@ -29,12 +32,18 @@ interface Props {}
 
 const Header: React.FC<Props> = () => {
     const classes = useStyles();
+    const theme = useTheme();
+    const matches = useMediaQuery(theme.breakpoints.up("md"));
 
     return (
         <>
             <Box className={classes.root}>
                 <img src={"/Header_symbols.png"} className={classes.logo} />
-                <Typography align="center" variant="h4">
+                <Typography
+                    align="center"
+                    variant={matches ? "h3" : "h4"}
+                    style={{ fontWeight: "lighter" }}
+                >
                     Gaigel
                 </Typography>
                 <img src={"/Header_symbols_mirror.png"} className={classes.logo} />

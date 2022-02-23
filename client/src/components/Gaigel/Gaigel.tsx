@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react";
 import socketIOClient from "socket.io-client";
 
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, Theme, useTheme, createStyles } from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 import LandingPage from "./LandingPage";
 import Talon from "./Talon";
@@ -21,26 +22,30 @@ import Actions from "./Actions";
 import OpeningInstructions from "./OpeningInstructions";
 
 // MARK: Styles
-const useStyles = makeStyles({
-    root: {
-        height: "100vh",
-        padding: 10,
-        paddingLeft: 20,
-        paddingRight: 20,
-        borderRadius: 20,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-around",
-        alignContent: "space-around",
-        alignItems: "center",
-    },
-    openingInstructions: {},
-    talonAndTrump: {
-        display: "flex",
-        justifyContent: "center",
-    },
-});
-
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        root: {
+            height: "100vh",
+            padding: 10,
+            paddingLeft: 20,
+            paddingRight: 20,
+            borderRadius: 20,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-around",
+            alignContent: "space-around",
+            alignItems: "center",
+        },
+        openingInstructions: {},
+        talonAndTrump: {
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-evenly",
+            alignContent: "center",
+            alignItems: "center",
+        },
+    })
+);
 interface Props {}
 
 interface CardProps {
@@ -78,6 +83,8 @@ interface EndPlayerInformation {
 const Gaigel: React.FC<Props> = () => {
     // MARK: States
     const classes = useStyles();
+    const theme = useTheme();
+    const matches = useMediaQuery(theme.breakpoints.up("md"));
 
     // Boolean for deciding on whether to show the landing page or the lobby
     const [loggedIn, setLoggedIn] = useState<boolean>(false);

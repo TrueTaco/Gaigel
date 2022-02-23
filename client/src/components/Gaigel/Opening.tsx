@@ -1,44 +1,50 @@
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, Theme, useTheme, createStyles } from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 import Button from "@material-ui/core/Button";
 import { Box, IconButton, Typography } from "@material-ui/core";
 import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
 
-const useStyles = makeStyles({
-    root: {
-        borderRadius: 20,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-evenly",
-        alignContent: "center",
-        alignItems: "center",
-        flex: "flex-grow",
-        gap: "5px",
-    },
-    header: {
-        textAlign: "center",
-        fontWeight: "lighter",
-    },
-    headerBox: {
-        display: "flex",
-        justifyContent: "flex-start",
-        flexDirection: "row",
-        gap: "30px",
-        alignItems: "center",
-    },
-    instructions: {
-        position: "fixed",
-    },
-    buttonContainer: {
-        display: "flex",
-        justifyContent: "center",
-        alignContent: "center",
-        alignItems: "center",
-        gap: "5px",
-    },
-    button: {
-        fontSize: 10,
-    },
-});
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        root: {
+            borderRadius: 20,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-evenly",
+            alignContent: "center",
+            alignItems: "center",
+            flex: "flex-grow",
+            gap: "5px",
+        },
+        header: {
+            textAlign: "center",
+            fontWeight: "lighter",
+        },
+        headerBox: {
+            display: "flex",
+            justifyContent: "center",
+            flexDirection: "row",
+            gap: "10px",
+            alignItems: "center",
+        },
+        instructions: {
+            position: "fixed",
+        },
+        buttonContainer: {
+            display: "flex",
+            justifyContent: "center",
+            alignContent: "center",
+            alignItems: "center",
+            gap: "5px",
+        },
+        button: {
+            fontSize: 10,
+            [theme.breakpoints.up("md")]: {
+                fontSize: 14,
+            },
+        },
+    })
+);
 
 interface Props {
     GeElfen: () => void;
@@ -58,6 +64,8 @@ const Opening: React.FC<Props> = ({
     hover,
 }) => {
     const classes = useStyles();
+    const theme = useTheme();
+    const matches = useMediaQuery(theme.breakpoints.up("md"));
 
     const handleAndereAlteHat = () => {
         AndereAlteHat();
@@ -79,7 +87,9 @@ const Opening: React.FC<Props> = ({
         <Box className={classes.root}>
             <Box className={classes.headerBox}>
                 <HelpOutlineIcon style={{ opacity: "0", width: "50px" }} color="action" />
-                <Typography className={classes.header}> Eröffnung</Typography>
+                <Typography variant={matches ? "h6" : "body1"} className={classes.header}>
+                    Eröffnung
+                </Typography>
                 <IconButton>
                     <HelpOutlineIcon onClick={handleClick} color="action" />
                 </IconButton>
@@ -89,7 +99,7 @@ const Opening: React.FC<Props> = ({
                 <Button
                     className={classes.button}
                     variant="contained"
-                    size="small"
+                    size={matches ? "medium" : "small"}
                     onClick={handleAndereAlteHat}
                 >
                     Andere Alte
@@ -97,7 +107,7 @@ const Opening: React.FC<Props> = ({
                 <Button
                     className={classes.button}
                     variant="contained"
-                    size="small"
+                    size={matches ? "medium" : "small"}
                     onClick={handleGeElfen}
                 >
                     Ge-Elfen
@@ -106,7 +116,7 @@ const Opening: React.FC<Props> = ({
                 <Button
                     className={classes.button}
                     variant="contained"
-                    size="small"
+                    size={matches ? "medium" : "small"}
                     onClick={handleHöherHat}
                 >
                     Höher hat
@@ -114,7 +124,7 @@ const Opening: React.FC<Props> = ({
                 <Button
                     className={classes.button}
                     variant="contained"
-                    size="small"
+                    size={matches ? "medium" : "small"}
                     onClick={handleAufDissle}
                 >
                     Auf Dissle

@@ -1,4 +1,5 @@
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, Theme, useTheme, createStyles } from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { Box, Typography, Card, Button, IconButton } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import { useEffect, useState } from "react";
@@ -6,61 +7,67 @@ import { useEffect, useState } from "react";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 
-const useStyles = makeStyles({
-    root: {
-        zIndex: 50,
-        position: "fixed",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        padding: 20,
-        display: "flex",
-        flexDirection: "column",
-        gap: "15px",
-        boxShadow: "5px 5px 15px black",
-    },
-    header: {
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignContent: "center",
-        alignItems: "center",
-        gap: "5px",
-    },
-    logo: {
-        width: "50px",
-    },
-    rankingHeaderContainer: {
-        display: "flex",
-        justifyContent: "space-between",
-        alignContent: "center",
-        alignItems: "center",
-    },
-    rankingHeader: {
-        textAlign: "center",
-        fontWeight: "lighter",
-    },
-    rankingContainer: {
-        display: "flex",
-        flexDirection: "column",
-        gap: "5px",
-    },
-    rankingElement: {
-        display: "flex",
-        justifyContent: "space-between",
-    },
-    rankingElementText: {
-        fontWeight: "lighter",
-    },
-    footer: {
-        marginTop: "10px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignContent: "center",
-        alignItems: "center",
-        gap: "30px",
-    },
-});
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        root: {
+            zIndex: 50,
+            maxWidth: "450px",
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            padding: 20,
+            display: "flex",
+            flexDirection: "column",
+            gap: "15px",
+            boxShadow: "5px 5px 15px black",
+        },
+        header: {
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignContent: "center",
+            alignItems: "center",
+            gap: "5px",
+        },
+        logo: {
+            width: "50px",
+            [theme.breakpoints.up("md")]: {
+                width: "70px",
+            },
+        },
+        rankingHeaderContainer: {
+            display: "flex",
+            justifyContent: "space-between",
+            alignContent: "center",
+            alignItems: "center",
+        },
+        rankingHeader: {
+            textAlign: "center",
+            fontWeight: "lighter",
+        },
+        rankingContainer: {
+            display: "flex",
+            flexDirection: "column",
+            gap: "5px",
+        },
+        rankingElement: {
+            display: "flex",
+            justifyContent: "space-between",
+        },
+        rankingElementText: {
+            fontWeight: "lighter",
+        },
+        footer: {
+            marginTop: "10px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignContent: "center",
+            alignItems: "center",
+            gap: "30px",
+        },
+    })
+);
 
 interface EndPlayerInformation {
     username: string;
@@ -77,6 +84,8 @@ interface Props {
 
 const EndPopup: React.FC<Props> = ({ endInformation, backToLobby, aufDissle, losingPlayer }) => {
     const classes = useStyles();
+    const theme = useTheme();
+    const matches = useMediaQuery(theme.breakpoints.up("md"));
 
     const [showRanking, setShowRanking] = useState<boolean>(false);
     const [counter, setCounter] = useState<number>(20);
@@ -125,10 +134,10 @@ const EndPopup: React.FC<Props> = ({ endInformation, backToLobby, aufDissle, los
         <Card className={classes.root}>
             <Box className={classes.header}>
                 <img src={"/crown.png"} className={classes.logo} />
-                <Typography align="center" variant="h4">
-                    {aufDissle
-                        ? "Ein " + losingPlayer + " hat auf Dissle verloren!"
-                        : endInformation[0].username + " hat gewonnen!"}
+                <Typography align="center" variant={matches ? "h4" : "h5"}>
+                    {true
+                        ? `Ein ${losingPlayer} hat auf Dissle verloren!`
+                        : `${endInformation[0].username} hat gewonnen!`}
                 </Typography>
             </Box>
 
@@ -138,7 +147,7 @@ const EndPopup: React.FC<Props> = ({ endInformation, backToLobby, aufDissle, los
                 <IconButton onClick={toggleShowRanking}>
                     <ArrowBackIosIcon />
                 </IconButton>
-                <Typography className={classes.rankingHeader} variant="h6">
+                <Typography className={classes.rankingHeader} variant={matches ? "h5" : "h6"}>
                     {showRanking ? "Ranking" : "Platzierungen"}
                 </Typography>
                 <IconButton onClick={toggleShowRanking}>
@@ -149,10 +158,16 @@ const EndPopup: React.FC<Props> = ({ endInformation, backToLobby, aufDissle, los
             <Box className={classes.rankingContainer}>
                 {finalSorting.map((player, index) => (
                     <Box className={classes.rankingElement}>
-                        <Typography className={classes.rankingElementText}>
+                        <Typography
+                            variant={matches ? "h6" : "body1"}
+                            className={classes.rankingElementText}
+                        >
                             {index + 1}. {player.username}
                         </Typography>
-                        <Typography className={classes.rankingElementText}>
+                        <Typography
+                            variant={matches ? "h6" : "body1"}
+                            className={classes.rankingElementText}
+                        >
                             {showRanking ? player.wins : Math.floor(player.score)}{" "}
                             {showRanking
                                 ? player.wins === 1
