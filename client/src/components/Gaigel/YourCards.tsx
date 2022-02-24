@@ -52,8 +52,6 @@ const YourCards: React.FC<Props> = ({ userCards, playCard, toggleShowInstruction
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.up("md"));
 
-    let i: number = 0;
-
     let filledUserCards: CardProps[] = userCards.slice();
 
     for (let q = filledUserCards.length; q < 5; q++) {
@@ -71,7 +69,6 @@ const YourCards: React.FC<Props> = ({ userCards, playCard, toggleShowInstruction
 
                 <Box className={classes.cardContainer}>
                     {filledUserCards.map((card) => {
-                        i++;
                         let currentClickable = card.type === "" ? false : true;
                         return (
                             <GaigelCard

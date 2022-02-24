@@ -18,6 +18,9 @@ const useStyles = makeStyles((theme: Theme) =>
             gap: "15px",
             boxShadow: "5px 5px 15px black",
         },
+        header: {
+            fontWeight: "lighter",
+        },
     })
 );
 
@@ -30,7 +33,7 @@ const Instructions: React.FC<Props> = () => {
 
     return (
         <Card className={classes.root}>
-            <Typography align="center" variant={matches ? "h4" : "h5"}>
+            <Typography align="center" variant={matches ? "h4" : "h5"} className={classes.header}>
                 Anleitung
             </Typography>
         </Card>
