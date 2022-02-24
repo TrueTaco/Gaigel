@@ -26,6 +26,7 @@ import Instructions from "./Instructions";
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
+            position: "relative",
             height: "100vh",
             padding: 10,
             paddingLeft: 20,
@@ -468,7 +469,7 @@ const Gaigel: React.FC<Props> = () => {
                 detail={warningType.detail}
                 reset={resetWarning}
             />
-            {showInstructions && <Instructions />}
+            {showInstructions && <Instructions toggleShowInstructions={toggleShowInstructions} />}
         </Box>
     );
 };

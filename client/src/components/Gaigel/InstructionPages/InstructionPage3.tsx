@@ -1,7 +1,7 @@
 import { makeStyles, createStyles, Theme, useTheme } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 
-import { Box, Typography, Card, Button, IconButton, MobileStepper } from "@material-ui/core";
+import { Box, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface Props {}
 
-const InstructionPage1: React.FC<Props> = () => {
+const InstructionPage3: React.FC<Props> = () => {
     const classes = useStyles();
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.up("md"));
@@ -35,7 +35,7 @@ const InstructionPage1: React.FC<Props> = () => {
     return (
         <Box className={classes.root}>
             <Typography variant={matches ? "h5" : "h6"} style={{ fontWeight: "lighter" }}>
-                Spielverlauf
+                Besondere Regeln
             </Typography>
 
             <Box className={classes.paragraph}>
@@ -43,16 +43,14 @@ const InstructionPage1: React.FC<Props> = () => {
                     variant={matches ? "h6" : "body1"}
                     style={{ fontWeight: "normal", width: "100%" }}
                 >
-                    Stiche
+                    Melden
                 </Typography>
                 <Typography align="justify" variant={matches ? "body1" : "body2"}>
-                    Zu Beginn einer regulären Runde spielt die Person, die den letzten Stich
-                    gewonnen hat, eine beliebige Karte offen aus. Daraufhin können die anderen
-                    Spieler nacheinander Karten hinzulegen. Sobald jeder Spieler eine Karte gelegt
-                    hat wird entschieden, wer den Stich gewonnen hat. Gewonnen hat der, der eine
-                    Karte mit der gleichen Farbe, wie die der ersten Karte, aber mit einem höheren
-                    Wert oder wer den höchsten Trumpf gelegt hat. Wurde keine höhere Karte und kein
-                    Trumpf gelegt, so gewinnt der Spieler, der die erste Karte gelegt hat.
+                    Besitzt ein Spieler sowohl den Ober als auch den König derselben Farbe, so kann
+                    er dieses Paar melden. Für ein normales Paar gibt es 20 und für ein Paar in
+                    Trumpffarbe 40 Punkte. Gemeldet werden kann nur, wenn der Spieler zuvor einen
+                    Stich gemacht hat und nun die nächste Runde beginnen kann. In dieser nächsten
+                    Runde muss eine der beiden gemeldeten Karten gespielt werden.
                 </Typography>
             </Box>
 
@@ -61,16 +59,17 @@ const InstructionPage1: React.FC<Props> = () => {
                     variant={matches ? "h6" : "body1"}
                     style={{ fontWeight: "normal", width: "100%" }}
                 >
-                    Bedienen
+                    Rauben
                 </Typography>
                 <Typography align="justify" variant={matches ? "body1" : "body2"}>
-                    Sobald der Talon leer ist, also keine Karten mehr zum Nachziehen vorhanden sind,
-                    besteht Bedienpflicht. Wenn man also eine Karte besitzt, die die gleiche Farbe
-                    wie die erste Karte des Stiches hat, so muss diese gelegt werden.
+                    Besitzt ein Spieler die Trumpf Sieben, so kann diese gegen die Karte getauscht
+                    werden, die zu Beginn des Spiels als Trumpfkarte gewählt wurde. Geraubt werden
+                    kann nur, wenn der Spieler zuvor einen Stich gemacht hat und nun die nächste
+                    Runde beginnen kann.
                 </Typography>
             </Box>
         </Box>
     );
 };
 
-export default InstructionPage1;
+export default InstructionPage3;

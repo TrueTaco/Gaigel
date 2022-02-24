@@ -9,7 +9,7 @@ import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
-            zIndex: 100,
+            // zIndex: 100,
             backgroundColor: "#fafafa",
             boxShadow: "4px 4px 15px #444",
         },

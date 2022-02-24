@@ -1,7 +1,7 @@
 import { makeStyles, Theme, useTheme, createStyles } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { Box, IconButton, Typography, Card, MobileStepper } from "@material-ui/core";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 
@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme: Theme) =>
             gap: "15px",
             boxShadow: "5px 5px 15px black",
         },
-        buttons: {
+        headerButton: {
             display: "flex",
             justifyContent: "space-between",
             alignContent: "center",
@@ -43,8 +43,6 @@ const OpeningInstructions: React.FC<Props> = () => {
     const matches = useMediaQuery(theme.breakpoints.up("md"));
 
     const [currentPage, setCurrentPage] = useState<number>(0);
-    const backButton = useRef(null);
-    const nextButton = useRef(null);
 
     let instructions: string[] = [
         "Bei dieser Eröffnungsmöglichkeit wird ein Ass verdeckt durch die Vorhand gespielt. Alle anderen Spieler spielen nun auch verdeckt jeweils eine Karte. Der Stich gehört dem Spieler, der das gleiche Ass wie die Vorhand gespielt hat. Ist dies nicht der Fall, gehört der Stich der Vorhand.",
@@ -55,7 +53,7 @@ const OpeningInstructions: React.FC<Props> = () => {
     let instructionTitles: string[] = ["Andere Alte hat", "Ge-Elfen", "Höher hat", "Auf Dissle"];
 
     const pageDown = () => {
-        let newPage = currentPage - 1 < 0 ? 0 : currentPage - 1;
+        let newPage = currentPage - 1 < 0 ? 3 : currentPage - 1;
         setCurrentPage(newPage);
     };
 
@@ -66,14 +64,14 @@ const OpeningInstructions: React.FC<Props> = () => {
 
     return (
         <Card className={classes.root}>
-            <Box className={classes.buttons}>
-                <IconButton ref={backButton} onClick={pageDown}>
+            <Box className={classes.headerButton}>
+                <IconButton onClick={pageDown}>
                     <ArrowBackIosIcon />
                 </IconButton>
                 <Typography variant={matches ? "h5" : "h6"} style={{ fontWeight: "lighter" }}>
                     {instructionTitles[currentPage]}
                 </Typography>
-                <IconButton ref={nextButton} onClick={pageUp}>
+                <IconButton onClick={pageUp}>
                     <ArrowForwardIosIcon />
                 </IconButton>
             </Box>
