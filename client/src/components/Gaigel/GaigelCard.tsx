@@ -79,7 +79,7 @@ const GaigelCard: React.FC<Props> = ({ type, value, clickable, playCard, hidden 
             >
                 {hidden && value !== "" ? (
                     <img
-                        src={"/cardBacksite_noSpaceAround_n1.png"}
+                        src={"/cardBacksite_noSpaceAround_n1_n1.png"}
                         width={matches ? "50" : "40"}
                         height={matches ? "75" : "60"}
                         alt=""

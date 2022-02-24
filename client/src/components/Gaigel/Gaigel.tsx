@@ -111,6 +111,10 @@ const Gaigel: React.FC<Props> = () => {
 
     const [opening, setOpening] = useState<boolean>(false);
 
+    const [canPlayAndereAlte, setCanPlayAndereAlte] = useState<boolean>(true);
+    const [canPlayGeElfen, setCanPlayGeElfen] = useState<boolean>(true);
+    const [canPlayHöherHat, setCanPlayHöherHat] = useState<boolean>(true);
+
     const [currentOpening, setCurrentOpening] = useState<string>("");
 
     // Latest response from server (For debugging purposes)
@@ -280,6 +284,24 @@ const Gaigel: React.FC<Props> = () => {
         setSocket(socket);
     }, []);
 
+    useEffect(() => {
+        if (!Opening) return;
+
+        let playerHasAce: boolean = yourCards.filter((card) => card.value === "A").length > 0;
+        console.log(playerHasAce);
+        console.log(yourCards);
+        console.log(yourCards.filter((card) => card.value === "A"));
+
+        setCanPlayAndereAlte(playerHasAce);
+        setCanPlayGeElfen(playerHasAce);
+
+        let hasNonTrumpNonAceCard =
+            yourCards.filter((card) => trumpCard.type !== card.type && card.value !== "A").length >
+            1;
+
+        setCanPlayHöherHat(hasNonTrumpNonAceCard);
+    }, [yourCards]);
+
     // @ts-ignore
     useEffect(() => {
         const newSocket = socketIOClient("http://127.0.0.1:5000");
@@ -438,8 +460,11 @@ const Gaigel: React.FC<Props> = () => {
                     {opening && (
                         <Opening
                             AndereAlteHat={AndereAlteHat}
+                            canPlayAndereAlte={canPlayAndereAlte}
                             GeElfen={GeElfen}
+                            canPlayGeElfen={canPlayGeElfen}
                             HöherHat={HöherHat}
+                            canPlayHöherHat={canPlayHöherHat}
                             AufDissle={AufDissle}
                             handleClick={onClickOpening}
                             hover={clickedOpening}
