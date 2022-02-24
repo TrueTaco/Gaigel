@@ -1,6 +1,6 @@
 import { makeStyles, Theme, useTheme, createStyles } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
-import { Grid, Box, Typography } from "@material-ui/core";
+import { Box, Typography } from "@material-ui/core";
 
 import GaigelCard from "./GaigelCard";
 import HelpButton from "./HelpButton";
@@ -68,7 +68,7 @@ const YourCards: React.FC<Props> = ({ userCards, playCard, toggleShowInstruction
                 <HelpButton toggleShowInstructions={toggleShowInstructions} invisible={true} />
 
                 <Box className={classes.cardContainer}>
-                    {filledUserCards.map((card) => {
+                    {filledUserCards.map((card, index) => {
                         let currentClickable = card.type === "" ? false : true;
                         return (
                             <GaigelCard
@@ -76,6 +76,7 @@ const YourCards: React.FC<Props> = ({ userCards, playCard, toggleShowInstruction
                                 value={card.value}
                                 clickable={currentClickable}
                                 playCard={playCard}
+                                key={index}
                             />
                         );
                     })}

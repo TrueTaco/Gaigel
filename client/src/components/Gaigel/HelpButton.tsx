@@ -1,7 +1,7 @@
 import { makeStyles, createStyles, Theme, useTheme } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 
-import { Fab, Typography } from "@material-ui/core";
+import { Fab } from "@material-ui/core";
 
 // This is the old import for the icons
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";

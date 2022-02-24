@@ -10,7 +10,7 @@ import Talon from "./Talon";
 import TrumpCard from "./TrumpCard";
 import PlayedCards from "./PlayedCards";
 import YourCards from "./YourCards";
-import { Box, Fab } from "@material-ui/core";
+import { Box } from "@material-ui/core";
 import Opening from "./Opening";
 import LobbyPage from "./LobbyPage";
 import PlayerList from "./PlayerList";
