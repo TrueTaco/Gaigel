@@ -3,6 +3,8 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 import { Box, Typography, Card, Button, IconButton } from "@material-ui/core";
 
+import InstructionPage1 from "./InstructionPages/InstructionPage1";
+
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
@@ -36,6 +38,7 @@ const Instructions: React.FC<Props> = () => {
             <Typography align="center" variant={matches ? "h4" : "h5"} className={classes.header}>
                 Anleitung
             </Typography>
+            <InstructionPage1 />
         </Card>
     );
 };
