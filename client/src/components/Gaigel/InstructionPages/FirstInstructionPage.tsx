@@ -44,7 +44,7 @@ interface CardInfoProps {
 
 interface Props {}
 
-const InstructionPage0: React.FC<Props> = () => {
+const FirstInstructionPage: React.FC<Props> = () => {
     const classes = useStyles();
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.up("md"));
@@ -118,4 +118,4 @@ const InstructionPage0: React.FC<Props> = () => {
     );
 };
 
-export default InstructionPage0;
+export default FirstInstructionPage;
