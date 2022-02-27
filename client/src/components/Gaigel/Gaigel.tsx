@@ -289,7 +289,7 @@ const Gaigel: React.FC<Props> = () => {
 
     // @ts-ignore
     useEffect(() => {
-        const newSocket = socketIOClient("http://127.0.0.1:5000");
+        const newSocket = socketIOClient("https://gaigel-web.herokuapp.com/");
         // @ts-ignore
         setSocket(newSocket);
 
