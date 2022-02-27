@@ -289,10 +289,9 @@ const Gaigel: React.FC<Props> = () => {
 
     // @ts-ignore
     useEffect(() => {
-        if ( ! '%NODE_ENV%' || '%NODE_ENV%' === 'development') {
+        const newSocket = socketIOClient("https://gaigel-web.herokuapp.com/");
+        if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
             const newSocket = socketIOClient("http://127.0.0.1:5000");
-        } else {
-            const newSocket = socketIOClient("https://gaigel-web.herokuapp.com/");
         }
         // @ts-ignore
         setSocket(newSocket);
